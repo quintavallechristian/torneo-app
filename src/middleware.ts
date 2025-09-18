@@ -10,7 +10,6 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = ['/tournaments/new', '/tournaments/*/edit'];
   const isProtectedRoute = protectedRoutes.some((route) => request.nextUrl.pathname.match(route));
 
-  console.log(data.user);
   // Se l'utente è loggato e cerca di accedere a una pagina di login o signup, lo reindirizziamo
   if (data.user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
     return NextResponse.redirect(new URL('/tournaments', request.url));

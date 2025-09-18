@@ -9,12 +9,15 @@ import {
 } from "@/components/ui/card"
 import { decode } from "html-entities";
 
+
 import { ChevronLeft, PencilIcon } from "lucide-react";
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { parseStringPromise } from 'xml2js';
 import  { isBefore, subDays } from "date-fns";
 import Image from "next/image";
+import TiltedCard from "@/components/TiltedCard";
+import SpotlightCard from "@/components/SpotlightCard";
 
 export default async function GameDetailsPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
@@ -22,7 +25,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
   if (!isNaN(Number(params.id))) {
     const result = await supabase
       .from('games')
-      .select('*')
+      .select('*, tournaments:tournaments(*)')
       .eq('id', params.id)
       .single();
     game = result.data;
@@ -55,7 +58,6 @@ export default async function GameDetailsPage({ params }: { params: { id: string
 
   // Se la descrizione non esiste, la recuperiamo dall'API esterna e la salviamo nel database
   if (!updateAt || isBefore(updateAt, subDays(Date.now(), 30))) {
-    console.log("again");
     try {
       // Nota: Per rendere il codice più robusto, dovresti anche gestire il caso
       // in cui game.bgg_id non esista.
@@ -110,7 +112,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
             </Button>
           </Link>
         </div>
-        <Card className="shadow-xl border-2 border-muted bg-gradient-to-br from-white to-blue-50 dark:from-gray-900 dark:to-gray-800">
+        <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
           <div className="flex flex-col md:flex-row gap-6 items-center p-6">
             <div className="flex-shrink-0">
               <Image
@@ -161,7 +163,44 @@ export default async function GameDetailsPage({ params }: { params: { id: string
               </CardContent>
             </div>
           </div>
-        </Card>
+        </SpotlightCard>
+        <section className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Tornei collegati</h2>
+          {game.tournaments && game.tournaments.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {game.tournaments.map((tournament: any) => (
+               <Link key={tournament.id} href={`/tournaments/${tournament.id}`} className="no-underline">
+                <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
+                      {tournament.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex gap-2 mb-2">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                        Inizio: {tournament.startAt ? new Date(tournament.startAt).toLocaleDateString() : 'N/A'}
+                      </span>
+                      <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                        Fine: {tournament.endAt ? new Date(tournament.endAt).toLocaleDateString() : 'N/A'}
+                      </span>
+                    </div>
+                    <div className="max-h-24 overflow-y-auto bg-indigo-100 rounded-lg p-2 border border-muted">
+                      {tournament.description ? (
+                        <p className="whitespace-pre-line text-sm text-gray-700">{tournament.description}</p>
+                      ) : (
+                        <p className="italic text-muted-foreground">Descrizione non disponibile.</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </SpotlightCard>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="italic text-muted-foreground">Nessun torneo collegato.</p>
+          )}
+        </section>
       </div>
   );
 }
