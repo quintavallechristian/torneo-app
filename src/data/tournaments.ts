@@ -1,24 +1,24 @@
-export const tournaments = [
+export const matches = [
     {
-  id: 1, // L'ID unico del torneo
-  name: 'aaa', // Nome del torneo
+  id: 1, // L'ID unico del partita
+  name: 'aaa', // Nome del partita
   game: 'aaa', // Nome del gioco da tavolo
   description: 'aaa', // Descrizione
   startDate: 'aaa', // Data di inizio
   endDate: 'aaa', // Data di fine
 }, 
 {
-  id: 2, // L'ID unico del torneo
-  name: 'bbb', // Nome del torneo
+  id: 2, // L'ID unico del partita
+  name: 'bbb', // Nome del partita
   game: 'bbb', // Nome del gioco da tavolo
   description: 'bbb', // Descrizione
   startDate: 'bbb', // Data di inizio
   endDate: 'bbb', // Data di fine
 },
-// Altri tornei...
+// Altri partite...
 {
   id: 3,
-  name: 'ccc', // Nome del torneo
+  name: 'ccc', // Nome del partita
   game: 'ccc', // Nome del gioco da tavolo
   description: 'ccc', // Descrizione
   startDate: 'ccc', // Data di inizio

@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server'
 
 
- export async function editTournament(tournamentId: string, formData: FormData) {
+ export async function editmatch(matchId: string, formData: FormData) {
     const name = formData.get('name') as string;
     const game = formData.get('game') as string;
     const description = formData.get('description') as string;
@@ -18,29 +18,29 @@ import { createClient } from '@/utils/supabase/server'
 
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from('tournaments')
+      .from('matches')
       .update([{ name, game, description, startAt, endAt }])
-      .eq('id', tournamentId);
+      .eq('id', matchId);
 
     if (error) {
-      console.error('Error updating tournament:', error);
+      console.error('Error updating match:', error);
     } else {
-      redirect(`/tournaments/${tournamentId}`)
+      redirect(`/matches/${matchId}`)
     }
   }
 
 
-export default async function TournamentEditPage({ params }: { params: { id: string } }) {
+export default async function matchEditPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
-  const { data: tournament, error } = await supabase
-    .from('tournaments')
+  const { data: match, error } = await supabase
+    .from('matches')
     .select('*')
     .eq('id', params.id)
     .single();
 
   if (error) {
-    console.error('Errore nel recupero del torneo:', error);
-    return <p>Errore nel recupero del torneo</p>;
+    console.error('Errore nel recupero del partita:', error);
+    return <p>Errore nel recupero del partita</p>;
   }
 
   return (
@@ -48,36 +48,36 @@ export default async function TournamentEditPage({ params }: { params: { id: str
       <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">
-            <Link href='/tournaments' className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
+            <Link href='/matches' className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
               <ChevronLeft className='inline mr-2 h-4 w-4' />
               Indietro
             </Link>
           </Button>
         </div>
-        <h1 className="text-3xl font-extrabold text-indigo-700 dark:text-indigo-400 mb-2 text-center">Modifica torneo</h1>
+        <h1 className="text-3xl font-extrabold text-indigo-700 dark:text-indigo-400 mb-2 text-center">Modifica partita</h1>
         <p className="text-gray-500 dark:text-gray-300 text-center mb-6">Aggiorna i dettagli della competizione.</p>
-        {tournament ? (
-          <form action={editTournament.bind(null, params.id)} className="space-y-4">
+        {match ? (
+          <form action={editmatch.bind(null, params.id)} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome torneo</label>
-              <Input type="text" id="name" name="name" required defaultValue={tournament.name} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome partita</label>
+              <Input type="text" id="name" name="name" required defaultValue={match.name} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
             </div>
             <div>
               <label htmlFor="game" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gioco</label>
-              <Input type="text" id="game" name="game" required defaultValue={tournament.game} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
+              <Input type="text" id="game" name="game" required defaultValue={match.game} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
             </div>
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrizione</label>
-              <Textarea id="description" name="description" defaultValue={tournament.description} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
+              <Textarea id="description" name="description" defaultValue={match.description} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
             </div>
             <div className="flex gap-4">
               <div className="w-1/2">
                 <label htmlFor="startAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data inizio</label>
-                <Input type="date" id="startAt" name="startAt" defaultValue={tournament.startAt} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
+                <Input type="date" id="startAt" name="startAt" defaultValue={match.startAt} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
               </div>
               <div className="w-1/2">
                 <label htmlFor="endAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data fine</label>
-                <Input type="date" id="endAt" name="endAt" defaultValue={tournament.endAt} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
+                <Input type="date" id="endAt" name="endAt" defaultValue={match.endAt} className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
               </div>
             </div>
             <div className="flex items-center justify-center mt-6">
@@ -85,7 +85,7 @@ export default async function TournamentEditPage({ params }: { params: { id: str
             </div>
           </form>
         ) : (
-          <p className="text-center text-red-500 dark:text-red-400">Torneo non trovato</p>
+          <p className="text-center text-red-500 dark:text-red-400">Partita non trovato</p>
         )}
       </div>
     </div>

@@ -25,7 +25,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
   if (!isNaN(Number(params.id))) {
     const result = await supabase
       .from('games')
-      .select('*, tournaments:tournaments(*)')
+      .select('*, matches:matches(*)')
       .eq('id', params.id)
       .single();
     game = result.data;
@@ -41,8 +41,8 @@ export default async function GameDetailsPage({ params }: { params: { id: string
   }
 
   if (error) {
-    console.error('Errore nel recupero del torneo:', error);
-    return <p>Errore nel recupero del torneo</p>;
+    console.error('Errore nel recupero del partita:', error);
+    return <p>Errore nel recupero del partita</p>;
   }
 
   const updateAt = game.updated_at;
@@ -54,14 +54,18 @@ export default async function GameDetailsPage({ params }: { params: { id: string
   let min_playtime = game.min_playtime;
   let max_playtime = game.max_playtime;
   let year_published = game.year_published;
+  let age = game.age;
   let designer = game.designer;
+  let bgg_rating = game.bgg_rating;
+  let bgg_weight = game.bgg_weight;
+  let bgg_rank = game.bgg_rank;
 
   // Se la descrizione non esiste, la recuperiamo dall'API esterna e la salviamo nel database
   if (!updateAt || isBefore(updateAt, subDays(Date.now(), 30))) {
     try {
       // Nota: Per rendere il codice più robusto, dovresti anche gestire il caso
       // in cui game.bgg_id non esista.
-      const response = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${game.id}`);
+      const response = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${game.id}&stats=1`);
       const xmlData = await response.text();
       
       const parsedData = await parseStringPromise(xmlData);
@@ -71,11 +75,21 @@ export default async function GameDetailsPage({ params }: { params: { id: string
       thumbnail = parsedData?.items?.item?.[0].thumbnail?.[0] || '';
       min_players = parsedData?.items?.item?.[0].minplayers?.[0].$.value || 0;
       max_players = parsedData?.items?.item?.[0].maxplayers?.[0].$.value || 0;
-      year_published = parsedData?.items?.item?.[0].yearpublished?.[0].$.value || null;
       min_playtime = parsedData?.items?.item?.[0].minplaytime?.[0].$.value || null;
       max_playtime = parsedData?.items?.item?.[0].maxplaytime?.[0].$.value || null;
       year_published = parsedData?.items?.item?.[0].yearpublished?.[0].$.value || null;
-      designer = parsedData?.items?.item?.[0].link?.find((link: any) => link?.$.type === 'boardgamedesigner')?.$.value || null;
+      age = parsedData?.items?.item?.[0].minage?.[0].$.value || null;
+      designer = parsedData?.items?.item?.[0].link?.filter((link: any) => link?.$.type === 'boardgamedesigner')?.map((link: any) => link?.$.value).join(", ") || null;
+
+      bgg_rating = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.average?.[0].$.value
+        ? Math.round(parseFloat(parsedData.items.item[0].statistics[0].ratings[0].average[0].$.value) * 100) / 100
+        : null;
+
+      bgg_weight = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.averageweight?.[0].$.value
+        ? Math.round(parseFloat(parsedData.items.item[0].statistics[0].ratings[0].averageweight[0].$.value) * 100) / 100
+        : null;
+
+      bgg_rank = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.ranks?.[0].rank.find((r: any) => r?.$.name === 'boardgame')?.$.value || null;
 
       gameDescription = decode(gameDescription.replace(/<br\s*\/?>/gi, "\n"));
 
@@ -84,12 +98,17 @@ export default async function GameDetailsPage({ params }: { params: { id: string
         .update({ 
           description: gameDescription,
           min_players,
+          max_players,
           image,
           thumbnail,
           year_published,
           designer,
           min_playtime,
           max_playtime,
+          age,
+          bgg_rating,
+          bgg_weight,
+          bgg_rank,
           //updated_at: new Date(),
           })
         .eq('id', game.id);
@@ -113,18 +132,18 @@ export default async function GameDetailsPage({ params }: { params: { id: string
           </Link>
         </div>
         <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
-          <div className="flex flex-col md:flex-row gap-6 items-center p-6">
+          <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="flex-shrink-0">
               <Image
                 src={image || game.image}
                 alt={game.name}
-                width={350}
-                height={350}
+                width={250}
+                height={250}
                 className="rounded-2xl shadow-lg object-cover border border-muted"
               />
             </div>
             <div className="flex-1 w-full">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-8">
                 <CardTitle className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
                   {game.name}
                 </CardTitle>
@@ -145,14 +164,32 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                 )}
                 {min_playtime === max_playtime ? (
                   <div className="flex gap-2 mb-2">
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata: {min_playtime} minuti</span>
+                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata: {min_playtime} min</span>
                   </div>
                 ) : (
                   <div className="flex gap-2 mb-2">
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata minima: {min_playtime} minuti</span>
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata massima: {max_playtime} minuti</span>
+                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata minima: {min_playtime} min</span>
+                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata massima: {max_playtime} min</span>
                   </div>
                 )}
+                {/* BGG Stats */}
+                <div className="flex gap-2 mb-2">
+                  {bgg_rating && (
+                    <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
+                      BGG Rating: {bgg_rating}
+                    </span>
+                  )}
+                  {bgg_rank && (
+                    <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                      BGG Rank: {bgg_rank}
+                    </span>
+                  )}
+                  {bgg_weight && (
+                    <span className="bg-fuchsia-100 text-fuchsia-800 px-2 py-1 rounded-full text-xs font-medium">
+                      BGG Weight: {bgg_weight}
+                    </span>
+                  )}
+                </div>
                 <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted">
                   {gameDescription ? (
                     <p className="whitespace-pre-line text-sm text-gray-700">{gameDescription}</p>
@@ -165,29 +202,29 @@ export default async function GameDetailsPage({ params }: { params: { id: string
           </div>
         </SpotlightCard>
         <section className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Tornei collegati</h2>
-          {game.tournaments && game.tournaments.length > 0 ? (
+          <h2 className="text-xl font-semibold mb-4">Partite collegati</h2>
+          {game.matches && game.matches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {game.tournaments.map((tournament: any) => (
-               <Link key={tournament.id} href={`/tournaments/${tournament.id}`} className="no-underline">
+              {game.matches.map((match: any) => (
+               <Link key={match.id} href={`/matches/${match.id}`} className="no-underline">
                 <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
-                      {tournament.name}
+                      {match.name}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex gap-2 mb-2">
                       <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Inizio: {tournament.startAt ? new Date(tournament.startAt).toLocaleDateString() : 'N/A'}
+                        Inizio: {match.startAt ? new Date(match.startAt).toLocaleDateString() : 'N/A'}
                       </span>
                       <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Fine: {tournament.endAt ? new Date(tournament.endAt).toLocaleDateString() : 'N/A'}
+                        Fine: {match.endAt ? new Date(match.endAt).toLocaleDateString() : 'N/A'}
                       </span>
                     </div>
                     <div className="max-h-24 overflow-y-auto bg-indigo-100 rounded-lg p-2 border border-muted">
-                      {tournament.description ? (
-                        <p className="whitespace-pre-line text-sm text-gray-700">{tournament.description}</p>
+                      {match.description ? (
+                        <p className="whitespace-pre-line text-sm text-gray-700">{match.description}</p>
                       ) : (
                         <p className="italic text-muted-foreground">Descrizione non disponibile.</p>
                       )}
@@ -198,7 +235,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
               ))}
             </div>
           ) : (
-            <p className="italic text-muted-foreground">Nessun torneo collegato.</p>
+            <p className="italic text-muted-foreground">Nessun partita collegato.</p>
           )}
         </section>
       </div>

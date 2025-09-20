@@ -1,50 +1,10 @@
 'use server'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createClient } from '@/utils/supabase/server'
-
 
 import { ChevronLeft } from "lucide-react";
 import Link from 'next/link';
-
- export async function signup(formData: FormData) {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirm_password") as string;
-
-    if (password !== confirmPassword
-    ) {
-      console.error('Passwords do not match');
-      return;
-    }
-
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      console.error('Error signing up:', error);
-    } else {
-      //update profiles table
-      const firstname = formData.get("firstname") as string;
-      const lastname = formData.get("lastname") as string;
-      const birthday = formData.get("birthday") as string;
-      const country = formData.get("country") as string;
-
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .insert([{ user_id: data.user?.id, firstname, lastname, birthday, country }]);
-
-      if (profileError) {
-        console.error('Error creating profile:', profileError);
-      } else {
-        console.log('Profile created successfully:', profileData);
-      }
-
-    }
-  }
+import { signup } from "./actions";
 
 
 export default async function SignupPage() {
@@ -53,14 +13,14 @@ export default async function SignupPage() {
       <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">
-            <Link href='/tournaments' className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
+            <Link href='/matches' className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
               <ChevronLeft className='inline mr-2 h-4 w-4' />
               Indietro
             </Link>
           </Button>
         </div>
         <h1 className="text-3xl font-extrabold text-indigo-700 dark:text-indigo-400 mb-2 text-center">Crea il tuo account</h1>
-        <p className="text-gray-500 dark:text-gray-300 text-center mb-6">Benvenuto! Registrati per partecipare ai tornei e gestire il tuo profilo.</p>
+        <p className="text-gray-500 dark:text-gray-300 text-center mb-6">Benvenuto! Registrati per partecipare ai partite e gestire il tuo profilo.</p>
         <form action={signup} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>

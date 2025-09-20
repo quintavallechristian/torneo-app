@@ -7,26 +7,26 @@ import { Trash } from "lucide-react";
 import { supabase } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 
-export async function deleteTournament(tournamentId: string) {
+export async function deleteMatch(matchId: string) {
   const { data, error } = await supabase
-    .from('tournaments')
+    .from('matches')
     .delete()
-    .eq('id', tournamentId);
+    .eq('id', matchId);
 
   if (error) {
-    console.error('Error deleting tournament:', error);
+    console.error('Error deleting match:', error);
   } else {
-    console.log('Tournament deleted successfully:', data);
-    redirect('/tournaments')
+    console.log('match deleted successfully:', data);
+    redirect('/matches')
   }
 }
 
-export default function DeleteTournamentButton({ id }: { id: string }) {
+export default function DeleteMatchButton({ id }: { id: string }) {
     const [open, setOpen] = useState(false);
 
     const handleDelete = async () => {
         setOpen(false);
-        await deleteTournament(id);
+        await deleteMatch(id);
     };
 
     return (
@@ -41,7 +41,7 @@ export default function DeleteTournamentButton({ id }: { id: string }) {
                 <AlertDialogHeader>
                     <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Questa azione non può essere annullata. Verrà eliminato il torneo in modo permanente.
+                        Questa azione non può essere annullata. Verrà eliminato il partita in modo permanente.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

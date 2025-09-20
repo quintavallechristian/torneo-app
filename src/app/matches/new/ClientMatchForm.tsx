@@ -4,17 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GameSearchBar } from "@/components/GameSearchBar";
-import { createTournament } from "./actions";
+import { creatematch } from "./actions";
 import { DatePicker } from "@/components/DatePicker";
 
 
-export default function ClientTournamentForm() {
+export default function ClientMatchForm() {
   const [selectedGame, setSelectedGame] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   return (
-    <form action={createTournament} className="space-y-4">
+    <form action={creatematch} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome torneo</label>
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome partita</label>
         <Input type="text" id="name" name="name" required className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />
       </div>
       <div>
@@ -46,7 +46,7 @@ export default function ClientTournamentForm() {
         </div>
       </div>
       <div className="flex items-center justify-center mt-6">
-        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white font-semibold py-2 rounded-lg transition-all shadow-md">Crea torneo</Button>
+        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white font-semibold py-2 rounded-lg transition-all shadow-md">Crea partita</Button>
       </div>
     </form>
   );

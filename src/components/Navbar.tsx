@@ -1,6 +1,4 @@
 import { redirect } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
 import { ModeToggle } from './ModeToggle';
 import { createClient } from '@/utils/supabase/server'
 import {
@@ -9,15 +7,11 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Link from 'next/link';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 async function handleLogout() {
   'use server'
@@ -27,19 +21,7 @@ async function handleLogout() {
   }
 
 export default async function Navbar() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser()
-
-  let profile = null;
-  if(data.user) {
-    const { data: fetchedProfile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', data.user.id)
-      .single();
-    profile = fetchedProfile;
-  }
-  
+  const { user, profile, role } = await getAuthenticatedUserWithProfile();  
 
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
@@ -47,7 +29,7 @@ export default async function Navbar() {
         <Link href="/">Logo</Link>
       </div>
       <div>
-        <Link href="/tournaments" className="mr-4 hover:underline">Tornei</Link>
+        <Link href="/matches" className="mr-4 hover:underline">Partite</Link>
         <Link href="/games" className="mr-4 hover:underline">Giochi</Link>
       </div>
       <div className="flex items-center gap-4">

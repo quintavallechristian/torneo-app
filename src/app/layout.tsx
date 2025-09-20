@@ -6,8 +6,8 @@ import Navbar from "@/components/Navbar";
 
 
 export const metadata: Metadata = {
-  title: "Torneo app",
-  description: "Descrizione di torneo app",
+  title: "PartitApp",
+  description: "Descrizione di PartitApp",
 };
 
 export default function RootLayout({

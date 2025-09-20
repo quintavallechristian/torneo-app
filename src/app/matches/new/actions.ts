@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 
 import { redirect } from 'next/navigation';
 
- export async function createTournament(formData: FormData) {
+ export async function creatematch(formData: FormData) {
   const name = formData.get('name') as string;
     const game_id = formData.get('game') as string;
     const description = formData.get('description') as string;
@@ -13,13 +13,13 @@ import { redirect } from 'next/navigation';
     const supabase = await createClient();
 
     const { data, error } = await supabase
-      .from('tournaments')
+      .from('matches')
       .insert([{ name, game_id, description, startAt, endAt }]);
 
     if (error) {
-      console.error('Error creating tournament:', error);
+      console.error('Error creating match:', error);
     } else {
-      console.log('Tournament created successfully:', data);
-      redirect('/tournaments')
+      console.log('match created successfully:', data);
+      redirect('/matches')
     }
   }

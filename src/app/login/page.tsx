@@ -10,7 +10,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">
-            <Link href='/tournaments' className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
+            <Link href='/matches' className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
               <ChevronLeft className='inline mr-2 h-4 w-4' />
               Indietro
             </Link>
@@ -18,7 +18,7 @@ export default function LoginPage() {
         </div>
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-extrabold text-blue-700 dark:text-blue-400 mb-2">Accedi al tuo account</h1>
-          <p className="text-gray-500 dark:text-gray-300">Entra per gestire i tuoi tornei e partecipare alle competizioni!</p>
+          <p className="text-gray-500 dark:text-gray-300">Entra per gestire i tuoi partite e partecipare alle competizioni!</p>
         </div>
         <form action={login} className="space-y-6">
           <div>
