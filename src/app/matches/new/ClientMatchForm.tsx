@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GameSearchBar } from "@/components/GameSearchBar";
-import { creatematch } from "./actions";
+import { createMatch } from "./actions";
 import { DatePicker } from "@/components/DatePicker";
 
 
@@ -12,7 +12,7 @@ export default function ClientMatchForm() {
   const [selectedGame, setSelectedGame] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   return (
-    <form action={creatematch} className="space-y-4">
+    <form action={createMatch} className="space-y-4">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome partita</label>
         <Input type="text" id="name" name="name" required className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" />

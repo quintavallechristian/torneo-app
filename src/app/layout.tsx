@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/Navbar/Navbar";
+import { Toaster } from "sonner";
 
 
 
@@ -26,7 +27,9 @@ export default function RootLayout({
           >
             <Navbar />
             {children}
+            <Toaster />
         </ThemeProvider>
+        
       </body>
     </html>
   );
