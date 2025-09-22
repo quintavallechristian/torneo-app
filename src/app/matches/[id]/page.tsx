@@ -110,7 +110,7 @@ export default async function matchDetailsPage({ params }: { params: { id: strin
               ({match.players.length}/{match.max_players})
             </span>
             {role === ROLE.Admin && (
-              <Button variant="outline" size="sm" className="ml-4">
+              <Button variant="outline" size="sm" className="ml-4" data-testid="Add player">
                 <PlusIcon className="inline h-6 w-6" />
               </Button>
             )}
