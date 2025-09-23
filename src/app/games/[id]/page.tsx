@@ -19,14 +19,19 @@ import Image from "next/image";
 import SpotlightCard from "@/components/SpotlightCard";
 import { Game } from "@/types";
 
-export default async function GameDetailsPage({ params }: { params: { id: string } }) {
+interface GameDetaisPageProps {
+  params: Promise<{ id: string }>
+}
+
+export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
+  const { id } = await params;
   const supabase = await createClient();
   let game, error;
-  if (!isNaN(Number(params.id))) {
+  if (!isNaN(Number(id))) {
     const result = await supabase
       .from('games')
       .select('*, matches:matches(*)')
-      .eq('id', params.id)
+      .eq('id', id)
       .single<Game>();
     game = result.data;
     error = result.error;
@@ -34,7 +39,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
     const result = await supabase
       .from('games')
       .select('*')
-      .eq('name', params.id)
+      .eq('name', id)
       .single<Game>();
     game = result.data;
     error = result.error;

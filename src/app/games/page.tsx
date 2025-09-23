@@ -5,6 +5,7 @@ import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
 
 export default async function GamesPage() {
+
   const supabase = await createClient()
   const { data } = await supabase.from('games').select('*').order('bgg_rank').limit(10);
   return (

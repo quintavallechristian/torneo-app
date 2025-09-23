@@ -4,12 +4,17 @@ import SpotlightCard from '@/components/SpotlightCard';
 import ClientMatchForm from '../../ClientMatchForm';
 import { createClient } from '@/utils/supabase/server';
 
-  export default async function MatchEditPage({ params }: { params: { id: string } }) {
+interface MatchEditPageProps {
+  params: Promise<{ id: string }>
+}
+
+export default async function MatchEditPage({ params }: MatchEditPageProps) {
+  const { id } = await params;
   const supabase = await createClient();
   const { data: match, error } = await supabase
     .from('matches')
     .select('*, game:games(id, name, min_players, max_players)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (error) {

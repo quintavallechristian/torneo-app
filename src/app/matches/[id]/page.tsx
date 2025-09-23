@@ -17,8 +17,11 @@ import { Match, Player, ROLE } from "@/types";
 import { getAuthenticatedUserWithProfile } from "@/utils/auth-helpers";
 import { AddPlayerModal } from "@/components/AddPlayerModal/AddPlayerModal";
 
-
-export default async function matchDetailsPage({ params }: { params: { id: string } }) {
+interface MatchDetailPageProps {
+  params: Promise<{ id: string }>
+}
+export default async function matchDetailsPage({ params }: MatchDetailPageProps) {
+  const { id } = await params;
   const { role } = await getAuthenticatedUserWithProfile();
   const supabase = await createClient();
   const { data: match, error } = await supabase
@@ -30,7 +33,7 @@ export default async function matchDetailsPage({ params }: { params: { id: strin
         profile:profiles(*)
       )
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .single<Match>();
 
   if (error) {
