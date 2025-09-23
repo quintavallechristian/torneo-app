@@ -1,5 +1,4 @@
-
-import { login } from "@/app/login/actions";
+import { login } from '@/app/login/actions';
 import { redirect } from 'next/navigation';
 
 jest.mock('next/navigation', () => ({
@@ -22,7 +21,6 @@ const mockCookies = jest.fn();
 jest.mock('next/headers', () => ({
   cookies: mockCookies,
 }));
-
 
 describe('login server action', () => {
   beforeEach(() => {
@@ -50,8 +48,8 @@ describe('login server action', () => {
       password: 'password123',
     });
 
-  // 5. Verifica che il reindirizzamento sia stato chiamato
-  expect(redirect).toHaveBeenCalledWith('/');
+    // 5. Verifica che il reindirizzamento sia stato chiamato
+    expect(redirect).toHaveBeenCalledWith('/');
   });
 
   it('should call signInWithPassword and throw error if failed', async () => {
@@ -82,7 +80,9 @@ describe('login server action', () => {
   it('should throw if email is missing', async () => {
     const formData = new FormData();
     formData.append('password', 'password123');
-    await expect(login(formData)).rejects.toThrow('Email and password are required');
+    await expect(login(formData)).rejects.toThrow(
+      'Email and password are required',
+    );
     expect(mockSignInWithPassword).not.toHaveBeenCalled();
   });
 

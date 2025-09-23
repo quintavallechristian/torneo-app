@@ -1,20 +1,28 @@
-import { create } from "domain";
-import z from "zod";
+import { create } from 'domain';
+import z from 'zod';
 
 export enum ROLE {
   Admin = 'Admin',
   User = 'User',
 }
 
-export const createMatchSchema = (minPlayers: number, maxPlayers: number) => z.object({
-  name: z.string().min(3, "Nome partita troppo corto").max(100, "Nome partita troppo lungo"),
-  game_id: z.string().min(1, "Devi selezionare un gioco"),
-  description: z.string().max(500, "Descrizione troppo lunga").optional(),
-  startAt: z.string().min(1, "Devi selezionare una data di inizio"),
-  endAt: z.string().min(1, "Devi selezionare una data di fine"),
-  min_players: z.number().min(minPlayers, `Numero minimo di giocatori è ${minPlayers}`),
-  max_players: z.number().max(maxPlayers, `Numero massimo di giocatori è ${maxPlayers}`),
-});
+export const createMatchSchema = (minPlayers: number, maxPlayers: number) =>
+  z.object({
+    name: z
+      .string()
+      .min(3, 'Nome partita troppo corto')
+      .max(100, 'Nome partita troppo lungo'),
+    game_id: z.string().min(1, 'Devi selezionare un gioco'),
+    description: z.string().max(500, 'Descrizione troppo lunga').optional(),
+    startAt: z.string().min(1, 'Devi selezionare una data di inizio'),
+    endAt: z.string().min(1, 'Devi selezionare una data di fine'),
+    min_players: z
+      .number()
+      .min(minPlayers, `Numero minimo di giocatori è ${minPlayers}`),
+    max_players: z
+      .number()
+      .max(maxPlayers, `Numero massimo di giocatori è ${maxPlayers}`),
+  });
 
 export const ProfileSchema = z.object({
   id: z.string().optional(),
@@ -24,13 +32,13 @@ export const ProfileSchema = z.object({
   firstname: z.string().min(1).max(50).nullable(),
   lastname: z.string().min(1).max(50).nullable(),
 });
- 
+
 // extract the inferred type
 export type Profile = z.infer<typeof ProfileSchema>;
 export type Player = {
   id: string;
-  profile : Profile | null;
-}
+  profile: Profile | null;
+};
 export type Game = {
   id: string;
   name: string;
@@ -49,7 +57,7 @@ export type Game = {
   updated_at: string | null;
   thumbnail: string | null;
   matches?: Match[];
-}
+};
 export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;
   game?: Game;

@@ -1,13 +1,17 @@
-'use server'
-import { createClient } from '@/utils/supabase/server'
+'use server';
+import { createClient } from '@/utils/supabase/server';
 
-import { Match, createMatchSchema } from "@/types";
+import { Match, createMatchSchema } from '@/types';
 import { redirect } from 'next/navigation';
 
-import * as z from "zod"; 
+import * as z from 'zod';
 
- // eslint-disable-next-line @typescript-eslint/no-explicit-any
- export async function createMatch(formData: FormData, minAllowedPlayers: number, maxAllowedPlayers: number) : Promise<{ form: Match; errors: any }> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createMatch(
+  formData: FormData,
+  minAllowedPlayers: number,
+  maxAllowedPlayers: number,
+): Promise<{ form: Match; errors: any }> {
   const name = formData.get('name') as string;
   const game_id = formData.get('game') as string;
   const description = formData.get('description') as string;
@@ -23,16 +27,18 @@ import * as z from "zod";
     startAt,
     endAt,
     min_players,
-    max_players
-  }
+    max_players,
+  };
 
-  const validationResult = createMatchSchema(minAllowedPlayersmaxAllowedPlayers).safeParse(form);
+  const validationResult = createMatchSchema(
+    minAllowedPlayersmaxAllowedPlayers,
+  ).safeParse(form);
 
   if (!validationResult.success) {
     return {
       form,
-      errors: z.flattenError(validationResult.error).fieldErrors
-    }
+      errors: z.flattenError(validationResult.error).fieldErrors,
+    };
   }
 
   const supabase = await createClient();
@@ -46,38 +52,46 @@ import * as z from "zod";
     return { form, errors: null };
   } else {
     console.log('match created successfully:', data);
-    redirect('/matches')
+    redirect('/matches');
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
- export async function editMatch(formData: FormData, matchId: string, minAllowedPlayers: number, maxAllowedPlayers: number) : Promise<{ form: Match; errors: any }> {
-    const name = formData.get('name') as string;
-    const game_id = formData.get('game') as string;
-    const description = formData.get('description') as string;
-    const startAt = formData.get('startAt') as string;
-    const endAt = formData.get('endAt') as string;
-    const min_players = Number(formData.get('min_players') ?? 0);
-    const max_players = Number(formData.get('max_players') ?? 0);
-    console.log(formData);
+export async function editMatch(
+  formData: FormData,
+  matchId: string,
+  minAllowedPlayers: number,
+  maxAllowedPlayers: number,
+): Promise<{ form: Match; errors: any }> {
+  const name = formData.get('name') as string;
+  const game_id = formData.get('game') as string;
+  const description = formData.get('description') as string;
+  const startAt = formData.get('startAt') as string;
+  const endAt = formData.get('endAt') as string;
+  const min_players = Number(formData.get('min_players') ?? 0);
+  const max_players = Number(formData.get('max_players') ?? 0);
+  console.log(formData);
 
-    const form: Match = {
+  const form: Match = {
     name,
     game_id,
     description,
     startAt,
     endAt,
     min_players,
-    max_players
-  }
+    max_players,
+  };
 
-  const validationResult = createMatchSchema(minAllowedPlayers, maxAllowedPlayers).safeParse(form);
+  const validationResult = createMatchSchema(
+    minAllowedPlayers,
+    maxAllowedPlayers,
+  ).safeParse(form);
 
   if (!validationResult.success) {
     return {
       form,
-      errors: z.flattenError(validationResult.error).fieldErrors
-    }
+      errors: z.flattenError(validationResult.error).fieldErrors,
+    };
   }
 
   const supabase = await createClient();
@@ -90,6 +104,6 @@ import * as z from "zod";
     console.error('Error updating match:', error);
     return { form, errors: null };
   } else {
-    redirect(`/matches/${matchId}`)
+    redirect(`/matches/${matchId}`);
   }
 }

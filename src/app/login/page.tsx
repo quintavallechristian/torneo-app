@@ -10,28 +10,72 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">
-            <Link href='/matches' className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors">
-              <ChevronLeft className='inline mr-2 h-4 w-4' />
+            <Link
+              href="/matches"
+              className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
+            >
+              <ChevronLeft className="inline mr-2 h-4 w-4" />
               Indietro
             </Link>
           </Button>
         </div>
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-extrabold text-blue-700 dark:text-blue-400 mb-2">Accedi al tuo account</h1>
-          <p className="text-gray-500 dark:text-gray-300">Entra per gestire i tuoi partite e partecipare alle competizioni!</p>
+          <h1 className="text-3xl font-extrabold text-blue-700 dark:text-blue-400 mb-2">
+            Accedi al tuo account
+          </h1>
+          <p className="text-gray-500 dark:text-gray-300">
+            Entra per gestire i tuoi partite e partecipare alle competizioni!
+          </p>
         </div>
         <form action={login} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-            <Input type="email" id="email" name="email" required className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" placeholder="Inserisci la tua email" />
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Email
+            </label>
+            <Input
+              type="email"
+              id="email"
+              name="email"
+              required
+              className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              placeholder="Inserisci la tua email"
+            />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-            <Input type="password" id="password" name="password" required className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700" placeholder="••••••••" />
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Password
+            </label>
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              required
+              className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              placeholder="••••••••"
+            />
           </div>
           <div className="flex flex-col gap-2 mt-4">
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-semibold">Login</Button>
-            <span className="text-xs text-gray-400 dark:text-gray-500 text-center">Non hai un account? <Link href="/signup" className="text-blue-600 dark:text-blue-400 hover:underline">Registrati</Link></span>
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-semibold"
+            >
+              Login
+            </Button>
+            <span className="text-xs text-gray-400 dark:text-gray-500 text-center">
+              Non hai un account?{' '}
+              <Link
+                href="/signup"
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Registrati
+              </Link>
+            </span>
           </div>
         </form>
       </div>

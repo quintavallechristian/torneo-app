@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/utils/supabase/server';
 
 export async function getAuthenticatedUserWithProfile() {
   const supabase = await createClient();
@@ -25,5 +25,9 @@ export async function getAuthenticatedUserWithProfile() {
     console.error('Errore nel recupero del profilo:', profileError);
   }
 
-  return { user: userData.user, profile: profileData, role: roleData?.role.name };
+  return {
+    user: userData.user,
+    profile: profileData,
+    role: roleData?.role.name,
+  };
 }

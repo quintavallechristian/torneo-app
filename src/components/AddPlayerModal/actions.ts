@@ -1,8 +1,14 @@
 // actions.ts
-'use server'
-import { createClient } from '@/utils/supabase/server'
+'use server';
+import { createClient } from '@/utils/supabase/server';
 
-export async function addPlayer({ profile_id, match_id }: { profile_id: string; match_id: string }) {
+export async function addPlayer({
+  profile_id,
+  match_id,
+}: {
+  profile_id: string;
+  match_id: string;
+}) {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase

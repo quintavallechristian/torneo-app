@@ -1,26 +1,25 @@
-'use server'
-import { Button } from "@/components/ui/button";
+'use server';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { decode } from "html-entities";
+} from '@/components/ui/card';
+import { decode } from 'html-entities';
 
-
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { parseStringPromise } from 'xml2js';
-import  { isBefore, subDays } from "date-fns";
-import Image from "next/image";
-import SpotlightCard from "@/components/SpotlightCard";
-import { Game } from "@/types";
+import { isBefore, subDays } from 'date-fns';
+import Image from 'next/image';
+import SpotlightCard from '@/components/SpotlightCard';
+import { Game } from '@/types';
 
 interface GameDetaisPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
@@ -70,9 +69,11 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
     try {
       // Nota: Per rendere il codice più robusto, dovresti anche gestire il caso
       // in cui game.bgg_id non esista.
-      const response = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${game.id}&stats=1`);
+      const response = await fetch(
+        `https://boardgamegeek.com/xmlapi2/thing?id=${game.id}&stats=1`,
+      );
       const xmlData = await response.text();
-      
+
       const parsedData = await parseStringPromise(xmlData);
 
       gameDescription = parsedData?.items?.item?.[0].description?.[0] || '';
@@ -80,29 +81,51 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
       thumbnail = parsedData?.items?.item?.[0].thumbnail?.[0] || '';
       min_players = parsedData?.items?.item?.[0].minplayers?.[0].$.value || 0;
       max_players = parsedData?.items?.item?.[0].maxplayers?.[0].$.value || 0;
-      min_playtime = parsedData?.items?.item?.[0].minplaytime?.[0].$.value || null;
-      max_playtime = parsedData?.items?.item?.[0].maxplaytime?.[0].$.value || null;
-      year_published = parsedData?.items?.item?.[0].yearpublished?.[0].$.value || null;
+      min_playtime =
+        parsedData?.items?.item?.[0].minplaytime?.[0].$.value || null;
+      max_playtime =
+        parsedData?.items?.item?.[0].maxplaytime?.[0].$.value || null;
+      year_published =
+        parsedData?.items?.item?.[0].yearpublished?.[0].$.value || null;
       age = parsedData?.items?.item?.[0].minage?.[0].$.value || null;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      designer = parsedData?.items?.item?.[0].link?.filter((link: any) => link?.$.type === 'boardgamedesigner')?.map((link: any) => link?.$.value).join(", ") || null;
+      designer =
+        parsedData?.items?.item?.[0].link
+          ?.filter((link: any) => link?.$.type === 'boardgamedesigner')
+          ?.map((link: any) => link?.$.value)
+          .join(', ') || null;
 
-      bgg_rating = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.average?.[0].$.value
-        ? Math.round(parseFloat(parsedData.items.item[0].statistics[0].ratings[0].average[0].$.value) * 100) / 100
+      bgg_rating = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]
+        ?.average?.[0].$.value
+        ? Math.round(
+            parseFloat(
+              parsedData.items.item[0].statistics[0].ratings[0].average[0].$
+                .value,
+            ) * 100,
+          ) / 100
         : null;
 
-      bgg_weight = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.averageweight?.[0].$.value
-        ? Math.round(parseFloat(parsedData.items.item[0].statistics[0].ratings[0].averageweight[0].$.value) * 100) / 100
+      bgg_weight = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]
+        ?.averageweight?.[0].$.value
+        ? Math.round(
+            parseFloat(
+              parsedData.items.item[0].statistics[0].ratings[0].averageweight[0]
+                .$.value,
+            ) * 100,
+          ) / 100
         : null;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      bgg_rank = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.ranks?.[0].rank.find((r: any) => r?.$.name === 'boardgame')?.$.value || null;
+      bgg_rank =
+        parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.ranks?.[0].rank.find(
+          (r: any) => r?.$.name === 'boardgame',
+        )?.$.value || null;
 
-      gameDescription = decode(gameDescription.replace(/<br\s*\/?>/gi, "\n"));
+      gameDescription = decode(gameDescription.replace(/<br\s*\/?>/gi, '\n'));
 
       const { error: updateError } = await supabase
         .from('games')
-        .update({ 
+        .update({
           description: gameDescription,
           min_players,
           max_players,
@@ -117,136 +140,187 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
           bgg_weight,
           bgg_rank,
           //updated_at: new Date(),
-          })
+        })
         .eq('id', game.id);
 
       if (updateError) {
-        console.error('Errore nell\'aggiornamento della descrizione:', updateError);
+        console.error(
+          "Errore nell'aggiornamento della descrizione:",
+          updateError,
+        );
       }
     } catch (apiError) {
-      console.error('Errore nel recupero della descrizione dall\'API:', apiError);
+      console.error(
+        "Errore nel recupero della descrizione dall'API:",
+        apiError,
+      );
     }
   }
 
   return (
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <div className="mb-6 flex items-center gap-2">
-          <Link href="/games">
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
-              <ChevronLeft className="h-4 w-4" />
-              Indietro
-            </Button>
-          </Link>
-        </div>
-        <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
-          <div className="flex flex-col md:flex-row gap-6 items-center">
-            <div className="flex-shrink-0">
-              {image && <Image
+    <div className="max-w-4xl mx-auto py-8 px-4">
+      <div className="mb-6 flex items-center gap-2">
+        <Link href="/games">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Indietro
+          </Button>
+        </Link>
+      </div>
+      <SpotlightCard
+        className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
+        spotlightColor="rgba(0, 229, 255, 0.2)"
+      >
+        <div className="flex flex-col md:flex-row gap-6 items-center">
+          <div className="flex-shrink-0">
+            {image && (
+              <Image
                 src={image}
                 alt={game.name}
                 width={250}
                 height={250}
                 className="rounded-2xl shadow-lg object-cover border border-muted"
-              />}
-            </div>
-            <div className="flex-1 w-full">
-              <CardHeader className="pb-8">
-                <CardTitle className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
-                  {game.name}
-                </CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  {year_published ? `Anno: ${year_published}` : null} | {designer}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {min_players === max_players ? (
-                  <div className="flex gap-2 mb-2">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Giocatori: {min_players}</span>
-                  </div>
-                ) : (
-                  <div className="flex gap-2 mb-2">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Minimo giocatori: {min_players}</span>
-                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">Massimo giocatori: {max_players}</span>
-                  </div>
-                )}
-                {min_playtime === max_playtime ? (
-                  <div className="flex gap-2 mb-2">
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata: {min_playtime} min</span>
-                  </div>
-                ) : (
-                  <div className="flex gap-2 mb-2">
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata minima: {min_playtime} min</span>
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Durata massima: {max_playtime} min</span>
-                  </div>
-                )}
-                {/* BGG Stats */}
-                <div className="flex gap-2 mb-2">
-                  {bgg_rating && (
-                    <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
-                      BGG Rating: {bgg_rating}
-                    </span>
-                  )}
-                  {bgg_rank && (
-                    <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-                      BGG Rank: {bgg_rank}
-                    </span>
-                  )}
-                  {bgg_weight && (
-                    <span className="bg-fuchsia-100 text-fuchsia-800 px-2 py-1 rounded-full text-xs font-medium">
-                      BGG Weight: {bgg_weight}
-                    </span>
-                  )}
-                </div>
-                <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted">
-                  {gameDescription ? (
-                    <p className="whitespace-pre-line text-sm text-gray-700">{gameDescription}</p>
-                  ) : (
-                    <p className="italic text-muted-foreground">Descrizione non disponibile.</p>
-                  )}
-                </div>
-              </CardContent>
-            </div>
+              />
+            )}
           </div>
-        </SpotlightCard>
-        <section className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Partite collegati</h2>
-          {game.matches && game.matches.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {
+          <div className="flex-1 w-full">
+            <CardHeader className="pb-8">
+              <CardTitle className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
+                {game.name}
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                {year_published ? `Anno: ${year_published}` : null} | {designer}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {min_players === max_players ? (
+                <div className="flex gap-2 mb-2">
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Giocatori: {min_players}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex gap-2 mb-2">
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Minimo giocatori: {min_players}
+                  </span>
+                  <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Massimo giocatori: {max_players}
+                  </span>
+                </div>
+              )}
+              {min_playtime === max_playtime ? (
+                <div className="flex gap-2 mb-2">
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Durata: {min_playtime} min
+                  </span>
+                </div>
+              ) : (
+                <div className="flex gap-2 mb-2">
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Durata minima: {min_playtime} min
+                  </span>
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Durata massima: {max_playtime} min
+                  </span>
+                </div>
+              )}
+              {/* BGG Stats */}
+              <div className="flex gap-2 mb-2">
+                {bgg_rating && (
+                  <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
+                    BGG Rating: {bgg_rating}
+                  </span>
+                )}
+                {bgg_rank && (
+                  <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                    BGG Rank: {bgg_rank}
+                  </span>
+                )}
+                {bgg_weight && (
+                  <span className="bg-fuchsia-100 text-fuchsia-800 px-2 py-1 rounded-full text-xs font-medium">
+                    BGG Weight: {bgg_weight}
+                  </span>
+                )}
+              </div>
+              <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted">
+                {gameDescription ? (
+                  <p className="whitespace-pre-line text-sm text-gray-700">
+                    {gameDescription}
+                  </p>
+                ) : (
+                  <p className="italic text-muted-foreground">
+                    Descrizione non disponibile.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </div>
+        </div>
+      </SpotlightCard>
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Partite collegati</h2>
+        {game.matches && game.matches.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               game.matches.map((match: any) => (
-               <Link key={match.id} href={`/matches/${match.id}`} className="no-underline">
-                <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
-                      {match.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex gap-2 mb-2">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Inizio: {match.startAt ? new Date(match.startAt).toLocaleDateString() : 'N/A'}
-                      </span>
-                      <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Fine: {match.endAt ? new Date(match.endAt).toLocaleDateString() : 'N/A'}
-                      </span>
-                    </div>
-                    <div className="max-h-24 overflow-y-auto bg-indigo-100 rounded-lg p-2 border border-muted">
-                      {match.description ? (
-                        <p className="whitespace-pre-line text-sm text-gray-700">{match.description}</p>
-                      ) : (
-                        <p className="italic text-muted-foreground">Descrizione non disponibile.</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </SpotlightCard>
+                <Link
+                  key={match.id}
+                  href={`/matches/${match.id}`}
+                  className="no-underline"
+                >
+                  <SpotlightCard
+                    className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
+                    spotlightColor="rgba(0, 229, 255, 0.2)"
+                  >
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
+                        {match.name}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex gap-2 mb-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          Inizio:{' '}
+                          {match.startAt
+                            ? new Date(match.startAt).toLocaleDateString()
+                            : 'N/A'}
+                        </span>
+                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                          Fine:{' '}
+                          {match.endAt
+                            ? new Date(match.endAt).toLocaleDateString()
+                            : 'N/A'}
+                        </span>
+                      </div>
+                      <div className="max-h-24 overflow-y-auto bg-indigo-100 rounded-lg p-2 border border-muted">
+                        {match.description ? (
+                          <p className="whitespace-pre-line text-sm text-gray-700">
+                            {match.description}
+                          </p>
+                        ) : (
+                          <p className="italic text-muted-foreground">
+                            Descrizione non disponibile.
+                          </p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </SpotlightCard>
                 </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="italic text-muted-foreground">Nessun partita collegato.</p>
-          )}
-        </section>
-      </div>
+              ))
+            }
+          </div>
+        ) : (
+          <p className="italic text-muted-foreground">
+            Nessun partita collegato.
+          </p>
+        )}
+      </section>
+    </div>
   );
 }
