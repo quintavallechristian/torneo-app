@@ -52,7 +52,6 @@ export default function ClientMatchForm({ match }: { match?: Match }) {
       <div>
         <GameSearchBar game={match && match.game ? { value: match.game.id, label: match.game.name, min_players: match.game.min_players, max_players: match.game.max_players } : null} onSelect={setSelectedGame} />
         <input type="hidden" name="game" value={selectedGame ? selectedGame.value : ""} />
-        {JSON.stringify(selectedGame)}
         {errors && <ZodErrors error={errors.game_id} />}
       </div>
       <div>
