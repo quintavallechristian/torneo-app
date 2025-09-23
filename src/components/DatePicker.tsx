@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/popover"
 
 type DatePickerProps = {
+  defaultDate?: Date;
   onSelect?: (date: Date | undefined) => void;
 };
 
@@ -36,9 +37,9 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime())
 }
 
-export function DatePicker({ onSelect }: DatePickerProps) {
+export function DatePicker({ defaultDate, onSelect }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
-  const [date, setDate] = React.useState<Date | undefined>()
+  const [date, setDate] = React.useState<Date | undefined>(defaultDate)
   const [month, setMonth] = React.useState<Date | undefined>(date)
   const [value, setValue] = React.useState(formatDate(date))
 
@@ -93,6 +94,7 @@ export function DatePicker({ onSelect }: DatePickerProps) {
                 setDate(date)
                 setValue(formatDate(date))
                 setOpen(false)
+                onSelect?.(date)
               }}
             />
           </PopoverContent>

@@ -10,14 +10,14 @@ import {
 import { decode } from "html-entities";
 
 
-import { ChevronLeft, PencilIcon } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { parseStringPromise } from 'xml2js';
 import  { isBefore, subDays } from "date-fns";
 import Image from "next/image";
-import TiltedCard from "@/components/TiltedCard";
 import SpotlightCard from "@/components/SpotlightCard";
+import { Game } from "@/types";
 
 export default async function GameDetailsPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
@@ -27,7 +27,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
       .from('games')
       .select('*, matches:matches(*)')
       .eq('id', params.id)
-      .single();
+      .single<Game>();
     game = result.data;
     error = result.error;
   } else {
@@ -35,12 +35,12 @@ export default async function GameDetailsPage({ params }: { params: { id: string
       .from('games')
       .select('*')
       .eq('name', params.id)
-      .single();
+      .single<Game>();
     game = result.data;
     error = result.error;
   }
 
-  if (error) {
+  if (error || !game) {
     console.error('Errore nel recupero del partita:', error);
     return <p>Errore nel recupero del partita</p>;
   }
@@ -79,6 +79,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
       max_playtime = parsedData?.items?.item?.[0].maxplaytime?.[0].$.value || null;
       year_published = parsedData?.items?.item?.[0].yearpublished?.[0].$.value || null;
       age = parsedData?.items?.item?.[0].minage?.[0].$.value || null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       designer = parsedData?.items?.item?.[0].link?.filter((link: any) => link?.$.type === 'boardgamedesigner')?.map((link: any) => link?.$.value).join(", ") || null;
 
       bgg_rating = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.average?.[0].$.value
@@ -89,6 +90,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
         ? Math.round(parseFloat(parsedData.items.item[0].statistics[0].ratings[0].averageweight[0].$.value) * 100) / 100
         : null;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       bgg_rank = parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.ranks?.[0].rank.find((r: any) => r?.$.name === 'boardgame')?.$.value || null;
 
       gameDescription = decode(gameDescription.replace(/<br\s*\/?>/gi, "\n"));
@@ -134,13 +136,13 @@ export default async function GameDetailsPage({ params }: { params: { id: string
         <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="flex-shrink-0">
-              <Image
-                src={image || game.image}
+              {image && <Image
+                src={image}
                 alt={game.name}
                 width={250}
                 height={250}
                 className="rounded-2xl shadow-lg object-cover border border-muted"
-              />
+              />}
             </div>
             <div className="flex-1 w-full">
               <CardHeader className="pb-8">
@@ -205,7 +207,9 @@ export default async function GameDetailsPage({ params }: { params: { id: string
           <h2 className="text-xl font-semibold mb-4">Partite collegati</h2>
           {game.matches && game.matches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {game.matches.map((match: any) => (
+              {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              game.matches.map((match: any) => (
                <Link key={match.id} href={`/matches/${match.id}`} className="no-underline">
                 <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)">
                   <CardHeader className="pb-2">

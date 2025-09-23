@@ -21,19 +21,23 @@ import {
 } from "@/components/ui/popover"
 import { supabase } from "@/lib/supabase"
 import { useEffect, useState } from "react"
+import { Game } from "@/types"
 
 export type SearchBarItem = {
   value: string;
   label: string;
+  max_players: number | null;
+  min_players: number | null;
 };
 
 type GameSearchBarProps = {
+  game: SearchBarItem | null;
   onSelect?: (game: string) => void;
 };
 
-export function GameSearchBar({ onSelect }: GameSearchBarProps) {
+export function GameSearchBar({ onSelect, game }: GameSearchBarProps) {
   const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
+  const [selectedGame, setSelectedGame] = useState(game)
   const [items, setItems] = useState<SearchBarItem[]>([])
   const [search, setSearch] = useState("")
 
@@ -41,14 +45,13 @@ export function GameSearchBar({ onSelect }: GameSearchBarProps) {
   useEffect(() => {
     const handler = setTimeout(() => {
       if (!search) {
-        setItems([])
         return
       }
       let active = true
       async function fetchItems() {
         const { data, error } = await supabase
           .from('games')
-          .select('id, name')
+          .select('id, name, max_players, min_players')
           .ilike('name', `%${search}%`)
         if (!active) return
         if (error) {
@@ -58,9 +61,11 @@ export function GameSearchBar({ onSelect }: GameSearchBarProps) {
         }
         if (data) {
           setItems(
-            data.map((game: { id: string; name: string }) => ({
+            data.map((game: Pick<Game, 'id' | 'name' | 'max_players' | 'min_players'>) => ({
               value: game.id,
               label: game.name,
+              max_players: game.max_players,
+              min_players: game.min_players
             }))
           )
         }
@@ -79,8 +84,8 @@ export function GameSearchBar({ onSelect }: GameSearchBarProps) {
           aria-expanded={open}
           className="justify-between w-full"
         >
-          {value
-            ? items.find((item) => item.value === value)?.label
+          {selectedGame
+            ? selectedGame.label
             : "Seleziona gioco..."}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -103,17 +108,17 @@ export function GameSearchBar({ onSelect }: GameSearchBarProps) {
                     value={item.label}
                     onSelect={(currentLabel) => {
                       const selected = items.find(item => item.label === currentLabel)
-                      setValue(selected ? selected.value : "")
+                      setSelectedGame(selected)
                       setOpen(false)
                       if (selected && onSelect) {
-                        onSelect(selected.value)
+                        onSelect(selected)
                       }
                     }}
                   >
                     <CheckIcon
                       className={cn(
                         "mr-2 h-4 w-4",
-                        value === item.value ? "opacity-100" : "opacity-0"
+                        selectedGame?.value === item.value ? "opacity-100" : "opacity-0"
                       )}
                     />
                     {item.label}

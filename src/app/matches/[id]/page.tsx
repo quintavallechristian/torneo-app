@@ -1,20 +1,19 @@
 'use server'
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 
-import { ChevronLeft, PencilIcon, PlusIcon } from "lucide-react";
+import { ChevronLeft, PencilIcon } from "lucide-react";
 import Link from 'next/link';
 import DeleteMatchButton from '@/components/DeleteMatchButton';
 import { createClient } from '@/utils/supabase/server'
 import Image from "next/image";
 import SpotlightCard from "@/components/SpotlightCard";
-import { ROLE } from "@/types";
+import { Match, Player, ROLE } from "@/types";
 import { getAuthenticatedUserWithProfile } from "@/utils/auth-helpers";
 import { AddPlayerModal } from "@/components/AddPlayerModal/AddPlayerModal";
 
@@ -32,7 +31,7 @@ export default async function matchDetailsPage({ params }: { params: { id: strin
       )
     `)
     .eq('id', params.id)
-    .single();
+    .single<Match>();
 
   if (error) {
     console.error('Errore nel recupero del partita:', error);
@@ -95,7 +94,7 @@ export default async function matchDetailsPage({ params }: { params: { id: strin
                     <PencilIcon className="inline mr-2 h-4 w-4" />
                     <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
                   </Button>
-                  <DeleteMatchButton id={match.id} />
+                  {match.id && <DeleteMatchButton id={match.id} />}
                 </div>
               </CardContent>
             </div>
@@ -113,14 +112,17 @@ export default async function matchDetailsPage({ params }: { params: { id: strin
             </span>
             </div>
             {role === ROLE.Admin && (
-              <AddPlayerModal matchId={match.id} />
+              <>{match.id && <AddPlayerModal matchId={match.id} />}</>
             )}
           </h2>
           {match.players && match.players.length > 0 ? (
             <div className="space-y-4">
-              {match.players.map((playerObj: any, index: number) => (
-                <SpotlightCard className="flex items-center gap-4 my-2 px-2 py-2 shadow-xl border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800" spotlightColor="rgba(0, 229, 255, 0.2)" 
-                key={playerObj.profile?.id + index}>
+              {match.players.map((playerObj: Player, index: number) => (
+                <SpotlightCard
+                  className="flex items-center gap-4 my-2 px-2 py-2 shadow-xl border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
+                  spotlightColor="rgba(0, 229, 255, 0.2)"
+                  key={`${playerObj.profile?.id}-${index}`}
+                >
                   <div>
                     <Image
                       src={playerObj.profile?.image || '/placeholder.png'}
