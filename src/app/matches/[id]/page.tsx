@@ -7,13 +7,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { ChevronLeft, PencilIcon } from 'lucide-react';
+import { ChevronLeft, PencilIcon, TrophyIcon } from 'lucide-react';
 import Link from 'next/link';
 import DeleteMatchButton from '@/components/DeleteMatchButton';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
 import { Match, Player, ROLE } from '@/types';
+import { updatePlayerPoints, setWinner } from './actions';
+import { revalidatePath } from 'next/cache';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 
@@ -40,6 +42,7 @@ export default async function MatchDetailsPage({
     `,
     )
     .eq('id', id)
+    .order('points', { foreignTable: 'players', ascending: false })
     .single<Match>();
 
   if (error) {
@@ -153,6 +156,50 @@ export default async function MatchDetailsPage({
                     spotlightColor="rgba(0, 229, 255, 0.2)"
                     key={`${playerObj.profile?.id}-${index}`}
                   >
+                    {role === ROLE.Admin && (
+                      <div className="flex flex-col gap-2 ml-4">
+                        {match.id && playerObj.profile?.id && (
+                          <form
+                            action={setWinner.bind(null, {
+                              matchId: match.id!,
+                              winnerId: playerObj.profile.id,
+                            })}
+                          >
+                            <input
+                              type="hidden"
+                              name="matchId"
+                              value={match.id}
+                            />
+                            <input
+                              type="hidden"
+                              name="winnerId"
+                              value={playerObj.profile.id}
+                            />
+                            <button
+                              type="submit"
+                              className={`
+                                cursor-pointer size-14 flex items-center justify-center
+                                disabled:opacity-100
+                                ${
+                                  playerObj.profile?.id === match.winner?.id
+                                    ? 'bg-amber-100 text-amber-500'
+                                    : 'bg-indigo-50/5'
+                                }
+                              `}
+                              disabled={
+                                playerObj.profile?.id === match.winner?.id
+                              }
+                              style={{
+                                clipPath:
+                                  'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
+                              }}
+                            >
+                              <TrophyIcon className="size-7" strokeWidth={1} />
+                            </button>
+                          </form>
+                        )}
+                      </div>
+                    )}
                     <div>
                       <Image
                         src={playerObj.profile?.image || '/placeholder.png'}
@@ -171,11 +218,6 @@ export default async function MatchDetailsPage({
                       <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
                         {playerObj.points || 0} pts
                       </span>
-                      <div className="text-sm text-muted-foreground">
-                        {playerObj.profile?.id === match.winner?.id
-                          ? 'Vincitore'
-                          : ''}
-                      </div>
                     </div>
                   </SpotlightCard>
                 ))}
