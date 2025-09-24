@@ -20,7 +20,7 @@ import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
 }
-export default async function matchDetailsPage({
+export default async function MatchDetailsPage({
   params,
 }: MatchDetailPageProps) {
   const { id } = await params;
@@ -130,7 +130,11 @@ export default async function matchDetailsPage({
                     match.players.length >= match.min_players
                       ? 'text-green-300'
                       : ''
-                  } ${match.players.length < match.min_players ? 'text-red-300' : ''}`}
+                  } ${
+                    match.players.length < match.min_players
+                      ? 'text-red-300'
+                      : ''
+                  }`}
                 >
                   ({match.players.length}/{match.max_players || '∞'})
                 </span>
@@ -177,7 +181,7 @@ export default async function matchDetailsPage({
           </section>
         </>
       ) : (
-        <p>Partita non trovato</p>
+        <p>Partita non trovata</p>
       )}
     </div>
   );

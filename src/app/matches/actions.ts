@@ -31,7 +31,8 @@ export async function createMatch(
   };
 
   const validationResult = createMatchSchema(
-    minAllowedPlayersmaxAllowedPlayers,
+    minAllowedPlayers,
+    maxAllowedPlayers,
   ).safeParse(form);
 
   if (!validationResult.success) {
@@ -45,7 +46,7 @@ export async function createMatch(
 
   const { data, error } = await supabase
     .from('matches')
-    .insert([{ name, game_id, description, startAt, endAt }]);
+    .insert([validationResult.data]);
 
   if (error) {
     console.error('Error creating match:', error);
@@ -97,7 +98,7 @@ export async function editMatch(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('matches')
-    .update([{ name, game_id, description, startAt, endAt }])
+    .update([validationResult.data])
     .eq('id', matchId);
 
   if (error) {

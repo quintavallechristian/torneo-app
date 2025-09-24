@@ -9,14 +9,15 @@ import {
 } from '@/components/ui/card';
 import { decode } from 'html-entities';
 
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { parseStringPromise } from 'xml2js';
 import { isBefore, subDays } from 'date-fns';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
-import { Game } from '@/types';
+import { Game, ROLE } from '@/types';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 interface GameDetaisPageProps {
   params: Promise<{ id: string }>;
@@ -24,6 +25,7 @@ interface GameDetaisPageProps {
 
 export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
   const { id } = await params;
+  const { role } = await getAuthenticatedUserWithProfile();
   const supabase = await createClient();
   let game, error;
   if (!isNaN(Number(id))) {
@@ -263,7 +265,16 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
         </div>
       </SpotlightCard>
       <section className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Partite collegati</h2>
+        <div className="flex items-center gap-4 mb-4">
+          <h2 className="text-xl font-semibold">Partite collegate</h2>
+          {role === ROLE.Admin && (
+            <Link href={`/matches/new?game_id=${game.id}`}>
+              <Button variant="outline" size="sm" data-testid="Add player">
+                <PlusIcon className="inline h-6 w-6" />
+              </Button>
+            </Link>
+          )}
+        </div>
         {game.matches && game.matches.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {
@@ -274,10 +285,7 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
                   href={`/matches/${match.id}`}
                   className="no-underline"
                 >
-                  <SpotlightCard
-                    className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
-                    spotlightColor="rgba(0, 229, 255, 0.2)"
-                  >
+                  <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
                         {match.name}

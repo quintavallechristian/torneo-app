@@ -7,23 +7,36 @@ import { GameSearchBar } from '@/components/GameSearchBar';
 import { DatePicker } from '@/components/DatePicker';
 import { createMatch, editMatch } from './actions';
 import { ZodErrors } from '@/components/ZodErrors';
-import { Match } from '@/types';
+import { Game, Match } from '@/types';
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 
-export default function ClientMatchForm({ match }: { match?: Match }) {
+export default function ClientMatchForm({
+  match,
+  game,
+}: {
+  match?: Match;
+  game?: Game;
+}) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [errors, setErrors] = useState<any>(null);
 
-  const [selectedGame, setSelectedGame] = useState(
-    match
-      ? {
-          value: match.game?.id,
-          label: match.game?.name,
-          min_players: match.game?.min_players,
-          max_players: match.game?.max_players,
-        }
-      : null,
-  );
+  const preSelectedGame = match
+    ? {
+        value: match.game?.id,
+        label: match.game?.name,
+        min_players: match.game?.min_players,
+        max_players: match.game?.max_players,
+      }
+    : game
+    ? {
+        value: game.id,
+        label: game.name,
+        min_players: game.min_players,
+        max_players: game.max_players,
+      }
+    : null;
+
+  const [selectedGame, setSelectedGame] = useState(preSelectedGame);
   const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
     match ? new Date(match.startAt) : undefined,
   );
@@ -82,12 +95,12 @@ export default function ClientMatchForm({ match }: { match?: Match }) {
       <div>
         <GameSearchBar
           game={
-            match && match.game
+            selectedGame
               ? {
-                  value: match.game.id,
-                  label: match.game.name,
-                  min_players: match.game.min_players,
-                  max_players: match.game.max_players,
+                  value: selectedGame.value,
+                  label: selectedGame.label,
+                  min_players: selectedGame.min_players,
+                  max_players: selectedGame.max_players,
                 }
               : null
           }
@@ -122,24 +135,24 @@ export default function ClientMatchForm({ match }: { match?: Match }) {
         >
           Partecipanti
         </label>
-        {match?.game?.min_players &&
-        match?.game?.max_players &&
-        match?.game?.min_players < match?.game?.max_players ? (
+        {preSelectedGame?.min_players &&
+        preSelectedGame?.max_players &&
+        preSelectedGame?.min_players < preSelectedGame?.max_players ? (
           <div className="flex gap-2 text-sm mt-8">
             <span>Da</span>
             <DualRangeSlider
               label={(value) => <span>{value}</span>}
               value={minMaxParticipants}
               onValueChange={setMinMaxParticipants}
-              min={match?.game?.min_players ?? 1}
-              max={match?.game?.max_players ?? 10}
+              min={preSelectedGame?.min_players ?? 1}
+              max={preSelectedGame?.max_players ?? 10}
               step={1}
             />
             <span>A</span>
           </div>
         ) : (
           <span className="italic text-xs">
-            Numero di partecipanti: {match?.game?.min_players ?? 1}
+            Numero di partecipanti: {preSelectedGame?.min_players ?? 1}
           </span>
         )}
         <input type="hidden" name="min_players" value={minMaxParticipants[0]} />

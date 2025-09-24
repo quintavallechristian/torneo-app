@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`MatchEditPage matches snapshot when rendering a valid match 1`] = `
+<DocumentFragment>
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8"
+  >
+    <div
+      data-testid="spotlight-card"
+    >
+      <div
+        class="mb-6 text-center"
+      >
+        <h1
+          class="text-3xl font-extrabold text-indigo-700 dark:text-indigo-400 mb-2"
+        >
+          Modifica partita
+        </h1>
+        <p
+          class="text-gray-500 dark:text-gray-300"
+        >
+          Compila i dettagli per organizzare una nuova competizione!
+        </p>
+      </div>
+      <div
+        data-testid="client-match-form"
+      >
+        ClientMatchForm with match snapshot
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
