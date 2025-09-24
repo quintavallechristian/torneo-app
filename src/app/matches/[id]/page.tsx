@@ -33,8 +33,10 @@ export default async function MatchDetailsPage({
       *,
       game:games(*),
       players:profiles_matches(
+        *,
         profile:profiles(*)
-      )
+      ),
+      winner:profiles(*)
     `,
     )
     .eq('id', id)
@@ -124,19 +126,19 @@ export default async function MatchDetailsPage({
           <section className="mt-8">
             <h2 className="text-xl font-semibold mb-4 gap-4 flex items-center">
               <div>
-                Giocatori{' '}
+                Giocatori
                 <span
                   className={`${
-                    match.players.length >= match.min_players
+                    (match.players || []).length >= match.min_players
                       ? 'text-green-300'
                       : ''
                   } ${
-                    match.players.length < match.min_players
+                    (match.players || []).length < match.min_players
                       ? 'text-red-300'
                       : ''
                   }`}
                 >
-                  ({match.players.length}/{match.max_players || '∞'})
+                  ({(match.players || []).length}/{match.max_players || '∞'})
                 </span>
               </div>
               {role === ROLE.Admin && (
@@ -154,7 +156,7 @@ export default async function MatchDetailsPage({
                     <div>
                       <Image
                         src={playerObj.profile?.image || '/placeholder.png'}
-                        alt={playerObj.profile?.username}
+                        alt={playerObj.profile?.username || 'Avatar'}
                         width={64}
                         height={64}
                         className="rounded-2xl border-1 w-16 h-16 object-cover"
@@ -167,8 +169,13 @@ export default async function MatchDetailsPage({
                     </div>
                     <div className="text-right ml-auto">
                       <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
-                        ELO
+                        {playerObj.points || 0} pts
                       </span>
+                      <div className="text-sm text-muted-foreground">
+                        {playerObj.profile?.id === match.winner?.id
+                          ? 'Vincitore'
+                          : ''}
+                      </div>
                     </div>
                   </SpotlightCard>
                 ))}

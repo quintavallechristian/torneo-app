@@ -37,6 +37,7 @@ export const ProfileSchema = z.object({
 export type Profile = z.infer<typeof ProfileSchema>;
 export type Player = {
   id: string;
+  points: number | null;
   profile: Profile | null;
 };
 export type Game = {
@@ -62,4 +63,5 @@ export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;
   game?: Game;
   players?: Player[];
+  winner?: Player | null;
 };
