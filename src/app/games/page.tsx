@@ -18,7 +18,7 @@ export default async function GamesPage() {
         {data?.map((game) => (
           <Link href={`/games/${game.id}`} key={game.id}>
             <SpotlightCard
-              className="flex items-center gap-4 my-2 px-2 py-2 shadow-xl border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
+              className="flex items-center gap-4 my-2 px-2 py-2 shadow-xl  bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
               spotlightColor="rgba(0, 229, 255, 0.2)"
             >
               <div>

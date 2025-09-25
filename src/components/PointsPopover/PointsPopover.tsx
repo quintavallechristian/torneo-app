@@ -29,19 +29,18 @@ export async function PointsPopover({
     .single<any>();
 
   if (error) {
-    console.error('Errore nel recupero del score sheet:', error);
-    return <p>Errore nel recupero del score sheet</p>;
+    console.log('Errore nel recupero del score sheet:', error);
   }
   const field = { value: false }; // Placeholder for field state management
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost">
+        <button className="focus:outline-none">
           <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
             {startingPoints || 0} pts
           </span>
-        </Button>
+        </button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <form action={updatePlayerPoints}>

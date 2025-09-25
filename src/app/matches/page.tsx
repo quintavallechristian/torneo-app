@@ -17,7 +17,8 @@ export default async function matchesPage() {
           {data.map((match) => (
             <Link key={match.id} href={`/matches/${match.id}`}>
               <SpotlightCard
-                className="px-4 py-4 flex gap-4 h-32 shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
+                className="px-4 py-4 flex gap-4 h-32"
+                bgClassName="bg-gradient-to-br from-white to-slate-200 dark:from-gray-900 dark:to-gray-800"
                 spotlightColor="rgba(0, 229, 255, 0.2)"
               >
                 <Image

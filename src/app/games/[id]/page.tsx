@@ -173,10 +173,7 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
           </Button>
         </Link>
       </div>
-      <SpotlightCard
-        className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
-        spotlightColor="rgba(0, 229, 255, 0.2)"
-      >
+      <SpotlightCard spotlightColor="rgba(0, 229, 255, 0.2)">
         <div className="flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-shrink-0">
             {image && (
@@ -285,7 +282,7 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
                   href={`/matches/${match.id}`}
                   className="no-underline"
                 >
-                  <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+                  <SpotlightCard>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
                         {match.name}

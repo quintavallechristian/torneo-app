@@ -8,12 +8,14 @@ interface Position {
 
 interface SpotlightCardProps extends React.PropsWithChildren {
   className?: string;
+  bgClassName?: string;
   spotlightColor?: `rgba(${number}, ${number}, ${number}, ${number})`;
 }
 
 const SpotlightCard: React.FC<SpotlightCardProps> = ({
   children,
-  className = 'shadow-xl border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800',
+  className = '',
+  bgClassName = 'bg-gradient-to-br from-white to-slate-200 dark:from-gray-900 dark:to-gray-800',
   spotlightColor = 'rgba(0, 229, 255, 0.2)',
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
@@ -54,7 +56,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
       onBlur={handleBlur}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`relative rounded-3xl border border-neutral-800 bg-neutral-900 overflow-hidden p-8 ${className}`}
+      className={`shadow-xl relative rounded-3xl border overflow-hidden p-8 ${className} ${bgClassName}`}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out"

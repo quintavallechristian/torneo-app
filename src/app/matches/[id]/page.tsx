@@ -70,7 +70,7 @@ export default async function MatchDetailsPage({
       </div>
       {match && match.game ? (
         <>
-          <SpotlightCard className="shadow-xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+          <SpotlightCard>
             <div className="flex flex-col md:flex-row gap-6 items-center p-6">
               {/* Immagine del gioco se disponibile */}
               {match.game?.image && (
@@ -157,10 +157,10 @@ export default async function MatchDetailsPage({
                 {match.players.map((playerObj: Player, index: number) => (
                   <SpotlightCard
                     className={`
-                      flex items-center gap-4 my-2 px-2 py-2 shadow-xl border-indigo-200 bg-gradient-to-br 
+                      flex items-center gap-4 my-2 px-2 py-2 bg-gradient-to-br 
                       ${
                         playerObj.profile?.id === match.winner?.id
-                          ? 'border-2 from-yellow-500 to-amber-800'
+                          ? 'border border-amber-500 from-yellow-500 to-amber-800'
                           : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
                       }
                     `}
