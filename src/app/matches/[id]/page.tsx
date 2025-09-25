@@ -18,7 +18,7 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
 import { setWinner } from './actions';
-
+import { Badge } from '@/components/ui/badge';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -101,12 +101,12 @@ export default async function MatchDetailsPage({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2 mb-2">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                    <Badge className="bg-blue-100 text-blue-800">
                       Inizio: {match.startAt}
-                    </span>
-                    <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                    </Badge>
+                    <Badge className="bg-purple-100 text-purple-800">
                       Fine: {match.endAt}
-                    </span>
+                    </Badge>
                   </div>
                   <div className="max-h-40 overflow-y-auto bg-indigo-100 rounded-lg p-3 border border-muted">
                     {match.description ? (
@@ -157,13 +157,13 @@ export default async function MatchDetailsPage({
                 {match.players.map((playerObj: Player, index: number) => (
                   <SpotlightCard
                     className={`
-                      flex items-center gap-4 my-2 px-2 py-2 bg-gradient-to-br 
-                      ${
-                        playerObj.profile?.id === match.winner?.id
-                          ? 'border border-amber-500 from-yellow-500 to-amber-800'
-                          : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
-                      }
+                      flex items-center gap-4 my-2 px-2 py-2 
                     `}
+                    bgClassName={`bg-gradient-to-br ${
+                      playerObj.profile?.id === match.winner?.id
+                        ? 'border border-amber-500 from-yellow-500 to-amber-800'
+                        : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
+                    }`}
                     spotlightColor={`${
                       playerObj.profile?.id === match.winner?.id
                         ? '#ffff0030'

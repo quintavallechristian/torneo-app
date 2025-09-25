@@ -1,12 +1,12 @@
 'use server';
 import { Button } from '@/components/ui/button';
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { decode } from 'html-entities';
 
 import { ChevronLeft, PlusIcon } from 'lucide-react';
@@ -196,54 +196,51 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {min_players === max_players ? (
-                <div className="flex gap-2 mb-2">
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+              <div className="space-x-4 space-y-2">
+                {min_players === max_players ? (
+                  <Badge className="bg-green-100 text-green-800">
                     Giocatori: {min_players}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex gap-2 mb-2">
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                    Minimo giocatori: {min_players}
-                  </span>
-                  <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-                    Massimo giocatori: {max_players}
-                  </span>
-                </div>
-              )}
-              {min_playtime === max_playtime ? (
-                <div className="flex gap-2 mb-2">
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                  </Badge>
+                ) : (
+                  <>
+                    <Badge className="bg-green-100 text-green-800">
+                      Minimo giocatori: {min_players}
+                    </Badge>
+                    <Badge className="bg-red-100 text-red-800">
+                      Massimo giocatori: {max_players}
+                    </Badge>
+                  </>
+                )}
+                {min_playtime === max_playtime ? (
+                  <Badge className="bg-yellow-100 text-yellow-800">
                     Durata: {min_playtime} min
-                  </span>
-                </div>
-              ) : (
-                <div className="flex gap-2 mb-2">
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                    Durata minima: {min_playtime} min
-                  </span>
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                    Durata massima: {max_playtime} min
-                  </span>
-                </div>
-              )}
-              {/* BGG Stats */}
-              <div className="flex gap-2 mb-2">
+                  </Badge>
+                ) : (
+                  <>
+                    <Badge className="bg-yellow-100 text-yellow-800">
+                      Durata minima: {min_playtime} min
+                    </Badge>
+                    <Badge className="bg-yellow-100 text-yellow-800">
+                      Durata massima: {max_playtime} min
+                    </Badge>
+                  </>
+                )}
+                {/* BGG Stats */}
+
                 {bgg_rating && (
-                  <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
+                  <Badge className="bg-cyan-100 text-cyan-800">
                     BGG Rating: {bgg_rating}
-                  </span>
+                  </Badge>
                 )}
                 {bgg_rank && (
-                  <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                  <Badge className="bg-orange-100 text-orange-800">
                     BGG Rank: {bgg_rank}
-                  </span>
+                  </Badge>
                 )}
                 {bgg_weight && (
-                  <span className="bg-fuchsia-100 text-fuchsia-800 px-2 py-1 rounded-full text-xs font-medium">
+                  <Badge className="bg-fuchsia-100 text-fuchsia-800">
                     BGG Weight: {bgg_weight}
-                  </span>
+                  </Badge>
                 )}
               </div>
               <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted">
@@ -290,18 +287,18 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <div className="flex gap-2 mb-2">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                        <Badge className="bg-blue-100 text-blue-800">
                           Inizio:{' '}
                           {match.startAt
                             ? new Date(match.startAt).toLocaleDateString()
                             : 'N/A'}
-                        </span>
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                        </Badge>
+                        <Badge className="bg-purple-100 text-purple-800">
                           Fine:{' '}
                           {match.endAt
                             ? new Date(match.endAt).toLocaleDateString()
                             : 'N/A'}
-                        </span>
+                        </Badge>
                       </div>
                       <div className="max-h-24 overflow-y-auto bg-indigo-100 rounded-lg p-2 border border-muted">
                         {match.description ? (
