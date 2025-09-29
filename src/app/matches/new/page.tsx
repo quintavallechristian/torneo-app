@@ -3,11 +3,8 @@ import ClientMatchForm from '../ClientMatchForm';
 import { createClient } from '@/utils/supabase/server';
 import { Game } from '@/types';
 
-type NewMatchPageProps = {
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function Newmatch({ searchParams }: NewMatchPageProps) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function NewMatch({ searchParams }: any) {
   const gameId =
     typeof searchParams?.game_id === 'string'
       ? searchParams.game_id
