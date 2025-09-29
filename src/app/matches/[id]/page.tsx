@@ -1,16 +1,13 @@
 'use server';
 import { Button } from '@/components/ui/button';
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import {
   ChevronLeft,
-  Dice1Icon,
   DicesIcon,
+  LocationEdit,
+  MapIcon,
+  MapPinIcon,
   PencilIcon,
   TrophyIcon,
 } from 'lucide-react';
@@ -40,6 +37,7 @@ export default async function MatchDetailsPage({
       `
       *,
       game:games(*),
+      location:locations(*),
       players:profiles_matches(
         *,
         profile:profiles(*)
@@ -95,14 +93,22 @@ export default async function MatchDetailsPage({
                   <CardTitle className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex items-center gap-2">
                     {match.name}
                   </CardTitle>
-                  {/* Nome gioco in risalto */}
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2">
                     <DicesIcon className="h-5 w-5 text-amber-500" />
                     <Link
                       href={`/games/${match.game?.id}`}
                       className="text-xl font-bold text-amber-600 dark:text-amber-400 hover:underline"
                     >
                       {match.game?.name ?? match.game_id}
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPinIcon className="h-5 w-5 text-slate-500" />
+                    <Link
+                      href={`/places/${match.location?.id}`}
+                      className="text-md font-bold text-slate-600 dark:text-slate-400 hover:underline"
+                    >
+                      {match.location?.name}
                     </Link>
                   </div>
                 </CardHeader>

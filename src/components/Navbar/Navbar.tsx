@@ -38,6 +38,9 @@ export default async function Navbar() {
         <Link href="/games" className="mr-4 hover:underline">
           Giochi
         </Link>
+        <Link href="/places" className="mr-4 hover:underline">
+          Luoghi
+        </Link>
       </div>
       <div className="flex items-center gap-4">
         {profile ? (

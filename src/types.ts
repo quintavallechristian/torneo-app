@@ -59,9 +59,20 @@ export type Game = {
   thumbnail: string | null;
   matches?: Match[];
 };
+export type Location = {
+  id: string;
+  name: string;
+  image: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  description: string | null;
+  matches?: Match[];
+};
 export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;
   game?: Game;
+  location?: Location;
   players?: Player[];
   winner?: Player | null;
 };
