@@ -24,6 +24,9 @@ export async function addPlayer({
     return data;
   } catch (err) {
     console.error('Server action addPlayer error:', err);
-    throw err.code;
+    if (err && typeof err === 'object' && 'code' in err) {
+      throw (err as { code: unknown }).code;
+    }
+    throw err;
   }
 }

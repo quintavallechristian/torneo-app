@@ -15,7 +15,7 @@ export default async function Newmatch({ searchParams }: NewMatchPageProps) {
       ? searchParams?.game_id[0]
       : undefined;
 
-  let game: Game | null = null;
+  let game: Game | undefined = undefined;
   if (gameId) {
     const supabase = await createClient();
     const { data: gameData, error } = await supabase
@@ -24,7 +24,7 @@ export default async function Newmatch({ searchParams }: NewMatchPageProps) {
       .eq('id', gameId)
       .single<Game>();
 
-    if (error || !game) {
+    if (error || !gameData) {
       console.error('Errore nel recupero del gioco:', error);
       return <p>Errore nel recupero del gioco</p>;
     }

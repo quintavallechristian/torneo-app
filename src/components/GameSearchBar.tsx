@@ -32,7 +32,7 @@ export type SearchBarItem = {
 
 type GameSearchBarProps = {
   game: SearchBarItem | null;
-  onSelect?: (game: string) => void;
+  onSelect?: (game: SearchBarItem | null) => void;
 };
 
 export function GameSearchBar({ onSelect, game }: GameSearchBarProps) {
@@ -114,7 +114,7 @@ export function GameSearchBar({ onSelect, game }: GameSearchBarProps) {
                       const selected = items.find(
                         (item) => item.label === currentLabel,
                       );
-                      setSelectedGame(selected);
+                      setSelectedGame(selected ?? null);
                       setOpen(false);
                       if (selected && onSelect) {
                         onSelect(selected);

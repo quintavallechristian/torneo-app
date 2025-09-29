@@ -112,10 +112,10 @@ export default function ClientMatchForm({
           game={
             selectedGame
               ? {
-                  value: selectedGame.value,
-                  label: selectedGame.label,
-                  min_players: selectedGame.min_players,
-                  max_players: selectedGame.max_players,
+                  value: selectedGame.value ?? '',
+                  label: selectedGame.label ?? '',
+                  min_players: selectedGame.min_players ?? null,
+                  max_players: selectedGame.max_players ?? null,
                 }
               : null
           }
