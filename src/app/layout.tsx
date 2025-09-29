@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider"
-import Navbar from "@/components/Navbar";
-
-
+import type { Metadata } from 'next';
+import './globals.css';
+import { ThemeProvider } from '@/components/theme-provider';
+import Navbar from '@/components/Navbar/Navbar';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
-  title: "Torneo app",
-  description: "Descrizione di torneo app",
+  title: 'PartitApp',
+  description: 'Descrizione di PartitApp',
 };
 
 export default function RootLayout({
@@ -19,13 +18,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar />
-            {children}
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

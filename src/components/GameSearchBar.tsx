@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
+import * as React from 'react';
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react';
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -12,64 +12,75 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from '@/components/ui/command';
 
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { supabase } from "@/lib/supabase"
-import { useEffect, useState } from "react"
+} from '@/components/ui/popover';
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
+import { Game } from '@/types';
 
 export type SearchBarItem = {
   value: string;
   label: string;
+  max_players: number | null;
+  min_players: number | null;
 };
 
 type GameSearchBarProps = {
+  game: SearchBarItem | null;
   onSelect?: (game: string) => void;
 };
 
-export function GameSearchBar({ onSelect }: GameSearchBarProps) {
-  const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
-  const [items, setItems] = useState<SearchBarItem[]>([])
-  const [search, setSearch] = useState("")
+export function GameSearchBar({ onSelect, game }: GameSearchBarProps) {
+  const [open, setOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(game);
+  const [items, setItems] = useState<SearchBarItem[]>([]);
+  const [search, setSearch] = useState('');
 
   // Debounce della ricerca
   useEffect(() => {
     const handler = setTimeout(() => {
       if (!search) {
-        setItems([])
-        return
+        return;
       }
-      let active = true
+      let active = true;
       async function fetchItems() {
         const { data, error } = await supabase
           .from('games')
-          .select('id, name')
-          .ilike('name', `%${search}%`)
-        if (!active) return
+          .select('id, name, max_players, min_players')
+          .ilike('name', `%${search}%`);
+        if (!active) return;
         if (error) {
-          console.error('Errore fetch items:', error)
-          setItems([])
-          return
+          console.error('Errore fetch items:', error);
+          setItems([]);
+          return;
         }
         if (data) {
           setItems(
-            data.map((game: { id: string; name: string }) => ({
-              value: game.id,
-              label: game.name,
-            }))
-          )
+            data.map(
+              (
+                game: Pick<Game, 'id' | 'name' | 'max_players' | 'min_players'>,
+              ) => ({
+                value: game.id,
+                label: game.name,
+                max_players: game.max_players,
+                min_players: game.min_players,
+              }),
+            ),
+          );
         }
       }
-      fetchItems()
-      return () => { active = false }
-    }, 400)
-    return () => clearTimeout(handler)
-  }, [search])
+      fetchItems();
+      return () => {
+        active = false;
+      };
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -79,9 +90,7 @@ export function GameSearchBar({ onSelect }: GameSearchBarProps) {
           aria-expanded={open}
           className="justify-between w-full"
         >
-          {value
-            ? items.find((item) => item.value === value)?.label
-            : "Seleziona gioco..."}
+          {selectedGame ? selectedGame.label : 'Seleziona gioco...'}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -102,18 +111,22 @@ export function GameSearchBar({ onSelect }: GameSearchBarProps) {
                     key={item.value}
                     value={item.label}
                     onSelect={(currentLabel) => {
-                      const selected = items.find(item => item.label === currentLabel)
-                      setValue(selected ? selected.value : "")
-                      setOpen(false)
+                      const selected = items.find(
+                        (item) => item.label === currentLabel,
+                      );
+                      setSelectedGame(selected);
+                      setOpen(false);
                       if (selected && onSelect) {
-                        onSelect(selected.value)
+                        onSelect(selected);
                       }
                     }}
                   >
                     <CheckIcon
                       className={cn(
-                        "mr-2 h-4 w-4",
-                        value === item.value ? "opacity-100" : "opacity-0"
+                        'mr-2 h-4 w-4',
+                        selectedGame?.value === item.value
+                          ? 'opacity-100'
+                          : 'opacity-0',
                       )}
                     />
                     {item.label}
@@ -125,5 +138,5 @@ export function GameSearchBar({ onSelect }: GameSearchBarProps) {
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

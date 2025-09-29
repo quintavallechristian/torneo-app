@@ -1,46 +1,47 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { CalendarIcon } from "lucide-react"
+import * as React from 'react';
+import { CalendarIcon } from 'lucide-react';
 
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from '@/components/ui/popover';
 
 type DatePickerProps = {
+  defaultDate?: Date;
   onSelect?: (date: Date | undefined) => void;
 };
 
 function formatDate(date: Date | undefined) {
   if (!date) {
-    return ""
+    return '';
   }
 
-  return date.toLocaleDateString("it-IT", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  })
+  return date.toLocaleDateString('it-IT', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 function isValidDate(date: Date | undefined) {
   if (!date) {
-    return false
+    return false;
   }
-  return !isNaN(date.getTime())
+  return !isNaN(date.getTime());
 }
 
-export function DatePicker({ onSelect }: DatePickerProps) {
-  const [open, setOpen] = React.useState(false)
-  const [date, setDate] = React.useState<Date | undefined>()
-  const [month, setMonth] = React.useState<Date | undefined>(date)
-  const [value, setValue] = React.useState(formatDate(date))
+export function DatePicker({ defaultDate, onSelect }: DatePickerProps) {
+  const [open, setOpen] = React.useState(false);
+  const [date, setDate] = React.useState<Date | undefined>(defaultDate);
+  const [month, setMonth] = React.useState<Date | undefined>(date);
+  const [value, setValue] = React.useState(formatDate(date));
 
   return (
     <div className="flex flex-col gap-3">
@@ -51,18 +52,18 @@ export function DatePicker({ onSelect }: DatePickerProps) {
           placeholder="Seleziona data"
           className="bg-background pr-10"
           onChange={(e) => {
-            const date = new Date(e.target.value)
-            setValue(e.target.value)
+            const date = new Date(e.target.value);
+            setValue(e.target.value);
             if (isValidDate(date)) {
-              setDate(date)
-              setMonth(date)
-              onSelect?.(date)
+              setDate(date);
+              setMonth(date);
+              onSelect?.(date);
             }
           }}
           onKeyDown={(e) => {
-            if (e.key === "ArrowDown") {
-              e.preventDefault()
-              setOpen(true)
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setOpen(true);
             }
           }}
         />
@@ -90,14 +91,15 @@ export function DatePicker({ onSelect }: DatePickerProps) {
               month={month}
               onMonthChange={setMonth}
               onSelect={(date) => {
-                setDate(date)
-                setValue(formatDate(date))
-                setOpen(false)
+                setDate(date);
+                setValue(formatDate(date));
+                setOpen(false);
+                onSelect?.(date);
               }}
             />
           </PopoverContent>
         </Popover>
       </div>
     </div>
-  )
+  );
 }
