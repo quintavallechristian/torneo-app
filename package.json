@@ -25,6 +25,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "html-entities": "^2.6.0",
+    "lightningcss": "^1.30.2",
     "lucide-react": "^0.544.0",
     "motion": "^12.23.15",
     "next": "^15.5.4",
