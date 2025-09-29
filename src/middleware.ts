@@ -4,7 +4,7 @@ import { updateSession } from '@/utils/supabase/middleware';
 import { createClient } from './utils/supabase/server';
 export async function middleware(request: NextRequest) {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
 
   const protectedRoutes = ['/matches/new', '/matches/*/edit'];
   const isProtectedRoute = protectedRoutes.some((route) =>

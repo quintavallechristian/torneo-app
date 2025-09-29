@@ -7,15 +7,13 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { decode } from 'html-entities';
-
-import { ChevronLeft, PlusIcon } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
-import { Location, ROLE } from '@/types';
-import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
+import { Location } from '@/types';
+//import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -25,7 +23,7 @@ export default async function PlaceDetailsPage({
   params,
 }: PlaceDetailsPageProps) {
   const { id } = await params;
-  const { role } = await getAuthenticatedUserWithProfile();
+  //const { role } = await getAuthenticatedUserWithProfile();
   const supabase = await createClient();
   let location, error;
   if (!isNaN(Number(id))) {

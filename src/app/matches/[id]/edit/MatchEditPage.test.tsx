@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file __tests__/MatchEditPage.test.tsx
  */
@@ -10,9 +11,13 @@ jest.mock('@/utils/supabase/server', () => ({
   createClient: jest.fn(),
 }));
 
-jest.mock('@/components/SpotlightCard', () => (props: any) => (
-  <div data-testid="spotlight-card">{props.children}</div>
-));
+jest.mock('@/components/SpotlightCard', () => {
+  const MockSpotlightCard = (props: any) => (
+    <div data-testid="spotlight-card">{props.children}</div>
+  );
+  MockSpotlightCard.displayName = 'MockSpotlightCard';
+  return MockSpotlightCard;
+});
 
 jest.mock('../../ClientMatchForm', () => ({
   __esModule: true,

@@ -37,7 +37,8 @@ export function AddPlayerModal({ matchId }: AddPlayerModalProps) {
         router.refresh();
         setSelectedPlayer('');
         toast.success('Giocatore aggiunto con successo!');
-        setOpen(false); // Chiude il modale
+        setOpen(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         if (err.message === '23505') {
           toast.error('Giocatore già aggiunto a questa partita.');

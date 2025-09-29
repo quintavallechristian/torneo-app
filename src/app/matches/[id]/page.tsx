@@ -5,8 +5,6 @@ import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChevronLeft,
   DicesIcon,
-  LocationEdit,
-  MapIcon,
   MapPinIcon,
   PencilIcon,
   TrophyIcon,
@@ -179,7 +177,7 @@ export default async function MatchDetailsPage({
                     }`}
                     spotlightColor={`${
                       playerObj.profile?.id === match.winner?.id
-                        ? '#ffff0030'
+                        ? 'rgba(255, 255, 0, 0.188)'
                         : 'rgba(0, 229, 255, 0.2)'
                     }`}
                     key={`${playerObj.profile?.id}-${index}`}

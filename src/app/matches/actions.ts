@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 import { createClient } from '@/utils/supabase/server';
 
@@ -6,7 +7,6 @@ import { redirect } from 'next/navigation';
 
 import * as z from 'zod';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createMatch(
   formData: FormData,
   minAllowedPlayers: number,
@@ -56,8 +56,6 @@ export async function createMatch(
     redirect('/matches');
   }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function editMatch(
   formData: FormData,
   matchId: string,
@@ -96,7 +94,7 @@ export async function editMatch(
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('matches')
     .update([validationResult.data])
     .eq('id', matchId);

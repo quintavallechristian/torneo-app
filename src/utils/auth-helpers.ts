@@ -15,7 +15,7 @@ export async function getAuthenticatedUserWithProfile() {
     .eq('user_id', userData.user.id)
     .single();
 
-  const { data: roleData, error: roleError } = await supabase
+  const { data: roleData } = await supabase
     .from('users_roles')
     .select('*, role:roles(*)')
     .eq('user_id', userData.user.id)

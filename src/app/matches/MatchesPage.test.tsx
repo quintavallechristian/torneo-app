@@ -1,16 +1,31 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import matchesPage from './page';
 
 // Mock next/link
-jest.mock('next/link', () => {
-  return ({ children, href }: any) => <a href={href}>{children}</a>;
-});
+import type { FC, ReactNode } from 'react';
+
+interface MockNextLinkProps {
+  children: ReactNode;
+  href: string;
+}
+
+const MockNextLink: FC<MockNextLinkProps> = ({ children, href }) => (
+  <a href={href}>{children}</a>
+);
+MockNextLink.displayName = 'MockNextLink';
+
+jest.mock('next/link', () => MockNextLink);
 
 // Mock next/image
-jest.mock('next/image', () => (props: any) => {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img {...props} alt={props.alt} />;
+jest.mock('next/image', () => {
+  function MockNextImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...props} alt={props.alt} />;
+  }
+  MockNextImage.displayName = 'MockNextImage';
+  return MockNextImage;
 });
 
 // Mock Button

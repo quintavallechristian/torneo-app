@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import {
   Popover,
@@ -8,12 +7,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { updatePlayerPoints } from './actions';
-import { createClient } from '@/utils/supabase/server';
+//import { createClient } from '@/utils/supabase/server';
 
 export async function PointsPopover({
   startingPoints,
   matchId,
-  gameId,
+  //gameId,
   playerId,
 }: {
   startingPoints: number;
@@ -21,17 +20,17 @@ export async function PointsPopover({
   matchId: string;
   playerId: string;
 }) {
-  const supabase = await createClient();
-  const { data: scoreSheet, error } = await supabase
-    .from('score_sheets')
-    .select('*')
-    .eq('game_id', gameId)
-    .single<any>();
+  // const supabase = await createClient();
+  // const { data: scoreSheet, error } = await supabase
+  //   .from('score_sheets')
+  //   .select('*')
+  //   .eq('game_id', gameId)
+  //   .single<any>();
 
-  if (error) {
-    console.log('Errore nel recupero del score sheet:', error);
-  }
-  const field = { value: false }; // Placeholder for field state management
+  // if (error) {
+  //   console.log('Errore nel recupero del score sheet:', error);
+  // }
+  // const field = { value: false };
 
   return (
     <Popover>

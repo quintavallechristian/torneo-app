@@ -90,10 +90,11 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
       year_published =
         parsedData?.items?.item?.[0].yearpublished?.[0].$.value || null;
       age = parsedData?.items?.item?.[0].minage?.[0].$.value || null;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       designer =
         parsedData?.items?.item?.[0].link
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ?.filter((link: any) => link?.$.type === 'boardgamedesigner')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ?.map((link: any) => link?.$.value)
           .join(', ') || null;
 
@@ -117,9 +118,9 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
           ) / 100
         : null;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       bgg_rank =
         parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.ranks?.[0].rank.find(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (r: any) => r?.$.name === 'boardgame',
         )?.$.value || null;
 

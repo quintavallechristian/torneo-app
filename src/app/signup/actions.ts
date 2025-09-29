@@ -51,6 +51,6 @@ export async function signup(formData: FormData) {
       console.log('Role assigned successfully:', roleData);
     }
   }
-  //revalidatePath('/', 'layout')
+  revalidatePath('/', 'layout');
   redirect('/');
 }
