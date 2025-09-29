@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -73,6 +73,21 @@ export default function ClientMatchForm({
     }
   }
 
+  useEffect(() => {
+    if (
+      selectedGame?.min_players &&
+      selectedGame?.max_players &&
+      selectedGame?.min_players < selectedGame?.max_players
+    ) {
+      setMinMaxParticipants([
+        selectedGame.min_players,
+        selectedGame.max_players,
+      ]);
+    } else {
+      setMinMaxParticipants([selectedGame?.min_players ?? 1, 1]);
+    }
+  }, [selectedGame]);
+
   return (
     <form action={action} className="space-y-4">
       <div>
@@ -135,17 +150,17 @@ export default function ClientMatchForm({
         >
           Partecipanti
         </label>
-        {preSelectedGame?.min_players &&
-        preSelectedGame?.max_players &&
-        preSelectedGame?.min_players < preSelectedGame?.max_players ? (
+        {selectedGame?.min_players &&
+        selectedGame?.max_players &&
+        selectedGame?.min_players < selectedGame?.max_players ? (
           <div className="flex gap-2 text-sm mt-8">
             <span>Da</span>
             <DualRangeSlider
               label={(value) => <span>{value}</span>}
               value={minMaxParticipants}
               onValueChange={setMinMaxParticipants}
-              min={preSelectedGame?.min_players ?? 1}
-              max={preSelectedGame?.max_players ?? 10}
+              min={selectedGame?.min_players ?? 1}
+              max={selectedGame?.max_players ?? 10}
               step={1}
             />
             <span>A</span>

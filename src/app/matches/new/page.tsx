@@ -15,20 +15,20 @@ export default async function Newmatch({ searchParams }: NewMatchPageProps) {
       ? searchParams?.game_id[0]
       : undefined;
 
-  if (!gameId) {
-    return <p>Parametro game_id mancante</p>;
-  }
+  let game: Game | null = null;
+  if (gameId) {
+    const supabase = await createClient();
+    const { data: gameData, error } = await supabase
+      .from('games')
+      .select('id, name, min_players, max_players')
+      .eq('id', gameId)
+      .single<Game>();
 
-  const supabase = await createClient();
-  const { data: game, error } = await supabase
-    .from('games')
-    .select('id, name, min_players, max_players')
-    .eq('id', gameId)
-    .single<Game>();
-
-  if (error || !game) {
-    console.error('Errore nel recupero del gioco:', error);
-    return <p>Errore nel recupero del gioco</p>;
+    if (error || !game) {
+      console.error('Errore nel recupero del gioco:', error);
+      return <p>Errore nel recupero del gioco</p>;
+    }
+    game = gameData;
   }
 
   return (
