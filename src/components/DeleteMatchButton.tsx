@@ -51,7 +51,7 @@ export default function DeleteMatchButton({ id }: { id: string }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
           <AlertDialogDescription>
-            Questa azione non può essere annullata. Verrà eliminato il partita
+            Questa azione non può essere annullata. Verrà eliminata la partita
             in modo permanente.
           </AlertDialogDescription>
         </AlertDialogHeader>

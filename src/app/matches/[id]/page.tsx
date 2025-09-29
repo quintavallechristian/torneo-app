@@ -7,7 +7,13 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { ChevronLeft, PencilIcon, TrophyIcon } from 'lucide-react';
+import {
+  ChevronLeft,
+  Dice1Icon,
+  DicesIcon,
+  PencilIcon,
+  TrophyIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import DeleteMatchButton from '@/components/DeleteMatchButton';
 import { createClient } from '@/utils/supabase/server';
@@ -86,18 +92,19 @@ export default async function MatchDetailsPage({
               )}
               <div className="flex-1 w-full">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 mb-2 flex items-center gap-2">
+                  <CardTitle className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex items-center gap-2">
                     {match.name}
                   </CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Gioco:{' '}
+                  {/* Nome gioco in risalto */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <DicesIcon className="h-5 w-5 text-amber-500" />
                     <Link
                       href={`/games/${match.game?.id}`}
-                      className="font-semibold"
+                      className="text-xl font-bold text-amber-600 dark:text-amber-400 hover:underline"
                     >
                       {match.game?.name ?? match.game_id}
                     </Link>
-                  </CardDescription>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2 mb-2">
