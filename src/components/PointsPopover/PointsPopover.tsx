@@ -36,7 +36,7 @@ export async function PointsPopover({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="focus:outline-none">
+        <button className="cursor-pointer focus:outline-none">
           <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
             {startingPoints || 0} pts
           </span>
