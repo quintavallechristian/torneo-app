@@ -1,16 +1,8 @@
 'use server';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import {
-  ChevronLeft,
-  DicesIcon,
-  MapPinIcon,
-  PencilIcon,
-  TrophyIcon,
-} from 'lucide-react';
+import { ChevronLeft, TrophyIcon } from 'lucide-react';
 import Link from 'next/link';
-import DeleteMatchButton from '@/components/DeleteMatchButton';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
@@ -19,7 +11,7 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
 import { setWinner } from './actions';
-import { Badge } from '@/components/ui/badge';
+import MatchCard from '@/components/MatchCard';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -72,75 +64,7 @@ export default async function MatchDetailsPage({
       </div>
       {match && match.game ? (
         <>
-          <SpotlightCard>
-            <div className="flex flex-col md:flex-row gap-6 items-center p-6">
-              {/* Immagine del gioco se disponibile */}
-              {match.game?.image && (
-                <div className="flex-shrink-0">
-                  <Image
-                    src={match.game.image}
-                    alt={match.game.name}
-                    width={220}
-                    height={220}
-                    className="rounded-2xl shadow-lg object-cover border border-muted"
-                  />
-                </div>
-              )}
-              <div className="flex-1 w-full">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex items-center gap-2">
-                    {match.name}
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <DicesIcon className="h-5 w-5 text-amber-500" />
-                    <Link
-                      href={`/games/${match.game?.id}`}
-                      className="text-xl font-bold text-amber-600 dark:text-amber-400 hover:underline"
-                    >
-                      {match.game?.name ?? match.game_id}
-                    </Link>
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <MapPinIcon className="h-5 w-5 text-slate-500" />
-                    <Link
-                      href={`/places/${match.location?.id}`}
-                      className="text-md font-bold text-slate-600 dark:text-slate-400 hover:underline"
-                    >
-                      {match.location?.name}
-                    </Link>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex gap-2 mb-2">
-                    <Badge className="bg-blue-100 text-blue-800">
-                      Inizio: {match.startAt}
-                    </Badge>
-                    <Badge className="bg-purple-100 text-purple-800">
-                      Fine: {match.endAt}
-                    </Badge>
-                  </div>
-                  <div className="max-h-40 overflow-y-auto bg-indigo-100 rounded-lg p-3 border border-muted">
-                    {match.description ? (
-                      <p className="whitespace-pre-line text-sm text-gray-700">
-                        {match.description}
-                      </p>
-                    ) : (
-                      <p className="italic text-muted-foreground">
-                        Descrizione non disponibile.
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <Button className="cursor-pointer" variant="secondary">
-                      <PencilIcon className="inline mr-2 h-4 w-4" />
-                      <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
-                    </Button>
-                    {match.id && <DeleteMatchButton id={match.id} />}
-                  </div>
-                </CardContent>
-              </div>
-            </div>
-          </SpotlightCard>
+          <MatchCard match={match} small={false} />
           <section className="mt-8">
             <h2 className="text-xl font-semibold mb-4 gap-4 flex items-center">
               <div>

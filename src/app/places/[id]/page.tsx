@@ -13,6 +13,7 @@ import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
 import { Location } from '@/types';
+import MatchCard from '@/components/MatchCard';
 //import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 interface PlaceDetailsPageProps {
@@ -29,7 +30,9 @@ export default async function PlaceDetailsPage({
   if (!isNaN(Number(id))) {
     const result = await supabase
       .from('locations')
-      .select('*, matches:matches(*)')
+      .select(
+        '*, matches:matches(*, game:games(name, image, id), location:locations(name, id))',
+      )
       .eq('id', id)
       .single<Location>();
     location = result.data;
@@ -99,51 +102,9 @@ export default async function PlaceDetailsPage({
         </div>
         {location.matches && location.matches.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              location.matches.map((match: any) => (
-                <Link
-                  key={match.id}
-                  href={`/matches/${match.id}`}
-                  className="no-underline"
-                >
-                  <SpotlightCard>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-2">
-                        {match.name}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="flex gap-2 mb-2">
-                        <Badge className="bg-blue-100 text-blue-800">
-                          Inizio:{' '}
-                          {match.startAt
-                            ? new Date(match.startAt).toLocaleDateString()
-                            : 'N/A'}
-                        </Badge>
-                        <Badge className="bg-purple-100 text-purple-800">
-                          Fine:{' '}
-                          {match.endAt
-                            ? new Date(match.endAt).toLocaleDateString()
-                            : 'N/A'}
-                        </Badge>
-                      </div>
-                      <div className="max-h-24 overflow-y-auto bg-indigo-100 rounded-lg p-2 border border-muted">
-                        {match.description ? (
-                          <p className="whitespace-pre-line text-sm text-gray-700">
-                            {match.description}
-                          </p>
-                        ) : (
-                          <p className="italic text-muted-foreground">
-                            Descrizione non disponibile.
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </SpotlightCard>
-                </Link>
-              ))
-            }
+            {location.matches.map((match) => (
+              <MatchCard key={match.id} match={match} small />
+            ))}
           </div>
         ) : (
           <p className="italic text-muted-foreground">
