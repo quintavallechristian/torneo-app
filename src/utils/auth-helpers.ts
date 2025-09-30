@@ -62,3 +62,19 @@ export async function getGameStatsPerProfile(
 
   return gameStats;
 }
+
+export async function getGameRanking(gameId: number): Promise<GameStats[]> {
+  const supabase = await createClient();
+  let { data: gameStats } = await supabase
+    .from('profiles_games')
+    .select('*')
+    .eq('game_id', gameId);
+
+  console.log(gameStats);
+  if (!gameStats) {
+    return [];
+  }
+
+  gameStats = gameStats.sort((a, b) => b.points - a.points);
+  return gameStats;
+}

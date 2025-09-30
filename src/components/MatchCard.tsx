@@ -81,16 +81,10 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                 Dal {match.startAt} al {match.endAt}
               </Badge>
             </div>
-            <div className="max-h-40 flex flex-wrap bg-indigo-100 rounded-lg p-3 border border-muted">
-              {match.description ? (
-                <p className="whitespace-pre-line text-sm text-gray-700">
-                  {match.description}
-                </p>
-              ) : (
-                <p className="italic text-muted-foreground">
-                  Descrizione non disponibile.
-                </p>
-              )}
+            <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700">
+              {match.description
+                ? match.description
+                : 'Descrizione non disponibile'}
             </div>
           </CardContent>
         </div>

@@ -7,19 +7,16 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { decode } from 'html-entities';
 
 import { ChevronLeft, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/server';
-import { parseStringPromise } from 'xml2js';
-import { isBefore, subDays } from 'date-fns';
 import Image from 'next/image';
 import MatchCard from '@/components/MatchCard';
 import SpotlightCard from '@/components/SpotlightCard';
-import { Game, ROLE } from '@/types';
+import { GameStats, ROLE } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
+  getGameRanking,
   getGameStatsPerProfile,
 } from '@/utils/auth-helpers';
 import { getGame, updateGame } from './actions';
@@ -28,12 +25,26 @@ interface GameDetaisPageProps {
   params: Promise<{ id: string }>;
 }
 
+function getPositionInGame(profileId: number, gameRanking: GameStats[]) {
+  let positionInGame = -1;
+  if (gameRanking.length !== 0) {
+    const position = gameRanking.findIndex((gs) => gs.profile_id === profileId);
+    if (position !== -1) {
+      positionInGame = position + 1;
+    }
+  }
+  return positionInGame;
+}
+
 export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
   const { id } = await params;
   const { profile, role } = await getAuthenticatedUserWithProfile();
 
-  const res = await getGameStatsPerProfile(profile?.id || '', Number(id));
-  console.log(res);
+  // Get game stats for this user and game
+  const gameStats = await getGameStatsPerProfile(profile?.id || '', Number(id));
+  const gameRanking = await getGameRanking(Number(id));
+
+  const positionInGame = getPositionInGame(profile.id, gameRanking);
 
   const { game, error } = await getGame(id);
 
@@ -70,7 +81,34 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
           </Button>
         </Link>
       </div>
-      <SpotlightCard spotlightColor="rgba(0, 229, 255, 0.2)">
+      <SpotlightCard>
+        {gameStats && (
+          <SpotlightCard className="px-4 py-4 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-lg font-bold">Le tue statistiche</div>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  <Badge className="bg-green-200 text-green-900">
+                    Vittorie: {gameStats.win}
+                  </Badge>
+                  <Badge className="bg-red-200 text-red-900">
+                    Sconfitte: {gameStats.loss}
+                  </Badge>
+                  <Badge className="bg-yellow-200 text-yellow-900">
+                    Pareggi: {gameStats.draw}
+                  </Badge>
+                  <Badge className="bg-purple-200 text-purple-900">
+                    Minuti giocati: {gameStats.minutes_played}
+                  </Badge>
+                </div>
+              </div>
+              <div className="text-lg font-medium text-right">
+                <div>ELO: {gameStats.points}</div>
+                <div>Pos: {positionInGame}</div>
+              </div>
+            </div>
+          </SpotlightCard>
+        )}
         <div className="flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-shrink-0">
             {image && (
@@ -140,16 +178,10 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
                   </Badge>
                 )}
               </div>
-              <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted">
-                {gameDescription ? (
-                  <p className="whitespace-pre-line text-sm text-gray-700">
-                    {gameDescription}
-                  </p>
-                ) : (
-                  <p className="italic text-muted-foreground">
-                    Descrizione non disponibile.
-                  </p>
-                )}
+              <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700">
+                {gameDescription
+                  ? gameDescription
+                  : 'Descrizione non disponibile'}
               </div>
             </CardContent>
           </div>
