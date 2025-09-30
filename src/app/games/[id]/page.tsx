@@ -43,7 +43,6 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
   // Get game stats for this user and game
   const gameStats = await getGameStatsPerProfile(profile?.id || '', Number(id));
   const gameRanking = await getGameRanking(Number(id));
-
   const positionInGame = getPositionInGame(profile.id, gameRanking);
 
   const { game, error } = await getGame(id);

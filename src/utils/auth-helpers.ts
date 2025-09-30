@@ -44,8 +44,6 @@ export async function getGameStatsPerProfile(
     .eq('profile_id', profileId)
     .eq('game_id', gameId)
     .maybeSingle();
-
-  console.log(gameStats);
   if (!gameStats) {
     console.log(profileId, gameId, gameStats);
     const { data, error } = await supabase
