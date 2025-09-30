@@ -1,4 +1,4 @@
-import { Game, GameStats } from '@/types';
+import { GameStats } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 
 export async function getAuthenticatedUserWithProfile() {
@@ -45,7 +45,6 @@ export async function getGameStatsPerProfile(
     .eq('game_id', gameId)
     .maybeSingle();
   if (!gameStats) {
-    console.log(profileId, gameId, gameStats);
     const { data, error } = await supabase
       .from('profiles_games')
       .insert({
@@ -68,7 +67,6 @@ export async function getGameRanking(gameId: number): Promise<GameStats[]> {
     .select('*')
     .eq('game_id', gameId);
 
-  console.log(gameStats);
   if (!gameStats) {
     return [];
   }

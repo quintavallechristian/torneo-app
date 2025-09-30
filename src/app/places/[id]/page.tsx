@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';

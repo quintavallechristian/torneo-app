@@ -51,7 +51,6 @@ export default function ClientMatchForm({
 
   async function action(formData: FormData) {
     let res;
-    console.log(formData.get('min_players'));
     if (match && match.id) {
       res = await editMatch(
         formData,

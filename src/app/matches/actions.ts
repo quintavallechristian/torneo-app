@@ -44,7 +44,7 @@ export async function createMatch(
 
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('matches')
     .insert([validationResult.data]);
 
@@ -52,7 +52,6 @@ export async function createMatch(
     console.error('Error creating match:', error);
     return { form, errors: null };
   } else {
-    console.log('match created successfully:', data);
     redirect('/matches');
   }
 }
@@ -69,7 +68,6 @@ export async function editMatch(
   const endAt = formData.get('endAt') as string;
   const min_players = Number(formData.get('min_players') ?? 0);
   const max_players = Number(formData.get('max_players') ?? 0);
-  console.log(formData);
 
   const form: Match = {
     name,

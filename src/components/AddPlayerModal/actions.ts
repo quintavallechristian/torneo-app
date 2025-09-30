@@ -20,7 +20,6 @@ export async function addPlayer({
       throw error;
     }
 
-    console.log('player added', data);
     return data;
   } catch (err) {
     console.error('Server action addPlayer error:', err);

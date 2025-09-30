@@ -7,11 +7,6 @@ export async function updatePlayerPoints(formData: FormData) {
   const playerId = formData.get('playerId');
   const points = formData.get('points');
 
-  console.log('updatePlayerPoints called with:', {
-    matchId,
-    playerId,
-    points,
-  });
   const supabase = await createClient();
   const { error } = await supabase
     .from('profiles_matches')
