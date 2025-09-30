@@ -75,3 +75,15 @@ export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   players?: Player[];
   winner?: Player | null;
 };
+
+export type GameStats = {
+  id: number;
+  created_at: string;
+  profile_id: number;
+  points: number;
+  game_id: number;
+  win: number;
+  loss: number;
+  draw: number;
+  minutes_played: number;
+};

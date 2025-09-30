@@ -1,3 +1,4 @@
+import { Game, GameStats } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 
 export async function getAuthenticatedUserWithProfile() {
@@ -30,4 +31,34 @@ export async function getAuthenticatedUserWithProfile() {
     profile: profileData,
     role: roleData?.role.name,
   };
+}
+
+export async function getGameStatsPerProfile(
+  profileId: string,
+  gameId: number,
+): Promise<GameStats> {
+  const supabase = await createClient();
+  let { data: gameStats } = await supabase
+    .from('profiles_games')
+    .select('*')
+    .eq('profile_id', profileId)
+    .eq('game_id', gameId)
+    .maybeSingle();
+
+  console.log(gameStats);
+  if (!gameStats) {
+    console.log(profileId, gameId, gameStats);
+    const { data, error } = await supabase
+      .from('profiles_games')
+      .insert({
+        profile_id: profileId,
+        game_id: gameId,
+      })
+      .select()
+      .single();
+    console.log(error);
+    gameStats = data;
+  }
+
+  return gameStats;
 }
