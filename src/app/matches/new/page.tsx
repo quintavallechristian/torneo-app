@@ -1,15 +1,24 @@
 import SpotlightCard from '@/components/SpotlightCard';
 import ClientMatchForm from '../ClientMatchForm';
 import { createClient } from '@/utils/supabase/server';
-import { Game } from '@/types';
+import { Game, Location } from '@/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function NewMatch({ searchParams }: any) {
+  const { game_id, place_id } = await searchParams;
+
   const gameId =
-    typeof searchParams?.game_id === 'string'
-      ? searchParams.game_id
-      : Array.isArray(searchParams?.game_id)
+    typeof game_id === 'string'
+      ? game_id
+      : Array.isArray(game_id)
       ? searchParams?.game_id[0]
+      : undefined;
+
+  const placeId =
+    typeof place_id === 'string'
+      ? place_id
+      : Array.isArray(place_id)
+      ? place_id[0]
       : undefined;
 
   let game: Game | undefined = undefined;
@@ -28,6 +37,22 @@ export default async function NewMatch({ searchParams }: any) {
     game = gameData;
   }
 
+  let place: Location | undefined = undefined;
+  if (placeId) {
+    const supabase = await createClient();
+    const { data: placeData, error } = await supabase
+      .from('locations')
+      .select('id, name')
+      .eq('id', placeId)
+      .single<Location>();
+
+    if (error || !placeData) {
+      console.error('Errore nel recupero del luogo:', error);
+      return <p>Errore nel recupero del luogo</p>;
+    }
+    place = placeData;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8">
       <SpotlightCard
@@ -42,7 +67,7 @@ export default async function NewMatch({ searchParams }: any) {
             Compila i dettagli per organizzare una nuova competizione!
           </p>
         </div>
-        <ClientMatchForm game={game} />
+        <ClientMatchForm game={game} place={place} />
       </SpotlightCard>
     </div>
   );

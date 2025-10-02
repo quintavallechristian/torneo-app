@@ -1,32 +1,31 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/utils/supabase/server';
-import {
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import SpotlightCard from '@/components/SpotlightCard';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
+import ProfileCard from '@/components/ProfileCard';
+import MatchCard from '@/components/MatchCard';
+import { createClient } from '@/utils/supabase/server';
 
 export default async function PrivatePage() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data?.user) {
+  const { user, profile } = await getAuthenticatedUserWithProfile();
+  if (!user || !profile) {
     redirect('/login');
   }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', data.user.id)
-    .single();
-
-  const avatarUrl = profile?.image || '/placeholder.png';
+  console.log(profile.id);
+  const supabase = await createClient();
+  const { data: matches } = await supabase
+    .from('matches')
+    .select(
+      `
+      *,
+      game:games(*),
+      location:locations(*),
+      winner:profiles(*),
+      profiles_matches!inner(profile_id)
+    `,
+    )
+    .eq('profiles_matches.profile_id', profile.id);
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -42,43 +41,27 @@ export default async function PrivatePage() {
           </Button>
         </Link>
       </div>
-      <SpotlightCard>
-        <div className="flex flex-col md:flex-row gap-8 items-center p-8">
-          <div className="flex-shrink-0">
-            <Image
-              src={avatarUrl}
-              alt={profile?.username || 'Avatar'}
-              width={120}
-              height={120}
-              className="rounded-2xl shadow-lg object-cover border border-muted bg-white"
-              priority
-            />
-          </div>
-          <div className="flex-1 w-full">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 mb-2 flex items-center gap-2">
-                {profile?.firstname
-                  ? `${profile.firstname} ${profile.lastname ?? ''}`
-                  : 'Utente'}
-              </CardTitle>
-              <CardDescription className="text-muted-foreground text-lg">
-                @{profile?.username ?? 'username'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col gap-1">
-                <span className="font-semibold text-gray-700">Email:</span>
-                <span className="text-indigo-700 dark:text-indigo-400">
-                  {data.user.email}
-                </span>
-              </div>
-            </CardContent>
-            <div className="mt-6">
-              <Button variant="secondary">Modifica profilo</Button>
+      {profile && (
+        <>
+          <ProfileCard profile={profile} />
+          <section className="mt-8">
+            <div className="flex items-center gap-4 mb-4">
+              <h2 className="text-xl font-semibold">Partite</h2>
             </div>
-          </div>
-        </div>
-      </SpotlightCard>
+            {matches && matches.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {matches.map((match) => (
+                  <MatchCard key={match.id} match={match} small />
+                ))}
+              </div>
+            ) : (
+              <p className="italic text-muted-foreground">
+                Nessun partita collegato.
+              </p>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 }

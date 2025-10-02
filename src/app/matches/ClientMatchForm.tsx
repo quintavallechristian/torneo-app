@@ -7,36 +7,54 @@ import { GameSearchBar } from '@/components/GameSearchBar';
 import { DatePicker } from '@/components/DatePicker';
 import { createMatch, editMatch } from './actions';
 import { ZodErrors } from '@/components/ZodErrors';
-import { Game, Match } from '@/types';
+import { Game, Location, Match } from '@/types';
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';
+import { PlaceSearchBar } from '@/components/PlaceSearchBar';
 
 export default function ClientMatchForm({
   match,
   game,
+  place,
 }: {
   match?: Match;
   game?: Game;
+  place?: Location;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [errors, setErrors] = useState<any>(null);
 
-  const preSelectedGame = match
-    ? {
-        value: match.game?.id,
-        label: match.game?.name,
-        min_players: match.game?.min_players,
-        max_players: match.game?.max_players,
-      }
-    : game
-    ? {
-        value: game.id,
-        label: game.name,
-        min_players: game.min_players,
-        max_players: game.max_players,
-      }
-    : null;
+  const preSelectedGame =
+    match && match.game
+      ? {
+          value: match.game.id,
+          label: match.game.name,
+          min_players: match.game.min_players,
+          max_players: match.game.max_players,
+        }
+      : game
+      ? {
+          value: game.id,
+          label: game.name,
+          min_players: game.min_players,
+          max_players: game.max_players,
+        }
+      : null;
+
+  const preSelectedPlace =
+    match && match.location
+      ? {
+          value: match.location.id,
+          label: match.location.name,
+        }
+      : place
+      ? {
+          value: place.id,
+          label: place.name,
+        }
+      : null;
 
   const [selectedGame, setSelectedGame] = useState(preSelectedGame);
+  const [selectedPlace, setSelectedPlace] = useState(preSelectedPlace);
   const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
     match ? new Date(match.startAt) : undefined,
   );
@@ -107,6 +125,12 @@ export default function ClientMatchForm({
         {errors && <ZodErrors error={errors.name} />}
       </div>
       <div>
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          Gioco
+        </label>
         <GameSearchBar
           game={
             selectedGame
@@ -120,6 +144,37 @@ export default function ClientMatchForm({
           }
           onSelect={setSelectedGame}
         />
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 mt-4"
+        >
+          Luogo
+        </label>
+        <PlaceSearchBar
+          place={
+            selectedPlace
+              ? {
+                  value: selectedPlace.value ?? '',
+                  label: selectedPlace.label ?? '',
+                }
+              : null
+          }
+          onSelect={setSelectedPlace}
+        />
+        <input
+          type="hidden"
+          name="game"
+          value={selectedGame ? selectedGame.value : ''}
+        />
+        <input
+          type="hidden"
+          name="place"
+          value={selectedPlace ? selectedPlace.value : ''}
+        />
+        {errors && <ZodErrors error={errors.game_id} />}
+      </div>
+      <div>
+        <label />
         <input
           type="hidden"
           name="game"
@@ -174,7 +229,6 @@ export default function ClientMatchForm({
         {errors && <ZodErrors error={errors.min_players} />}
         {errors && <ZodErrors error={errors.max_players} />}
       </div>
-
       <div className="flex gap-4">
         <div className="w-1/2">
           <label

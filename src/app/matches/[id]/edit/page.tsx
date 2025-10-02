@@ -14,7 +14,9 @@ export default async function MatchEditPage({ params }: MatchEditPageProps) {
   const supabase = await createClient();
   const { data: match, error } = await supabase
     .from('matches')
-    .select('*, game:games(id, name, min_players, max_players)')
+    .select(
+      '*, game:games(id, name, min_players, max_players), location:locations(id, name)',
+    )
     .eq('id', id)
     .single<Match>();
 

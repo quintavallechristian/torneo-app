@@ -9,11 +9,18 @@ import { Badge } from '@/components/ui/badge';
 import SpotlightCard from '@/components/SpotlightCard';
 import React from 'react';
 import { Match, ROLE } from '@/types';
-import { DicesIcon, MapPinIcon, PencilIcon } from 'lucide-react';
+import {
+  CalendarIcon,
+  CrownIcon,
+  DicesIcon,
+  MapPinIcon,
+  PencilIcon,
+} from 'lucide-react';
 import Image from 'next/image';
 import { Button } from './ui/button';
 import DeleteMatchButton from './DeleteMatchButton';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
+import { formatMatchStatus, getMatchStatus } from '@/lib/match';
 
 interface MatchCardProps {
   match: Match;
@@ -21,6 +28,7 @@ interface MatchCardProps {
 }
 
 export default async function MatchCard({ match, small }: MatchCardProps) {
+  const matchStatus = getMatchStatus(match);
   const { role } = await getAuthenticatedUserWithProfile();
   return (
     <SpotlightCard className="px-0 py-0">
@@ -36,17 +44,22 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
             {match.game?.name ?? match.game_id}
           </Link>
         </div>
-        <div className="flex items-center gap-2">
-          <MapPinIcon className="h-5 w-5 text-slate-500" />
-          <Link
-            href={`/places/${match.location?.id}`}
-            className={` font-bold text-slate-600 dark:text-slate-400 hover:underline ${
-              small ? 'text-sm' : 'text-base'
+        {match.winner?.id ? (
+          <div>
+            <CrownIcon className="inline mr-1 h-4 w-4 text-amber-500 -rotate-30" />
+            <span className="text-sm text-amber-500">
+              {match.winner.username}
+            </span>
+          </div>
+        ) : (
+          <Badge
+            className={`${formatMatchStatus(matchStatus).color} ${
+              small ? 'rounded-full px-2 py-2' : 'px-2 py-1 rounded-full'
             }`}
           >
-            {match.location?.name}
-          </Link>
-        </div>
+            {small ? '' : formatMatchStatus(matchStatus).label}
+          </Badge>
+        )}
       </div>
       <div className={`flex px-4 pb-6 ${small ? 'text-sm' : 'text-base'}`}>
         {/* Immagine del gioco se disponibile */}
@@ -77,9 +90,21 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
           </CardHeader>
           <CardContent className="space-y-4 w-full">
             <div className="flex flex-wrap gap-2 mb-2">
-              <Badge className="bg-indigo-100 text-indigo-800">
-                Dal {match.startAt} al {match.endAt}
-              </Badge>
+              <div className="flex items-center gap-1">
+                <CalendarIcon className="size-4 text-slate-500" />
+                <span className="text-xs text-slate-600 dark:text-slate-400 hover:underline">
+                  Dal {match.startAt} al {match.endAt}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MapPinIcon className="size-4 text-slate-500" />
+                <Link
+                  href={`/places/${match.location?.id}`}
+                  className=" text-slate-600 dark:text-slate-400 hover:underline text-xs"
+                >
+                  {match.location?.name}
+                </Link>
+              </div>
             </div>
             <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700">
               {match.description

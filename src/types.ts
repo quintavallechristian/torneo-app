@@ -3,6 +3,17 @@ import z from 'zod';
 export enum ROLE {
   Admin = 'Admin',
   User = 'User',
+  Moderator = 'Moderator',
+  PlaceAdmin = 'PlaceAdmin',
+  PlaceModerator = 'PlaceModerator',
+}
+
+export enum MATCHSTATUS {
+  Scheduled = 'Scheduled',
+  Ongoing = 'Ongoing',
+  Completed = 'Completed',
+  Canceled = 'Canceled',
+  WaitingForResults = 'WaitingForResults',
 }
 
 export const createMatchSchema = (minPlayers: number, maxPlayers: number) =>
@@ -12,6 +23,7 @@ export const createMatchSchema = (minPlayers: number, maxPlayers: number) =>
       .min(3, 'Nome partita troppo corto')
       .max(100, 'Nome partita troppo lungo'),
     game_id: z.string().min(1, 'Devi selezionare un gioco'),
+    location_id: z.string().min(1, 'Devi selezionare un luogo'),
     description: z.string().max(500, 'Descrizione troppo lunga').optional(),
     startAt: z.string().min(1, 'Devi selezionare una data di inizio'),
     endAt: z.string().min(1, 'Devi selezionare una data di fine'),
@@ -33,7 +45,10 @@ export const ProfileSchema = z.object({
 });
 
 // extract the inferred type
-export type Profile = z.infer<typeof ProfileSchema>;
+export type Profile = z.infer<typeof ProfileSchema> & {
+  matches?: Match[];
+};
+
 export type Player = {
   id: string;
   points: number | null;
@@ -73,10 +88,10 @@ export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   game?: Game;
   location?: Location;
   players?: Player[];
-  winner?: Player | null;
+  winner?: Profile | null;
 };
 
-export type GameStats = {
+interface Stats {
   id: number;
   created_at: string;
   profile_id: number;
@@ -86,4 +101,7 @@ export type GameStats = {
   loss: number;
   draw: number;
   minutes_played: number;
-};
+}
+
+export type GameStats = Stats;
+export type LocationStats = Stats;

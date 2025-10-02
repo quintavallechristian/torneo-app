@@ -6,31 +6,65 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
-import { Location } from '@/types';
+import { Location, LocationStats, ROLE } from '@/types';
 import MatchCard from '@/components/MatchCard';
-//import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
+import {
+  getAuthenticatedUserWithProfile,
+  getLocationRanking,
+  getLocationStatsPerProfile,
+} from '@/utils/auth-helpers';
+import { Badge } from '@/components/ui/badge';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
+}
+
+function getPositionInLocation(
+  profileId: number,
+  locationRanking: LocationStats[],
+) {
+  let positionInLocation = -1;
+  if (locationRanking.length !== 0) {
+    const position = locationRanking.findIndex(
+      (gs) => gs.profile_id === profileId,
+    );
+    if (position !== -1) {
+      positionInLocation = position + 1;
+    }
+  }
+  return positionInLocation;
 }
 
 export default async function PlaceDetailsPage({
   params,
 }: PlaceDetailsPageProps) {
   const { id } = await params;
-  //const { role } = await getAuthenticatedUserWithProfile();
+  const { profile, role } = await getAuthenticatedUserWithProfile();
+
+  // Get game stats for this user and game
+  const locationStats = await getLocationStatsPerProfile(
+    profile?.id || '',
+    Number(id),
+  );
+  const gameRanking = await getLocationRanking(Number(id));
+  let positionInLocation = -1;
+  if (profile) {
+    positionInLocation = getPositionInLocation(profile.id, gameRanking);
+  }
+
   const supabase = await createClient();
+
   let location, error;
   if (!isNaN(Number(id))) {
     const result = await supabase
       .from('locations')
       .select(
-        '*, matches:matches(*, game:games(name, image, id), location:locations(name, id))',
+        '*, matches:matches(*, game:games(name, image, id), location:locations(name, id), winner:profiles(id, username))',
       )
       .eq('id', id)
       .single<Location>();
@@ -66,6 +100,33 @@ export default async function PlaceDetailsPage({
         </Link>
       </div>
       <SpotlightCard spotlightColor="rgba(0, 229, 255, 0.2)">
+        {locationStats && (
+          <SpotlightCard className="px-4 py-4 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-lg font-bold">Le tue statistiche</div>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  <Badge className="bg-green-200 text-green-900">
+                    Vittorie: {locationStats.win}
+                  </Badge>
+                  <Badge className="bg-red-200 text-red-900">
+                    Sconfitte: {locationStats.loss}
+                  </Badge>
+                  <Badge className="bg-yellow-200 text-yellow-900">
+                    Pareggi: {locationStats.draw}
+                  </Badge>
+                  <Badge className="bg-purple-200 text-purple-900">
+                    Minuti giocati: {locationStats.minutes_played}
+                  </Badge>
+                </div>
+              </div>
+              <div className="text-lg font-medium text-right">
+                <div>ELO: {locationStats.points}</div>
+                <div>Pos: {positionInLocation}</div>
+              </div>
+            </div>
+          </SpotlightCard>
+        )}
         <div className="flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-shrink-0">
             <Image
@@ -98,6 +159,13 @@ export default async function PlaceDetailsPage({
       <section className="mt-8">
         <div className="flex items-center gap-4 mb-4">
           <h2 className="text-xl font-semibold">Partite collegate</h2>
+          {role === ROLE.Admin && (
+            <Link href={`/matches/new?place_id=${location.id}`}>
+              <Button variant="outline" size="sm" data-testid="Add player">
+                <PlusIcon className="inline h-6 w-6" />
+              </Button>
+            </Link>
+          )}
         </div>
         {location.matches && location.matches.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

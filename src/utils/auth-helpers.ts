@@ -1,13 +1,18 @@
-import { GameStats } from '@/types';
+import { GameStats, LocationStats, Profile } from '@/types';
 import { createClient } from '@/utils/supabase/server';
+import { User } from '@supabase/supabase-js';
 
-export async function getAuthenticatedUserWithProfile() {
+export async function getAuthenticatedUserWithProfile(): Promise<{
+  user: User | null;
+  profile: Profile | null;
+  role: string | null;
+}> {
   const supabase = await createClient();
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
 
   if (userError || !userData.user) {
-    return { user: null, profile: null };
+    return { user: null, profile: null, role: null };
   }
 
   const { data: profileData, error: profileError } = await supabase
@@ -73,4 +78,48 @@ export async function getGameRanking(gameId: number): Promise<GameStats[]> {
 
   gameStats = gameStats.sort((a, b) => b.points - a.points);
   return gameStats;
+}
+
+export async function getLocationStatsPerProfile(
+  profileId: string,
+  locationId: number,
+): Promise<LocationStats> {
+  const supabase = await createClient();
+  let { data: locationStats } = await supabase
+    .from('profiles_locations')
+    .select('*')
+    .eq('profile_id', profileId)
+    .eq('location_id', locationId)
+    .maybeSingle();
+  if (!locationStats) {
+    const { data, error } = await supabase
+      .from('profiles_locations')
+      .insert({
+        profile_id: profileId,
+        location_id: locationId,
+      })
+      .select()
+      .single();
+    console.log(error);
+    locationStats = data;
+  }
+
+  return locationStats;
+}
+
+export async function getLocationRanking(
+  locationId: number,
+): Promise<LocationStats[]> {
+  const supabase = await createClient();
+  let { data: locationStats } = await supabase
+    .from('profiles_locations')
+    .select('*')
+    .eq('location_id', locationId);
+
+  if (!locationStats) {
+    return [];
+  }
+
+  locationStats = locationStats.sort((a, b) => b.points - a.points);
+  return locationStats;
 }
