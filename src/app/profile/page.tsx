@@ -56,7 +56,7 @@ export default async function PrivatePage() {
               </div>
             ) : (
               <p className="italic text-muted-foreground">
-                Nessun partita collegato.
+                Nessun partita collegata.
               </p>
             )}
           </section>
