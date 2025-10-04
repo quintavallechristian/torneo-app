@@ -51,7 +51,7 @@ export async function signup(formData: FormData) {
 
     const { data: roleData, error: roleError } = await supabase
       .from('users_roles')
-      .insert([{ user_id: data.user?.id, role: 'user' }]);
+      .insert([{ user_id: data.user?.id, role_id: 2 }]);
 
     if (roleError) {
       console.error('Error assigning role:', roleError);

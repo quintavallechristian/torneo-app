@@ -7,7 +7,9 @@ export default async function matchesPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from('matches')
-    .select('*, game:games(*), location:locations(*), winner:profiles(*)');
+    .select(
+      '*, game:games(*), location:locations(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
+    );
   return (
     <div className="max-w-[90%] mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">

@@ -26,3 +26,51 @@ export async function setFavouriteGame({
   if (error) throw error;
   revalidatePath(`/places`);
 }
+
+export async function setInCollectionGame({
+  gameId,
+  status,
+}: {
+  gameId: string;
+  status: boolean;
+}) {
+  const { profile } = await getAuthenticatedUserWithProfile();
+  const supabase = await createClient();
+  const { error } = await supabase.from('profiles_games').upsert(
+    {
+      game_id: gameId,
+      profile_id: profile?.id,
+      in_collection: status,
+    },
+
+    {
+      onConflict: 'game_id, profile_id',
+    },
+  );
+  if (error) throw error;
+  revalidatePath(`/places`);
+}
+
+export async function setInWishlistGame({
+  gameId,
+  status,
+}: {
+  gameId: string;
+  status: boolean;
+}) {
+  const { profile } = await getAuthenticatedUserWithProfile();
+  const supabase = await createClient();
+  const { error } = await supabase.from('profiles_games').upsert(
+    {
+      game_id: gameId,
+      profile_id: profile?.id,
+      in_wishlist: status,
+    },
+
+    {
+      onConflict: 'game_id, profile_id',
+    },
+  );
+  if (error) throw error;
+  revalidatePath(`/places`);
+}

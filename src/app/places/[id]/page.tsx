@@ -157,7 +157,7 @@ export default async function PlaceDetailsPage({
                     <StarIcon
                       className={`size-6  ${
                         location.locationStats[0]?.favourite
-                          ? 'text-amber-500 hover:text-gray-600'
+                          ? 'text-amber-300 hover:text-gray-600'
                           : 'text-gray-400'
                       }`}
                     />

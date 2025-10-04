@@ -21,6 +21,8 @@ import { Button } from './ui/button';
 import DeleteMatchButton from './DeleteMatchButton';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { formatMatchStatus, getMatchStatus } from '@/lib/match';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface MatchCardProps {
   match: Match;
@@ -29,7 +31,7 @@ interface MatchCardProps {
 
 export default async function MatchCard({ match, small }: MatchCardProps) {
   const matchStatus = getMatchStatus(match);
-  const { role } = await getAuthenticatedUserWithProfile();
+  const { profile, role } = await getAuthenticatedUserWithProfile();
   return (
     <SpotlightCard className="px-0 py-0">
       <div className="flex justify-between items-center p-4">
@@ -115,6 +117,43 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                 {match.description
                   ? match.description
                   : 'Descrizione non disponibile'}
+              </div>
+            )}
+            {match.players && (
+              <div className="flex">
+                {match.players.map((player) => (
+                  <Link
+                    key={player.id}
+                    href={`/profiles/${player.id}`}
+                    className="-ml-2"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Avatar>
+                          {player.profile?.image ? (
+                            <AvatarImage src={player.profile.image} />
+                          ) : (
+                            <AvatarFallback
+                              className={`uppercase border-1 ${
+                                player.profile?.id === profile?.id
+                                  ? 'border-emerald-500 bg-indigo-900'
+                                  : ''
+                              }`}
+                            >
+                              {player.profile?.username.charAt(0)}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>
+                          {player.profile?.username}{' '}
+                          {player.profile?.id === profile?.id && '(TU)'}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </Link>
+                ))}
               </div>
             )}
           </CardContent>

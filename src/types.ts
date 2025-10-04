@@ -106,5 +106,9 @@ interface Stats {
   favourite: boolean;
 }
 
-export type GameStats = Stats;
+export type GameStats = Stats & {
+  in_collection: boolean;
+  in_wishlist: boolean;
+  rating: number | null;
+};
 export type LocationStats = Stats;

@@ -8,7 +8,13 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-import { ChevronLeft, PlusIcon, StarIcon } from 'lucide-react';
+import {
+  ChevronLeft,
+  LibraryBigIcon,
+  PlusIcon,
+  SparklesIcon,
+  StarIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import MatchCard from '@/components/MatchCard';
@@ -20,7 +26,16 @@ import {
   getGameStatsPerProfile,
 } from '@/utils/auth-helpers';
 import { getGame, updateGame } from './actions';
-import { setFavouriteGame } from '../actions';
+import {
+  setFavouriteGame,
+  setInCollectionGame,
+  setInWishlistGame,
+} from '../actions';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface GameDetaisPageProps {
   params: Promise<{ id: string }>;
@@ -128,26 +143,77 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
             <CardHeader className="pb-8">
               <CardTitle className="text-3xl font-bold text-primary mb-2 items-center gap-2 flex justify-between">
                 <div>{game.name}</div>
-                <form
-                  action={setFavouriteGame.bind(null, {
-                    gameId: game.id!,
-                    status: !game.gameStats[0]?.favourite,
-                  })}
-                >
-                  <Button
-                    variant="link"
-                    className="hover:scale-110"
-                    type="submit"
+                <div className="flex gap-2 items-center mt-1.5 ml-auto">
+                  <form
+                    action={setFavouriteGame.bind(null, {
+                      gameId: game.id!,
+                      status: !game.gameStats[0]?.favourite,
+                    })}
                   >
-                    <StarIcon
-                      className={`size-6  ${
-                        game.gameStats[0]?.favourite
-                          ? 'text-amber-500 hover:text-gray-600'
-                          : 'text-gray-400'
-                      }`}
-                    />
-                  </Button>
-                </form>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="hover:scale-110" type="submit">
+                          <StarIcon
+                            className={`size-6  ${
+                              game.gameStats[0]?.favourite
+                                ? 'text-amber-300 hover:text-gray-600'
+                                : 'text-gray-400'
+                            }`}
+                          />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Aggiungi ai preferiti</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </form>
+                  <form
+                    action={setInCollectionGame.bind(null, {
+                      gameId: game.id!,
+                      status: !game.gameStats[0]?.in_collection,
+                    })}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="hover:scale-110" type="submit">
+                          <LibraryBigIcon
+                            className={`size-6  ${
+                              game.gameStats[0]?.in_collection
+                                ? 'text-emerald-300 hover:text-gray-600'
+                                : 'text-gray-400'
+                            }`}
+                          />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Aggiungi alla collezione</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </form>
+                  <form
+                    action={setInWishlistGame.bind(null, {
+                      gameId: game.id!,
+                      status: !game.gameStats[0]?.in_wishlist,
+                    })}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="hover:scale-110" type="submit">
+                          <SparklesIcon
+                            className={`size-6  ${
+                              game.gameStats[0]?.in_wishlist
+                                ? 'text-sky-300 hover:text-gray-600'
+                                : 'text-gray-400'
+                            }`}
+                          />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Aggiungi alla wishlist</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </form>
+                </div>
               </CardTitle>
               <CardDescription className="text-muted-foreground">
                 {year_published ? `Anno: ${year_published}` : null} | {designer}
