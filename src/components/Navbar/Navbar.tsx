@@ -50,7 +50,7 @@ export default async function Navbar() {
                     role === ROLE.Admin ? 'text-red-300' : 'text-blue-300'
                   }`}
                 >
-                  {profile.firstname}
+                  {profile.username}
                 </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="start">

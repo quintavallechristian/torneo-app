@@ -28,11 +28,19 @@ export async function signup(formData: FormData) {
     const lastname = formData.get('lastname') as string;
     const birthday = formData.get('birthday') as string;
     const country = formData.get('country') as string;
+    const username = formData.get('username') as string;
 
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .insert([
-        { user_id: data.user?.id, firstname, lastname, birthday, country },
+        {
+          user_id: data.user?.id,
+          firstname,
+          lastname,
+          birthday,
+          country,
+          username,
+        },
       ]);
 
     if (profileError) {

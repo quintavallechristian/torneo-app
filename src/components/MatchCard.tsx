@@ -33,11 +33,15 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
   return (
     <SpotlightCard className="px-0 py-0">
       <div className="flex justify-between items-center p-4">
-        <div className="flex items-center gap-2">
-          <DicesIcon className="h-5 w-5 text-amber-500" />
+        <div
+          className={`flex items-center gap-2 ${
+            small ? 'max-w-64' : 'max-w-full'
+          }`}
+        >
+          <DicesIcon className="h-5 w-5 text-amber-500 shrink-0" />
           <Link
             href={`/games/${match.game?.id}`}
-            className={`font-bold text-amber-600 dark:text-amber-400 hover:underline ${
+            className={`font-bold text-amber-600 dark:text-amber-400 hover:underline truncate ${
               small ? 'text-sm' : 'text-base'
             }`}
           >
@@ -45,7 +49,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
           </Link>
         </div>
         {match.winner?.id ? (
-          <div>
+          <div className="">
             <CrownIcon className="inline mr-1 h-4 w-4 text-amber-500 -rotate-30" />
             <span className="text-sm text-amber-500">
               {match.winner.username}
@@ -68,8 +72,8 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
             <Image
               src={match.game.image}
               alt={match.game.name}
-              width={small ? 140 : 220}
-              height={small ? 140 : 220}
+              width={small ? 120 : 220}
+              height={small ? 120 : 220}
               className="rounded-2xl shadow-lg object-cover border border-muted"
             />
           </div>
@@ -106,11 +110,13 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                 </Link>
               </div>
             </div>
-            <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700">
-              {match.description
-                ? match.description
-                : 'Descrizione non disponibile'}
-            </div>
+            {!small && (
+              <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700">
+                {match.description
+                  ? match.description
+                  : 'Descrizione non disponibile'}
+              </div>
+            )}
           </CardContent>
         </div>
       </div>

@@ -17,7 +17,8 @@ export async function getGame(gameId: string) {
             *, 
             matches:matches(*, 
             game:games(name, image, id), 
-            location:locations(name, id))
+            location:locations(name, id)),
+            gameStats:profiles_games(profile_id, favourite)
             `,
       )
       .eq('id', gameId)

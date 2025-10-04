@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-import { ChevronLeft, PlusIcon } from 'lucide-react';
+import { ChevronLeft, PlusIcon, StarIcon } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import MatchCard from '@/components/MatchCard';
@@ -20,12 +20,13 @@ import {
   getGameStatsPerProfile,
 } from '@/utils/auth-helpers';
 import { getGame, updateGame } from './actions';
+import { setFavouriteGame } from '../actions';
 
 interface GameDetaisPageProps {
   params: Promise<{ id: string }>;
 }
 
-function getPositionInGame(profileId: number, gameRanking: GameStats[]) {
+function getPositionInGame(profileId: string, gameRanking: GameStats[]) {
   let positionInGame = -1;
   if (gameRanking.length !== 0) {
     const position = gameRanking.findIndex((gs) => gs.profile_id === profileId);
@@ -44,7 +45,7 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
   const gameStats = await getGameStatsPerProfile(profile?.id || '', Number(id));
   const gameRanking = await getGameRanking(Number(id));
   let positionInGame = -1;
-  if (profile) {
+  if (profile && profile.id) {
     positionInGame = getPositionInGame(profile.id, gameRanking);
   }
 
@@ -125,8 +126,28 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
           </div>
           <div className="flex-1 w-full">
             <CardHeader className="pb-8">
-              <CardTitle className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
-                {game.name}
+              <CardTitle className="text-3xl font-bold text-primary mb-2 items-center gap-2 flex justify-between">
+                <div>{game.name}</div>
+                <form
+                  action={setFavouriteGame.bind(null, {
+                    gameId: game.id!,
+                    status: !game.gameStats[0]?.favourite,
+                  })}
+                >
+                  <Button
+                    variant="link"
+                    className="hover:scale-110"
+                    type="submit"
+                  >
+                    <StarIcon
+                      className={`size-6  ${
+                        game.gameStats[0]?.favourite
+                          ? 'text-amber-500 hover:text-gray-600'
+                          : 'text-gray-400'
+                      }`}
+                    />
+                  </Button>
+                </form>
               </CardTitle>
               <CardDescription className="text-muted-foreground">
                 {year_published ? `Anno: ${year_published}` : null} | {designer}

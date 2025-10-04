@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronLeft, PlusIcon } from 'lucide-react';
+import { ChevronLeft, PlusIcon, StarIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
@@ -19,19 +19,20 @@ import {
   getLocationStatsPerProfile,
 } from '@/utils/auth-helpers';
 import { Badge } from '@/components/ui/badge';
+import { setFavouriteLocation } from '../actions';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
 }
 
 function getPositionInLocation(
-  profileId: number,
+  profileId: string,
   locationRanking: LocationStats[],
 ) {
   let positionInLocation = -1;
   if (locationRanking.length !== 0) {
     const position = locationRanking.findIndex(
-      (gs) => gs.profile_id === profileId,
+      (ls) => ls.profile_id === profileId,
     );
     if (position !== -1) {
       positionInLocation = position + 1;
@@ -53,7 +54,7 @@ export default async function PlaceDetailsPage({
   );
   const gameRanking = await getLocationRanking(Number(id));
   let positionInLocation = -1;
-  if (profile) {
+  if (profile && profile.id) {
     positionInLocation = getPositionInLocation(profile.id, gameRanking);
   }
 
@@ -64,9 +65,10 @@ export default async function PlaceDetailsPage({
     const result = await supabase
       .from('locations')
       .select(
-        '*, matches:matches(*, game:games(name, image, id), location:locations(name, id), winner:profiles(id, username))',
+        '*, matches:matches(*, game:games(name, image, id), location:locations(name, id), winner:profiles(id, username)), locationStats:profiles_locations(profile_id, favourite)',
       )
       .eq('id', id)
+      .eq('profiles_locations.profile_id', profile?.id)
       .single<Location>();
     location = result.data;
     error = result.error;
@@ -132,27 +134,47 @@ export default async function PlaceDetailsPage({
             <Image
               src={location.image || '/placeholder.png'}
               alt={location.name}
-              width={250}
-              height={250}
-              className="rounded-2xl border-1 w-32 h-32 object-cover"
+              width={150}
+              height={150}
+              className="rounded-2xl border-1 object-cover dark:bg-emerald-800/20 bg-emerald-500"
             />
           </div>
           <div className="flex-1 w-full">
-            <CardHeader className="pb-8">
-              <CardTitle className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
-                {location.name}
+            <div className="pb-8">
+              <CardTitle className="text-3xl font-bold text-primary mb-2 items-center gap-2 flex justify-between">
+                <div>{location.name}</div>
+                <form
+                  action={setFavouriteLocation.bind(null, {
+                    locationId: location.id!,
+                    status: !location.locationStats[0]?.favourite,
+                  })}
+                >
+                  <Button
+                    variant="link"
+                    className="hover:scale-110"
+                    type="submit"
+                  >
+                    <StarIcon
+                      className={`size-6  ${
+                        location.locationStats[0]?.favourite
+                          ? 'text-amber-500 hover:text-gray-600'
+                          : 'text-gray-400'
+                      }`}
+                    />
+                  </Button>
+                </form>
               </CardTitle>
               <CardDescription className="text-muted-foreground">
                 {location.address}
               </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            </div>
+            <div className="space-y-4">
               {location.description && (
                 <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted  text-gray-700  text-sm">
                   <p className="whitespace-pre-line">{location.description}</p>
                 </div>
               )}
-            </CardContent>
+            </div>
           </div>
         </div>
       </SpotlightCard>

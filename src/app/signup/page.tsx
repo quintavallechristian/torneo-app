@@ -43,6 +43,19 @@ export default async function SignupPage() {
               required
               className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
             />
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 mt-4"
+            >
+              Username
+            </label>
+            <Input
+              type="text"
+              id="username"
+              name="username"
+              required
+              className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+            />
           </div>
           <div className="flex gap-4">
             <div className="w-1/2">

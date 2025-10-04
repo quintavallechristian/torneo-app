@@ -72,6 +72,7 @@ export type Game = {
   updated_at: string | null;
   thumbnail: string | null;
   matches?: Match[];
+  gameStats: GameStats[];
 };
 export type Location = {
   id: string;
@@ -82,6 +83,7 @@ export type Location = {
   longitude: number | null;
   description: string | null;
   matches?: Match[];
+  locationStats: LocationStats[];
 };
 export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;
@@ -94,13 +96,14 @@ export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
 interface Stats {
   id: number;
   created_at: string;
-  profile_id: number;
+  profile_id: string;
   points: number;
   game_id: number;
   win: number;
   loss: number;
   draw: number;
   minutes_played: number;
+  favourite: boolean;
 }
 
 export type GameStats = Stats;
