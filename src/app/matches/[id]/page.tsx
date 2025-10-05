@@ -1,7 +1,14 @@
 'use server';
 import { Button } from '@/components/ui/button';
 
-import { ChevronLeft, TrophyIcon } from 'lucide-react';
+import {
+  ChevronLeft,
+  TrophyIcon,
+  UserCheck,
+  UserPlus,
+  UserRoundCheck,
+  UserRoundX,
+} from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
@@ -10,7 +17,12 @@ import { Match, Player, ROLE } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
-import { setWinner } from './actions';
+import {
+  confirmPlayer,
+  removePlayer,
+  setWinner,
+  subscribeMatch,
+} from './actions';
 import MatchCard from '@/components/MatchCard';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
@@ -19,7 +31,7 @@ export default async function MatchDetailsPage({
   params,
 }: MatchDetailPageProps) {
   const { id } = await params;
-  const { role } = await getAuthenticatedUserWithProfile();
+  const { profile, role } = await getAuthenticatedUserWithProfile();
   const supabase = await createClient();
   const { data: match, error } = await supabase
     .from('matches')
@@ -83,6 +95,19 @@ export default async function MatchDetailsPage({
                   ({(match.players || []).length}/{match.max_players || '∞'})
                 </span>
               </div>
+              <form
+                action={subscribeMatch.bind(null, {
+                  match_id: match.id!,
+                })}
+              >
+                {!match.players?.find(
+                  (player) => player.profile?.id === profile?.id,
+                ) ? (
+                  <Button variant="outline" type="submit" size="sm">
+                    <UserPlus className="size-4" strokeWidth={1} />
+                  </Button>
+                ) : null}
+              </form>
               {role === ROLE.Admin && (
                 <>{match.id && <AddPlayerModal matchId={match.id} />}</>
               )}
@@ -94,11 +119,18 @@ export default async function MatchDetailsPage({
                     className={`
                       flex items-center gap-4 my-2 px-2 py-2 
                     `}
-                    bgClassName={`bg-gradient-to-br ${
-                      playerObj.profile?.id === match.winner?.id
-                        ? 'border border-amber-500 from-yellow-500 to-amber-800'
-                        : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
-                    }`}
+                    bgClassName={`
+                      ${
+                        playerObj.profile?.id === match.winner?.id
+                          ? 'border border-amber-500 from-yellow-500 to-amber-800'
+                          : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
+                      }
+                      ${
+                        playerObj.confirmed
+                          ? 'bg-gradient-to-br'
+                          : 'bg-opacity-50'
+                      }
+                    `}
                     spotlightColor={`${
                       playerObj.profile?.id === match.winner?.id
                         ? 'rgba(255, 255, 0, 0.188)'
@@ -107,7 +139,11 @@ export default async function MatchDetailsPage({
                     key={`${playerObj.profile?.id}-${index}`}
                   >
                     {role === ROLE.Admin && (
-                      <div className="flex flex-col gap-2 ml-4">
+                      <div
+                        className={`${
+                          playerObj.confirmed ? 'opacity-100' : 'opacity-50'
+                        } flex flex-col gap-2 ml-4`}
+                      >
                         {match.id && playerObj.profile?.id && (
                           <form
                             action={setWinner.bind(null, {
@@ -156,22 +192,72 @@ export default async function MatchDetailsPage({
                         alt={playerObj.profile?.username || 'Avatar'}
                         width={64}
                         height={64}
-                        className="bg-slate-900 rounded-2xl border-1 w-16 h-16 object-cover"
+                        className={`bg-slate-900 rounded-2xl border-1 w-16 h-16 object-cover
+                          ${
+                            playerObj.confirmed ? 'opacity-100' : 'opacity-50'
+                          }`}
                       />
                     </div>
-                    <div className="font-bold text-lg">
+                    <div
+                      className={`font-bold text-lg
+                          ${
+                            playerObj.confirmed ? 'opacity-100' : 'opacity-50'
+                          }`}
+                    >
                       {playerObj.profile?.username ??
                         playerObj.profile?.firstname ??
                         'Anonimo'}
                     </div>
-                    <div className="text-right ml-auto">
-                      <PointsPopover
-                        gameId={match.game!.id}
-                        matchId={match.id!}
-                        playerId={playerObj.profile!.id!}
-                        startingPoints={playerObj.points || 0}
-                      />
-                    </div>
+                    {playerObj.confirmed ? (
+                      <div className="text-right ml-auto">
+                        <PointsPopover
+                          gameId={match.game!.id}
+                          matchId={match.id!}
+                          playerId={playerObj.profile!.id!}
+                          startingPoints={playerObj.points || 0}
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-right ml-auto">
+                        {role === ROLE.Admin && (
+                          <div className="flex flex-col gap-2 ml-4">
+                            {match.id && playerObj.profile?.id && (
+                              <div className="flex gap-2">
+                                <form
+                                  action={confirmPlayer.bind(null, {
+                                    matchId: match.id!,
+                                    profileId: playerObj.profile.id,
+                                  })}
+                                >
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    type="submit"
+                                  >
+                                    <UserRoundCheck
+                                      className="size-4"
+                                      strokeWidth={1}
+                                    />
+                                  </Button>
+                                </form>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {playerObj.profile?.id && (
+                      <form
+                        action={removePlayer.bind(null, {
+                          matchId: match.id!,
+                          profileId: playerObj.profile.id,
+                        })}
+                      >
+                        <Button variant="outline" size="sm" type="submit">
+                          <UserRoundX className="size-4" strokeWidth={1} />
+                        </Button>
+                      </form>
+                    )}
                   </SpotlightCard>
                 ))}
               </div>

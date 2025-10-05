@@ -121,39 +121,42 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
             )}
             {match.players && (
               <div className="flex">
-                {match.players.map((player) => (
-                  <Link
-                    key={player.id}
-                    href={`/profiles/${player.id}`}
-                    className="-ml-2"
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Avatar>
-                          {player.profile?.image ? (
-                            <AvatarImage src={player.profile.image} />
-                          ) : (
-                            <AvatarFallback
-                              className={`uppercase border-1 ${
-                                player.profile?.id === profile?.id
-                                  ? 'border-emerald-500 bg-indigo-900'
-                                  : ''
-                              }`}
-                            >
-                              {player.profile?.username.charAt(0)}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          {player.profile?.username}{' '}
-                          {player.profile?.id === profile?.id && '(TU)'}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </Link>
-                ))}
+                {match.players.map(
+                  (player) =>
+                    player.confirmed && (
+                      <Link
+                        key={player.id}
+                        href={`/profiles/${player.id}`}
+                        className="-ml-2"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Avatar>
+                              {player.profile?.image ? (
+                                <AvatarImage src={player.profile.image} />
+                              ) : (
+                                <AvatarFallback
+                                  className={`uppercase border-1 ${
+                                    player.profile?.id === profile?.id
+                                      ? 'border-emerald-500 bg-indigo-900'
+                                      : ''
+                                  }`}
+                                >
+                                  {player.profile?.username.charAt(0)}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {player.profile?.username}{' '}
+                              {player.profile?.id === profile?.id && '(TU)'}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </Link>
+                    ),
+                )}
               </div>
             )}
           </CardContent>

@@ -13,7 +13,7 @@ export async function addPlayer({
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('profiles_matches')
-      .insert([{ profile_id, match_id }]);
+      .insert([{ profile_id, match_id, confirmed: true }]);
 
     if (error) {
       console.error('Error creating profiles_matches:', error);

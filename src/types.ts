@@ -53,7 +53,9 @@ export type Player = {
   id: string;
   points: number | null;
   profile: Profile | null;
+  confirmed: boolean | null;
 };
+
 export type Game = {
   id: string;
   name: string;
