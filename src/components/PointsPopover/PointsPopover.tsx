@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { updatePlayerPoints } from './actions';
+import { updatePlayerPoints } from '@/lib/match';
 //import { createClient } from '@/utils/supabase/server';
 
 export async function PointsPopover({

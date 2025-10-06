@@ -51,11 +51,14 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
           </Link>
         </div>
         {match.winner?.id ? (
-          <div className="">
-            <CrownIcon className="inline mr-1 h-4 w-4 text-amber-500 -rotate-30" />
-            <span className="text-sm text-amber-500">
-              {match.winner.username}
-            </span>
+          <div className="relative">
+            <div className="size-96 -right-52 -top-52 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
+            <div>
+              <CrownIcon className="inline mr-1 h-4 w-4 text-amber-500 -rotate-30" />
+              <span className="text-sm text-amber-500">
+                {match.winner.username}
+              </span>
+            </div>
           </div>
         ) : (
           <Badge
@@ -124,28 +127,29 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                 {match.players.map(
                   (player) =>
                     player.confirmed && (
-                      <Link
-                        key={player.id}
-                        href={`/profiles/${player.id}`}
-                        className="-ml-2"
-                      >
+                      <Link key={player.id} href={`/profiles/${player.id}`}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Avatar>
-                              {player.profile?.image ? (
-                                <AvatarImage src={player.profile.image} />
-                              ) : (
-                                <AvatarFallback
-                                  className={`uppercase border-1 ${
-                                    player.profile?.id === profile?.id
-                                      ? 'border-emerald-500 bg-indigo-900'
-                                      : ''
-                                  }`}
-                                >
-                                  {player.profile?.username.charAt(0)}
-                                </AvatarFallback>
+                            <div className="relative">
+                              {player.profile?.id === match.winner?.id && (
+                                <div className="size-20 -right-6 -top-6 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
                               )}
-                            </Avatar>
+                              <Avatar>
+                                {player.profile?.image ? (
+                                  <AvatarImage src={player.profile.image} />
+                                ) : (
+                                  <AvatarFallback
+                                    className={`uppercase border-1 text-white bg-indigo-800 ${
+                                      player.profile?.id === profile?.id
+                                        ? 'border-emerald-500'
+                                        : ''
+                                    }`}
+                                  >
+                                    {player.profile?.username.charAt(0)}
+                                  </AvatarFallback>
+                                )}
+                              </Avatar>
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>

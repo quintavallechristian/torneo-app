@@ -1,11 +1,6 @@
 'use server';
 import { Button } from '@/components/ui/button';
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { CardDescription, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, PlusIcon, StarIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
@@ -20,6 +15,9 @@ import {
 } from '@/utils/auth-helpers';
 import { Badge } from '@/components/ui/badge';
 import { setFavouriteLocation } from '../actions';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import MatchList from '@/components/MatchList';
+import Ranking from '@/components/Ranking';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -47,7 +45,6 @@ export default async function PlaceDetailsPage({
   const { id } = await params;
   const { profile, role } = await getAuthenticatedUserWithProfile();
 
-  // Get game stats for this user and game
   const locationStats = await getLocationStatsPerProfile(
     profile?.id || '',
     Number(id),
@@ -65,7 +62,17 @@ export default async function PlaceDetailsPage({
     const result = await supabase
       .from('locations')
       .select(
-        '*, matches:matches(*, game:games(name, image, id), location:locations(name, id), winner:profiles(id, username)), locationStats:profiles_locations(profile_id, favourite)',
+        `*, 
+        matches:matches(
+          *,
+          players:profiles_matches(
+            *,
+            profile:profiles(*)
+          ),
+          game:games(name, image, id), 
+          location:locations(name, id), 
+          winner:profiles(id, username)),
+          locationStats:profiles_locations(profile_id, favourite)`,
       )
       .eq('id', id)
       .eq('profiles_locations.profile_id', profile?.id)
@@ -179,27 +186,18 @@ export default async function PlaceDetailsPage({
         </div>
       </SpotlightCard>
       <section className="mt-8">
-        <div className="flex items-center gap-4 mb-4">
-          <h2 className="text-xl font-semibold">Partite collegate</h2>
-          {role === ROLE.Admin && (
-            <Link href={`/matches/new?place_id=${location.id}`}>
-              <Button variant="outline" size="sm" data-testid="Add player">
-                <PlusIcon className="inline h-6 w-6" />
-              </Button>
-            </Link>
-          )}
-        </div>
-        {location.matches && location.matches.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {location.matches.map((match) => (
-              <MatchCard key={match.id} match={match} small />
-            ))}
-          </div>
-        ) : (
-          <p className="italic text-muted-foreground">
-            Nessun partita collegato.
-          </p>
-        )}
+        <Tabs defaultValue="matches">
+          <TabsList>
+            <TabsTrigger value="matches">Partite collegate</TabsTrigger>
+            <TabsTrigger value="ranking">Classifica</TabsTrigger>
+          </TabsList>
+          <TabsContent value="matches" className="w-full">
+            <MatchList matches={location.matches} locationId={location.id} />
+          </TabsContent>
+          <TabsContent value="ranking">
+            <Ranking locationId={location.id} />
+          </TabsContent>
+        </Tabs>
       </section>
     </div>
   );

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
   TrophyIcon,
-  UserCheck,
+  UserMinus,
   UserPlus,
   UserRoundCheck,
   UserRoundX,
@@ -22,8 +22,10 @@ import {
   removePlayer,
   setWinner,
   subscribeMatch,
+  unsubscribeMatch,
 } from './actions';
 import MatchCard from '@/components/MatchCard';
+import ProfileListItem from '@/components/ProfileListItem';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -95,19 +97,29 @@ export default async function MatchDetailsPage({
                   ({(match.players || []).length}/{match.max_players || '∞'})
                 </span>
               </div>
-              <form
-                action={subscribeMatch.bind(null, {
-                  match_id: match.id!,
-                })}
-              >
-                {!match.players?.find(
-                  (player) => player.profile?.id === profile?.id,
-                ) ? (
+              {!match.players?.find(
+                (player) => player.profile?.id === profile?.id,
+              ) ? (
+                <form
+                  action={subscribeMatch.bind(null, {
+                    match_id: match.id!,
+                  })}
+                >
                   <Button variant="outline" type="submit" size="sm">
                     <UserPlus className="size-4" strokeWidth={1} />
                   </Button>
-                ) : null}
-              </form>
+                </form>
+              ) : (
+                <form
+                  action={unsubscribeMatch.bind(null, {
+                    match_id: match.id!,
+                  })}
+                >
+                  <Button variant="outline" type="submit" size="sm">
+                    <UserMinus className="size-4" strokeWidth={1} />
+                  </Button>
+                </form>
+              )}
               {role === ROLE.Admin && (
                 <>{match.id && <AddPlayerModal matchId={match.id} />}</>
               )}
@@ -115,150 +127,191 @@ export default async function MatchDetailsPage({
             {match.players && match.players.length > 0 ? (
               <div className="space-y-4">
                 {match.players.map((playerObj: Player, index: number) => (
-                  <SpotlightCard
-                    className={`
-                      flex items-center gap-4 my-2 px-2 py-2 
-                    `}
-                    bgClassName={`
-                      ${
-                        playerObj.profile?.id === match.winner?.id
-                          ? 'border border-amber-500 from-yellow-500 to-amber-800'
-                          : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
-                      }
-                      ${
-                        playerObj.confirmed
-                          ? 'bg-gradient-to-br'
-                          : 'bg-opacity-50'
-                      }
-                    `}
-                    spotlightColor={`${
-                      playerObj.profile?.id === match.winner?.id
-                        ? 'rgba(255, 255, 0, 0.188)'
-                        : 'rgba(0, 229, 255, 0.2)'
-                    }`}
+                  // <SpotlightCard
+                  //   className={`
+                  //     flex items-center gap-4 my-2 px-2 py-2
+                  //   `}
+                  //   bgClassName={`
+                  //     ${
+                  //       playerObj.profile?.id === match.winner?.id
+                  //         ? 'border border-amber-500 from-yellow-500 to-amber-800'
+                  //         : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
+                  //     }
+                  //     ${
+                  //       playerObj.confirmed
+                  //         ? 'bg-gradient-to-br'
+                  //         : 'bg-opacity-50'
+                  //     }
+                  //   `}
+                  //   spotlightColor={`${
+                  //     playerObj.profile?.id === match.winner?.id
+                  //       ? 'rgba(255, 255, 0, 0.188)'
+                  //       : 'rgba(0, 229, 255, 0.2)'
+                  //   }`}
+                  //   key={`${playerObj.profile?.id}-${index}`}
+                  // >
+                  //   {playerObj.confirmed && (
+                  //     <div
+                  //       className={`${
+                  //         playerObj.confirmed ? 'opacity-100' : 'opacity-50'
+                  //       } flex flex-col gap-2 ml-4`}
+                  //     >
+                  //       {match.id && playerObj.profile?.id && (
+                  //         <form
+                  //           action={setWinner.bind(null, {
+                  //             matchId: match.id!,
+                  //             winnerId: playerObj.profile.id,
+                  //           })}
+                  //         >
+                  //           <input
+                  //             type="hidden"
+                  //             name="matchId"
+                  //             value={match.id}
+                  //           />
+                  //           <input
+                  //             type="hidden"
+                  //             name="winnerId"
+                  //             value={playerObj.profile.id}
+                  //           />
+                  //           <button
+                  //             type="submit"
+                  //             className={`
+                  //               cursor-pointer size-14 flex items-center justify-center
+                  //               disabled:opacity-100
+                  //               ${
+                  //                 playerObj.profile?.id === match.winner?.id
+                  //                   ? 'bg-amber-100 text-amber-500'
+                  //                   : 'bg-indigo-50/5'
+                  //               }
+                  //             `}
+                  //             disabled={
+                  //               playerObj.profile?.id === match.winner?.id
+                  //             }
+                  //             style={{
+                  //               clipPath:
+                  //                 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
+                  //             }}
+                  //           >
+                  //             <TrophyIcon className="size-7" strokeWidth={1} />
+                  //           </button>
+                  //         </form>
+                  //       )}
+                  //     </div>
+                  //   )}
+                  //   <div>
+                  //     <Image
+                  //       src={playerObj.profile?.image || '/placeholder.png'}
+                  //       alt={playerObj.profile?.username || 'Avatar'}
+                  //       width={64}
+                  //       height={64}
+                  //       className={`bg-slate-900 rounded-2xl border-1 w-16 h-16 object-cover
+                  //         ${
+                  //           playerObj.confirmed ? 'opacity-100' : 'opacity-50'
+                  //         }`}
+                  //     />
+                  //   </div>
+                  //   <div
+                  //     className={`font-bold text-lg
+                  //         ${
+                  //           playerObj.confirmed ? 'opacity-100' : 'opacity-50'
+                  //         }`}
+                  //   >
+                  //     {playerObj.profile?.username ??
+                  //       playerObj.profile?.firstname ??
+                  //       'Anonimo'}
+                  //   </div>
+                  //   {playerObj.confirmed ? (
+                  //     <div className="text-right ml-auto">
+                  //       <PointsPopover
+                  //         gameId={match.game!.id}
+                  //         matchId={match.id!}
+                  //         playerId={playerObj.profile!.id!}
+                  //         startingPoints={playerObj.points || 0}
+                  //       />
+                  //     </div>
+                  //   ) : (
+                  //     <div className="text-right ml-auto">
+                  //       {role === ROLE.Admin && (
+                  //         <div className="flex flex-col gap-2 ml-4">
+                  //           {match.id && playerObj.profile?.id && (
+                  //             <div className="flex gap-2">
+                  //               <form
+                  //                 action={confirmPlayer.bind(null, {
+                  //                   matchId: match.id!,
+                  //                   profileId: playerObj.profile.id,
+                  //                 })}
+                  //               >
+                  //                 <Button
+                  //                   variant="default"
+                  //                   size="sm"
+                  //                   type="submit"
+                  //                 >
+                  //                   <UserRoundCheck
+                  //                     className="size-4"
+                  //                     strokeWidth={1}
+                  //                   />
+                  //                 </Button>
+                  //               </form>
+                  //             </div>
+                  //           )}
+                  //         </div>
+                  //       )}
+                  //     </div>
+                  //   )}
+                  //   {role === ROLE.Admin && playerObj.profile?.id && (
+                  //     <form
+                  //       action={removePlayer.bind(null, {
+                  //         matchId: match.id!,
+                  //         profileId: playerObj.profile.id,
+                  //       })}
+                  //     >
+                  //       <Button variant="destructive" size="sm" type="submit">
+                  //         <UserRoundX className="size-4" strokeWidth={1} />
+                  //       </Button>
+                  //     </form>
+                  //   )}
+                  // </SpotlightCard>
+                  <ProfileListItem
                     key={`${playerObj.profile?.id}-${index}`}
-                  >
-                    {role === ROLE.Admin && (
-                      <div
-                        className={`${
-                          playerObj.confirmed ? 'opacity-100' : 'opacity-50'
-                        } flex flex-col gap-2 ml-4`}
-                      >
-                        {match.id && playerObj.profile?.id && (
+                    player={playerObj}
+                    match={match}
+                    relevant={!!playerObj.confirmed}
+                    TrophySlot={playerObj.confirmed ? null : () => null}
+                    PointsSlot={playerObj.confirmed ? null : () => null}
+                    AdminActionsSlot={
+                      role === ROLE.Admin && (
+                        <>
                           <form
-                            action={setWinner.bind(null, {
+                            action={confirmPlayer.bind(null, {
                               matchId: match.id!,
-                              winnerId: playerObj.profile.id,
+                              profileId: playerObj.profile!.id!,
                             })}
                           >
-                            <input
-                              type="hidden"
-                              name="matchId"
-                              value={match.id}
-                            />
-                            <input
-                              type="hidden"
-                              name="winnerId"
-                              value={playerObj.profile.id}
-                            />
-                            <button
-                              type="submit"
-                              className={`
-                                cursor-pointer size-14 flex items-center justify-center
-                                disabled:opacity-100
-                                ${
-                                  playerObj.profile?.id === match.winner?.id
-                                    ? 'bg-amber-100 text-amber-500'
-                                    : 'bg-indigo-50/5'
-                                }
-                              `}
-                              disabled={
-                                playerObj.profile?.id === match.winner?.id
-                              }
-                              style={{
-                                clipPath:
-                                  'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
-                              }}
-                            >
-                              <TrophyIcon className="size-7" strokeWidth={1} />
-                            </button>
+                            <Button variant="default" size="sm" type="submit">
+                              <UserRoundCheck
+                                className="size-4"
+                                strokeWidth={1}
+                              />
+                            </Button>
                           </form>
-                        )}
-                      </div>
-                    )}
-                    <div>
-                      <Image
-                        src={playerObj.profile?.image || '/placeholder.png'}
-                        alt={playerObj.profile?.username || 'Avatar'}
-                        width={64}
-                        height={64}
-                        className={`bg-slate-900 rounded-2xl border-1 w-16 h-16 object-cover
-                          ${
-                            playerObj.confirmed ? 'opacity-100' : 'opacity-50'
-                          }`}
-                      />
-                    </div>
-                    <div
-                      className={`font-bold text-lg
-                          ${
-                            playerObj.confirmed ? 'opacity-100' : 'opacity-50'
-                          }`}
-                    >
-                      {playerObj.profile?.username ??
-                        playerObj.profile?.firstname ??
-                        'Anonimo'}
-                    </div>
-                    {playerObj.confirmed ? (
-                      <div className="text-right ml-auto">
-                        <PointsPopover
-                          gameId={match.game!.id}
-                          matchId={match.id!}
-                          playerId={playerObj.profile!.id!}
-                          startingPoints={playerObj.points || 0}
-                        />
-                      </div>
-                    ) : (
-                      <div className="text-right ml-auto">
-                        {role === ROLE.Admin && (
-                          <div className="flex flex-col gap-2 ml-4">
-                            {match.id && playerObj.profile?.id && (
-                              <div className="flex gap-2">
-                                <form
-                                  action={confirmPlayer.bind(null, {
-                                    matchId: match.id!,
-                                    profileId: playerObj.profile.id,
-                                  })}
-                                >
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    type="submit"
-                                  >
-                                    <UserRoundCheck
-                                      className="size-4"
-                                      strokeWidth={1}
-                                    />
-                                  </Button>
-                                </form>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    {playerObj.profile?.id && (
-                      <form
-                        action={removePlayer.bind(null, {
-                          matchId: match.id!,
-                          profileId: playerObj.profile.id,
-                        })}
-                      >
-                        <Button variant="outline" size="sm" type="submit">
-                          <UserRoundX className="size-4" strokeWidth={1} />
-                        </Button>
-                      </form>
-                    )}
-                  </SpotlightCard>
+                          <form
+                            action={removePlayer.bind(null, {
+                              matchId: match.id!,
+                              profileId: playerObj.profile!.id!,
+                            })}
+                          >
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              type="submit"
+                            >
+                              <UserRoundX className="size-4" strokeWidth={1} />
+                            </Button>
+                          </form>
+                        </>
+                      )
+                    }
+                  />
                 ))}
               </div>
             ) : (

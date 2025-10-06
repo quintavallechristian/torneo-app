@@ -33,6 +33,22 @@ export async function subscribeMatch({ match_id }: { match_id: string }) {
   }
   revalidatePath(`/matches/${match_id}`);
 }
+export async function unsubscribeMatch({ match_id }: { match_id: string }) {
+  const { profile } = await getAuthenticatedUserWithProfile();
+  if (!profile) throw new Error('User not authenticated');
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('profiles_matches')
+    .delete()
+    .eq('profile_id', profile.id)
+    .eq('match_id', match_id);
+
+  if (error) {
+    console.error('Error removing profiles_matches:', error);
+    throw error;
+  }
+  revalidatePath(`/matches/${match_id}`);
+}
 
 export async function confirmPlayer({
   matchId,
