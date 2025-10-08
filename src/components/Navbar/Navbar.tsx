@@ -13,6 +13,7 @@ import {
 import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { ROLE } from '@/types';
+import { MyNavigationMenu } from './MyNavigationMenu';
 
 async function handleLogout() {
   'use server';
@@ -29,17 +30,7 @@ export default async function Navbar() {
       <div>
         <Link href="/">Logo</Link>
       </div>
-      <div>
-        <Link href="/matches" className="mr-4 hover:underline">
-          Partite
-        </Link>
-        <Link href="/games" className="mr-4 hover:underline">
-          Giochi
-        </Link>
-        <Link href="/places" className="mr-4 hover:underline">
-          Luoghi
-        </Link>
-      </div>
+      <MyNavigationMenu />
       <div className="flex items-center gap-4">
         {profile ? (
           <div>

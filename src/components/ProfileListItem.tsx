@@ -1,68 +1,56 @@
 import SpotlightCard from '@/components/SpotlightCard';
 import React from 'react';
-import { Match, Player, ROLE } from '@/types';
-import { TrophyIcon, UserRoundCheck, UserRoundX } from 'lucide-react';
-import Image from 'next/image';
-import { PointsPopover } from './PointsPopover/PointsPopover';
-import { setWinner } from '@/app/matches/[id]/actions';
+import { Player } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { get } from 'http';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 interface ProfileListItemProps {
   player: Player;
-  match: Match;
   relevant?: boolean;
+  isWinner?: boolean;
+  index?: number;
 
   /** --- Render Slot personalizzabili --- */
-  TrophySlot?: React.ReactNode | ((player: Player) => React.ReactNode);
-  PointsSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
+  IntroSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
+  StatsSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
   AdminActionsSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
 }
 
 export default async function ProfileListItem({
   player,
-  match,
   relevant = true,
-  TrophySlot,
-  PointsSlot,
+  isWinner = false,
+  index,
+  IntroSlot,
+  StatsSlot,
   AdminActionsSlot,
 }: ProfileListItemProps) {
   const { profile } = await getAuthenticatedUserWithProfile();
-  const isWinner = player.profile?.id === match.winner?.id;
 
-  const defaultTrophy = (
-    <form
-      action={setWinner.bind(null, {
-        matchId: match.id!,
-        winnerId: player.profile!.id!,
-      })}
+  const defaultIntro = (
+    <button
+      type="submit"
+      className={`
+        cursor-pointer size-10 flex items-center justify-center ring-offset-1
+        ${index === 1 ? 'bg-yellow-400 ring-amber-200 text-white' : ''}
+        ${index === 2 ? 'bg-slate-400 ring-slate-200 text-white' : ''}
+        ${index === 3 ? 'bg-amber-600 ring-amber-500 text-white' : ''}
+        ${!index || index > 3 ? 'bg-indigo-50/5' : ''}
+      `}
+      style={{
+        clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
+      }}
     >
-      <button
-        type="submit"
-        className={`
-          cursor-pointer size-14 flex items-center justify-center
-          disabled:opacity-100
-          ${isWinner ? 'bg-amber-100 text-amber-500' : 'bg-indigo-50/5'}
-        `}
-        disabled={isWinner}
-        style={{
-          clipPath:
-            'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
-        }}
-      >
-        <TrophyIcon className="size-7" strokeWidth={1} />
-      </button>
-    </form>
+      {index}
+    </button>
   );
 
-  const defaultPointsPopover = (
-    <PointsPopover
-      gameId={match.game!.id}
-      matchId={match.id!}
-      playerId={player.profile!.id!}
-      startingPoints={player.points || 0}
-    />
+  const defaultStatsArea = (
+    <button className="cursor-pointer focus:outline-none">
+      <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
+        {player.points || 0} pts
+      </span>
+    </button>
   );
 
   const defaultAdminActions = null;
@@ -88,7 +76,7 @@ export default async function ProfileListItem({
       }
     >
       <div className="flex flex-col gap-2 ml-4">
-        {renderSlot(TrophySlot, defaultTrophy)}
+        {renderSlot(IntroSlot, defaultIntro)}
       </div>
 
       {/* --- AVATAR --- */}
@@ -120,7 +108,7 @@ export default async function ProfileListItem({
         {/* --- POINTS POPOVER --- */}
         {
           <div className="text-right ml-auto">
-            {renderSlot(PointsSlot, defaultPointsPopover)}
+            {renderSlot(StatsSlot, defaultStatsArea)}
           </div>
         }
 

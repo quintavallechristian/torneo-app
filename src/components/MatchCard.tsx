@@ -32,12 +32,13 @@ interface MatchCardProps {
 export default async function MatchCard({ match, small }: MatchCardProps) {
   const matchStatus = getMatchStatus(match);
   const { profile, role } = await getAuthenticatedUserWithProfile();
+
   return (
     <SpotlightCard className="px-0 py-0">
-      <div className="flex justify-between items-center p-4">
+      <div className="flex justify-between items-center p-4 gap-2">
         <div
           className={`flex items-center gap-2 ${
-            small ? 'max-w-64' : 'max-w-full'
+            small ? 'max-w-52 md:max-w-64' : 'max-w-64 md:max-w-full'
           }`}
         >
           <DicesIcon className="h-5 w-5 text-amber-500 shrink-0" />
@@ -53,27 +54,38 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
         {match.winner?.id ? (
           <div className="relative">
             <div className="size-96 -right-52 -top-52 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
-            <div>
-              <CrownIcon className="inline mr-1 h-4 w-4 text-amber-500 -rotate-30" />
-              <span className="text-sm text-amber-500">
+            <div className="flex items-center gap-1">
+              <CrownIcon className="h-4 w-4 text-amber-500 -rotate-30 shrink-0" />
+              <span className="text-sm text-amber-500 truncate">
                 {match.winner.username}
               </span>
             </div>
           </div>
         ) : (
-          <Badge
-            className={`${formatMatchStatus(matchStatus).color} ${
-              small ? 'rounded-full px-2 py-2' : 'px-2 py-1 rounded-full'
-            }`}
-          >
-            {small ? '' : formatMatchStatus(matchStatus).label}
-          </Badge>
+          <>
+            <Badge
+              className={`hidden md:block ${
+                formatMatchStatus(matchStatus).color
+              } ${small ? 'rounded-full px-2 py-2' : 'px-2 py-1 rounded-full'}`}
+            >
+              {small ? '' : formatMatchStatus(matchStatus).label}
+            </Badge>
+            <Badge
+              className={`rounded-full px-2 py-2 md:hidden ${
+                formatMatchStatus(matchStatus).color
+              }`}
+            ></Badge>
+          </>
         )}
       </div>
-      <div className={`flex px-4 pb-6 ${small ? 'text-sm' : 'text-base'}`}>
+      <div
+        className={`flex px-4 pb-6 ${
+          small ? 'text-sm flex-row' : 'text-base flex-col md:flex-row gap-4'
+        }`}
+      >
         {/* Immagine del gioco se disponibile */}
         {match.game?.image && (
-          <div className="flex-shrink-0 space-y-2">
+          <div className="flex-shrink-0 space-y-2 mx-auto md:mx-0">
             <Image
               src={match.game.image}
               alt={match.game.name}
@@ -100,7 +112,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
           <CardContent className="space-y-4 w-full">
             <div className="flex flex-wrap gap-2 mb-2">
               <div className="flex items-center gap-1">
-                <CalendarIcon className="size-4 text-slate-500" />
+                <CalendarIcon className="size-4 text-slate-500 shrink-0" />
                 <span className="text-xs text-slate-600 dark:text-slate-400 hover:underline">
                   Dal {match.startAt} al {match.endAt}
                 </span>

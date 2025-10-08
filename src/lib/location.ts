@@ -1,3 +1,4 @@
+import { LocationStats } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 
 export async function getLocationRanking(locationId?: string) {
@@ -6,11 +7,11 @@ export async function getLocationRanking(locationId?: string) {
 
   const { data, error } = await supabase
     .from('profiles_locations')
-    .select('profile_id, points')
+    .select('*, profile:profiles(*)')
     .eq('location_id', locationId)
     .order('points', { ascending: false });
 
   if (error) throw error;
 
-  return data;
+  return data as LocationStats[];
 }

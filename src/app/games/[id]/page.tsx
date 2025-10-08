@@ -11,10 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import {
   ChevronLeft,
   LibraryBigIcon,
-  PlusIcon,
   SparklesIcon,
   StarIcon,
 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import Image from 'next/image';
 import MatchCard from '@/components/MatchCard';
@@ -36,6 +36,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import MatchList from '@/components/MatchList';
+import Ranking from '@/components/Ranking';
 
 interface GameDetaisPageProps {
   params: Promise<{ id: string }>;
@@ -277,27 +279,18 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
         </div>
       </SpotlightCard>
       <section className="mt-8">
-        <div className="flex items-center gap-4 mb-4">
-          <h2 className="text-xl font-semibold">Partite collegate</h2>
-          {role === ROLE.Admin && (
-            <Link href={`/matches/new?game_id=${game.id}`}>
-              <Button variant="outline" size="sm" data-testid="Add player">
-                <PlusIcon className="inline h-6 w-6" />
-              </Button>
-            </Link>
-          )}
-        </div>
-        {game.matches && game.matches.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {game.matches.map((match) => (
-              <MatchCard small key={match.id} match={match} />
-            ))}
-          </div>
-        ) : (
-          <p className="italic text-muted-foreground">
-            Nessun partita collegato.
-          </p>
-        )}
+        <Tabs defaultValue="matches">
+          <TabsList>
+            <TabsTrigger value="matches">Partite collegate</TabsTrigger>
+            <TabsTrigger value="ranking">Classifica</TabsTrigger>
+          </TabsList>
+          <TabsContent value="matches" className="w-full">
+            <MatchList matches={game.matches} gameId={game.id} />
+          </TabsContent>
+          <TabsContent value="ranking">
+            <Ranking gameId={game.id} />
+          </TabsContent>
+        </Tabs>
       </section>
     </div>
   );

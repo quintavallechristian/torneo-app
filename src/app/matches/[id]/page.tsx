@@ -1,8 +1,16 @@
 'use server';
 import { Button } from '@/components/ui/button';
-
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import {
   ChevronLeft,
+  DicesIcon,
   TrophyIcon,
   UserMinus,
   UserPlus,
@@ -97,30 +105,31 @@ export default async function MatchDetailsPage({
                   ({(match.players || []).length}/{match.max_players || '∞'})
                 </span>
               </div>
-              {!match.players?.find(
-                (player) => player.profile?.id === profile?.id,
-              ) ? (
-                <form
-                  action={subscribeMatch.bind(null, {
-                    match_id: match.id!,
-                  })}
-                >
-                  <Button variant="outline" type="submit" size="sm">
-                    <UserPlus className="size-4" strokeWidth={1} />
-                  </Button>
-                </form>
-              ) : (
-                <form
-                  action={unsubscribeMatch.bind(null, {
-                    match_id: match.id!,
-                  })}
-                >
-                  <Button variant="outline" type="submit" size="sm">
-                    <UserMinus className="size-4" strokeWidth={1} />
-                  </Button>
-                </form>
-              )}
-              {role === ROLE.Admin && (
+              {(match.players || []).length > 0 &&
+                (!match.players?.find(
+                  (player) => player.profile?.id === profile?.id,
+                ) ? (
+                  <form
+                    action={subscribeMatch.bind(null, {
+                      match_id: match.id!,
+                    })}
+                  >
+                    <Button variant="outline" type="submit" size="sm">
+                      <UserPlus className="size-4" strokeWidth={1} />
+                    </Button>
+                  </form>
+                ) : (
+                  <form
+                    action={unsubscribeMatch.bind(null, {
+                      match_id: match.id!,
+                    })}
+                  >
+                    <Button variant="outline" type="submit" size="sm">
+                      <UserMinus className="size-4" strokeWidth={1} />
+                    </Button>
+                  </form>
+                ))}
+              {(match.players || []).length > 0 && role === ROLE.Admin && (
                 <>{match.id && <AddPlayerModal matchId={match.id} />}</>
               )}
             </h2>
@@ -274,10 +283,44 @@ export default async function MatchDetailsPage({
                   <ProfileListItem
                     key={`${playerObj.profile?.id}-${index}`}
                     player={playerObj}
-                    match={match}
                     relevant={!!playerObj.confirmed}
-                    TrophySlot={playerObj.confirmed ? null : () => null}
-                    PointsSlot={playerObj.confirmed ? null : () => null}
+                    isWinner={playerObj.profile?.id === match.winner?.id}
+                    IntroSlot={
+                      <form
+                        action={setWinner.bind(null, {
+                          matchId: match.id!,
+                          winnerId: playerObj.profile!.id!,
+                        })}
+                      >
+                        <button
+                          type="submit"
+                          className={`
+                            cursor-pointer size-10 flex items-center justify-center
+                            disabled:opacity-100
+                            ${
+                              playerObj.profile?.id === match.winner?.id
+                                ? 'bg-amber-100 text-amber-500'
+                                : 'bg-indigo-50/5'
+                            }
+                          `}
+                          disabled={playerObj.profile?.id === match.winner?.id}
+                          style={{
+                            clipPath:
+                              'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
+                          }}
+                        >
+                          <TrophyIcon className="size-7" strokeWidth={1} />
+                        </button>
+                      </form>
+                    }
+                    StatsSlot={
+                      <PointsPopover
+                        gameId={match.game!.id}
+                        matchId={match.id!}
+                        playerId={playerObj.profile!.id!}
+                        startingPoints={playerObj.points || 0}
+                      />
+                    }
                     AdminActionsSlot={
                       role === ROLE.Admin && (
                         <>
@@ -315,9 +358,45 @@ export default async function MatchDetailsPage({
                 ))}
               </div>
             ) : (
-              <p className="italic text-muted-foreground">
-                Nessun giocatore associato.
-              </p>
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <DicesIcon />
+                  </EmptyMedia>
+                </EmptyHeader>
+                <EmptyTitle>Nessun giocatore</EmptyTitle>
+                <EmptyDescription>Nessun giocatore presente</EmptyDescription>
+                <EmptyContent>
+                  <div className="flex items-center gap-4">
+                    {!match.players?.find(
+                      (player) => player.profile?.id === profile?.id,
+                    ) ? (
+                      <form
+                        action={subscribeMatch.bind(null, {
+                          match_id: match.id!,
+                        })}
+                      >
+                        <Button variant="outline" type="submit" size="sm">
+                          <UserPlus className="size-4" strokeWidth={1} />
+                        </Button>
+                      </form>
+                    ) : (
+                      <form
+                        action={unsubscribeMatch.bind(null, {
+                          match_id: match.id!,
+                        })}
+                      >
+                        <Button variant="outline" type="submit" size="sm">
+                          <UserMinus className="size-4" strokeWidth={1} />
+                        </Button>
+                      </form>
+                    )}
+                    {role === ROLE.Admin && (
+                      <>{match.id && <AddPlayerModal matchId={match.id} />}</>
+                    )}
+                  </div>
+                </EmptyContent>
+              </Empty>
             )}
           </section>
         </>

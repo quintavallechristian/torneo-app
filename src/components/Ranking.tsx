@@ -9,6 +9,9 @@ import React from 'react';
 import { DicesIcon } from 'lucide-react';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { getLocationRanking } from '@/lib/location';
+import ProfileListItem from './ProfileListItem';
+import { getGameRanking } from '@/lib/game';
+import { Player } from '@/types';
 
 interface RankingProps {
   locationId?: string;
@@ -31,7 +34,19 @@ export default async function Ranking({ locationId, gameId }: RankingProps) {
       </Empty>
     );
   }
-  const ranking = await getLocationRanking(locationId);
+  let ranking: Player[] = [];
+  if (locationId) {
+    ranking = await getLocationRanking(locationId);
+  }
+  if (gameId) {
+    ranking = await getGameRanking(gameId);
+  }
 
-  return <>{JSON.stringify(ranking)}</>;
+  return (
+    <>
+      {ranking.map((player, index) => (
+        <ProfileListItem key={player.id} player={player} index={index + 1} />
+      ))}
+    </>
+  );
 }

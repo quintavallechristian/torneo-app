@@ -49,13 +49,6 @@ export type Profile = z.infer<typeof ProfileSchema> & {
   matches?: Match[];
 };
 
-export type Player = {
-  id: string;
-  points: number | null;
-  profile: Profile | null;
-  confirmed: boolean | null;
-};
-
 export type Game = {
   id: string;
   name: string;
@@ -95,22 +88,24 @@ export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   winner?: Profile | null;
 };
 
-interface Stats {
-  id: number;
+export type Player = {
+  id: string;
   created_at: string;
   profile_id: string;
+  profile: Profile;
   points: number;
-  game_id: number;
+  game_id: string;
   win: number;
   loss: number;
   draw: number;
   minutes_played: number;
   favourite: boolean;
-}
+  confirmed: boolean | null;
+};
 
-export type GameStats = Stats & {
+export type GameStats = Player & {
   in_collection: boolean;
   in_wishlist: boolean;
   rating: number | null;
 };
-export type LocationStats = Stats;
+export type LocationStats = Player;

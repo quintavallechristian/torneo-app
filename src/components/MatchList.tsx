@@ -42,8 +42,8 @@ export default async function MatchList({
               <DicesIcon />
             </EmptyMedia>
           </EmptyHeader>
-          <EmptyTitle>No data</EmptyTitle>
-          <EmptyDescription>No data found</EmptyDescription>
+          <EmptyTitle>Nessuna partita</EmptyTitle>
+          <EmptyDescription>Nessuna partita giocata</EmptyDescription>
           <EmptyContent>
             <div className="flex items-center gap-4">
               {role === ROLE.Admin && (

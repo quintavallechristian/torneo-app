@@ -1,13 +1,12 @@
 'use server';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, PlusIcon, StarIcon } from 'lucide-react';
+import { ChevronLeft, StarIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard';
-import { Location, LocationStats, ROLE } from '@/types';
-import MatchCard from '@/components/MatchCard';
+import { Location, LocationStats } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
   getLocationRanking,
