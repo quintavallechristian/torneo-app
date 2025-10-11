@@ -42,7 +42,7 @@ export default async function PlaceDetailsPage({
   params,
 }: PlaceDetailsPageProps) {
   const { id } = await params;
-  const { profile, role } = await getAuthenticatedUserWithProfile();
+  const { profile } = await getAuthenticatedUserWithProfile();
 
   const locationStats = await getLocationStatsPerProfile(
     profile?.id || '',

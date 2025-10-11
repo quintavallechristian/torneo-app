@@ -1,5 +1,9 @@
 import z from 'zod';
 
+export type SearchParams = {
+  q?: string;
+};
+
 export enum GAME_STATS_STATE {
   InCollection = 'in_collection',
   Favourite = 'favourite',

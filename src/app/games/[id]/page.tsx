@@ -17,9 +17,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import Image from 'next/image';
-import MatchCard from '@/components/MatchCard/MatchCard';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
-import { GameStats, ROLE } from '@/types';
+import { GameStats } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
   getGameRanking,
@@ -56,7 +55,7 @@ function getPositionInGame(profileId: string, gameRanking: GameStats[]) {
 
 export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
   const { id } = await params;
-  const { profile, role } = await getAuthenticatedUserWithProfile();
+  const { profile } = await getAuthenticatedUserWithProfile();
 
   // Get game stats for this user and game
   const gameStats = await getGameStatsPerProfile(profile?.id || '', Number(id));

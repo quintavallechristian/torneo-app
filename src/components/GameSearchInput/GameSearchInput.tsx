@@ -1,27 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-import { Game } from '@/types';
 import { useRouter } from 'next/navigation';
 import { Input } from '../ui/input';
 
@@ -49,7 +30,7 @@ export function GameSearchInput({
       router.push(`${currentPath}?${params.toString()}`);
     }, 400);
     return () => clearTimeout(handler);
-  }, [search]);
+  }, [search, router]);
   return (
     <Input
       type="text"

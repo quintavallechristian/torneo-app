@@ -7,7 +7,7 @@ import {
   setInCollectionGame,
   setInWishlistGame,
 } from '../actions';
-import { Game, GAME_STATS_STATE } from '@/types';
+import { Game, GAME_STATS_STATE, SearchParams } from '@/types';
 import {
   Tooltip,
   TooltipContent,
@@ -20,9 +20,10 @@ import { GameSearchInput } from '@/components/GameSearchInput/GameSearchInput';
 export default async function GamesPage({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: Promise<SearchParams>;
 }) {
-  const query = searchParams.q || '';
+  const { q } = await searchParams;
+  const query = q || '';
   const games: Game[] = await getGames(query, GAME_STATS_STATE.InCollection);
 
   return (

@@ -13,8 +13,6 @@ import { Game, Location } from '@/types';
 export async function PointsPopover({
   startingPoints,
   matchId,
-  game,
-  location,
   playerId,
 }: {
   startingPoints: number;
