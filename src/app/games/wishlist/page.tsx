@@ -28,7 +28,7 @@ export default async function GamesPage({
   return (
     <div className="max-w-2xl align-center mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">I tuoi preferiti</h1>
+        <h1 className="text-2xl font-bold">La tua lista desideri</h1>
         <GameSearchInput defaultValue={query} />
       </div>
 
