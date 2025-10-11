@@ -92,20 +92,32 @@ export type Player = {
   id: string;
   created_at: string;
   profile_id: string;
+  match_id: string;
   profile: Profile;
   points: number;
-  game_id: string;
+  confirmed?: boolean | null;
+};
+
+export type PlayerStats = Player & {
+  id: string;
+  created_at: string;
+  profile_id: string;
+  profile: Profile;
+  points: number;
   win: number;
   loss: number;
   draw: number;
   minutes_played: number;
-  favourite: boolean;
-  confirmed: boolean | null;
 };
 
-export type GameStats = Player & {
+export type GameStats = PlayerStats & {
+  game_id: string;
   in_collection: boolean;
   in_wishlist: boolean;
   rating: number | null;
+  favourite: boolean;
 };
-export type LocationStats = Player;
+export type LocationStats = PlayerStats & {
+  location_id: string;
+  favourite: boolean;
+};

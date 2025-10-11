@@ -3,22 +3,6 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export async function setWinner({
-  matchId,
-  winnerId,
-}: {
-  matchId: string;
-  winnerId: string;
-}) {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('matches')
-    .update({ winner_id: winnerId })
-    .eq('id', matchId);
-  if (error) throw error;
-  revalidatePath(`/matches/${matchId}`);
-}
-
 export async function subscribeMatch({ match_id }: { match_id: string }) {
   const { profile } = await getAuthenticatedUserWithProfile();
   if (!profile) throw new Error('User not authenticated');

@@ -18,7 +18,6 @@ export async function setFavouriteGame({
       profile_id: profile?.id,
       favourite: status,
     },
-
     {
       onConflict: 'game_id, profile_id',
     },

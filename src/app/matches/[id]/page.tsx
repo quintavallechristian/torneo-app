@@ -19,21 +19,20 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import Image from 'next/image';
-import SpotlightCard from '@/components/SpotlightCard';
-import { Match, Player, ROLE } from '@/types';
+import { GameStats, LocationStats, Match, Player, ROLE } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
 import {
   confirmPlayer,
   removePlayer,
-  setWinner,
   subscribeMatch,
   unsubscribeMatch,
 } from './actions';
 import MatchCard from '@/components/MatchCard';
 import ProfileListItem from '@/components/ProfileListItem';
+import { setWinner } from '@/lib/match';
+import { ExagonalBadge } from '@/components/ui/exagonalBadge';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -65,9 +64,43 @@ export default async function MatchDetailsPage({
     })
     .single<Match>();
 
-  if (error) {
+  if (error || !match) {
     console.error('Errore nel recupero del partita:', error);
     return <p>Errore nel recupero del partita</p>;
+  }
+
+  let profileGames: GameStats[] = [];
+  if (match.players) {
+    const { data } = await supabase
+      .from('profiles_games')
+      .select<'profile_id, points', GameStats>('profile_id, points')
+      .eq('game_id', match.game_id)
+      .in(
+        'profile_id',
+        match.players.map((p) => p.profile_id),
+      );
+
+    if (error) {
+      console.error('Errore nel recupero delle statistiche di gioco:', error);
+    }
+    profileGames = data || [];
+  }
+
+  let profileLocations: LocationStats[] = [];
+  if (match.players) {
+    const { data } = await supabase
+      .from('profiles_locations')
+      .select<'profile_id, points', LocationStats>('profile_id, points')
+      .eq('location_id', match.location_id)
+      .in(
+        'profile_id',
+        match.players.map((p) => p.profile_id),
+      );
+
+    if (error) {
+      console.error('Errore nel recupero delle statistiche di gioco:', error);
+    }
+    profileLocations = data || [];
   }
 
   return (
@@ -136,150 +169,6 @@ export default async function MatchDetailsPage({
             {match.players && match.players.length > 0 ? (
               <div className="space-y-4">
                 {match.players.map((playerObj: Player, index: number) => (
-                  // <SpotlightCard
-                  //   className={`
-                  //     flex items-center gap-4 my-2 px-2 py-2
-                  //   `}
-                  //   bgClassName={`
-                  //     ${
-                  //       playerObj.profile?.id === match.winner?.id
-                  //         ? 'border border-amber-500 from-yellow-500 to-amber-800'
-                  //         : 'from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800'
-                  //     }
-                  //     ${
-                  //       playerObj.confirmed
-                  //         ? 'bg-gradient-to-br'
-                  //         : 'bg-opacity-50'
-                  //     }
-                  //   `}
-                  //   spotlightColor={`${
-                  //     playerObj.profile?.id === match.winner?.id
-                  //       ? 'rgba(255, 255, 0, 0.188)'
-                  //       : 'rgba(0, 229, 255, 0.2)'
-                  //   }`}
-                  //   key={`${playerObj.profile?.id}-${index}`}
-                  // >
-                  //   {playerObj.confirmed && (
-                  //     <div
-                  //       className={`${
-                  //         playerObj.confirmed ? 'opacity-100' : 'opacity-50'
-                  //       } flex flex-col gap-2 ml-4`}
-                  //     >
-                  //       {match.id && playerObj.profile?.id && (
-                  //         <form
-                  //           action={setWinner.bind(null, {
-                  //             matchId: match.id!,
-                  //             winnerId: playerObj.profile.id,
-                  //           })}
-                  //         >
-                  //           <input
-                  //             type="hidden"
-                  //             name="matchId"
-                  //             value={match.id}
-                  //           />
-                  //           <input
-                  //             type="hidden"
-                  //             name="winnerId"
-                  //             value={playerObj.profile.id}
-                  //           />
-                  //           <button
-                  //             type="submit"
-                  //             className={`
-                  //               cursor-pointer size-14 flex items-center justify-center
-                  //               disabled:opacity-100
-                  //               ${
-                  //                 playerObj.profile?.id === match.winner?.id
-                  //                   ? 'bg-amber-100 text-amber-500'
-                  //                   : 'bg-indigo-50/5'
-                  //               }
-                  //             `}
-                  //             disabled={
-                  //               playerObj.profile?.id === match.winner?.id
-                  //             }
-                  //             style={{
-                  //               clipPath:
-                  //                 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
-                  //             }}
-                  //           >
-                  //             <TrophyIcon className="size-7" strokeWidth={1} />
-                  //           </button>
-                  //         </form>
-                  //       )}
-                  //     </div>
-                  //   )}
-                  //   <div>
-                  //     <Image
-                  //       src={playerObj.profile?.image || '/placeholder.png'}
-                  //       alt={playerObj.profile?.username || 'Avatar'}
-                  //       width={64}
-                  //       height={64}
-                  //       className={`bg-slate-900 rounded-2xl border-1 w-16 h-16 object-cover
-                  //         ${
-                  //           playerObj.confirmed ? 'opacity-100' : 'opacity-50'
-                  //         }`}
-                  //     />
-                  //   </div>
-                  //   <div
-                  //     className={`font-bold text-lg
-                  //         ${
-                  //           playerObj.confirmed ? 'opacity-100' : 'opacity-50'
-                  //         }`}
-                  //   >
-                  //     {playerObj.profile?.username ??
-                  //       playerObj.profile?.firstname ??
-                  //       'Anonimo'}
-                  //   </div>
-                  //   {playerObj.confirmed ? (
-                  //     <div className="text-right ml-auto">
-                  //       <PointsPopover
-                  //         gameId={match.game!.id}
-                  //         matchId={match.id!}
-                  //         playerId={playerObj.profile!.id!}
-                  //         startingPoints={playerObj.points || 0}
-                  //       />
-                  //     </div>
-                  //   ) : (
-                  //     <div className="text-right ml-auto">
-                  //       {role === ROLE.Admin && (
-                  //         <div className="flex flex-col gap-2 ml-4">
-                  //           {match.id && playerObj.profile?.id && (
-                  //             <div className="flex gap-2">
-                  //               <form
-                  //                 action={confirmPlayer.bind(null, {
-                  //                   matchId: match.id!,
-                  //                   profileId: playerObj.profile.id,
-                  //                 })}
-                  //               >
-                  //                 <Button
-                  //                   variant="default"
-                  //                   size="sm"
-                  //                   type="submit"
-                  //                 >
-                  //                   <UserRoundCheck
-                  //                     className="size-4"
-                  //                     strokeWidth={1}
-                  //                   />
-                  //                 </Button>
-                  //               </form>
-                  //             </div>
-                  //           )}
-                  //         </div>
-                  //       )}
-                  //     </div>
-                  //   )}
-                  //   {role === ROLE.Admin && playerObj.profile?.id && (
-                  //     <form
-                  //       action={removePlayer.bind(null, {
-                  //         matchId: match.id!,
-                  //         profileId: playerObj.profile.id,
-                  //       })}
-                  //     >
-                  //       <Button variant="destructive" size="sm" type="submit">
-                  //         <UserRoundX className="size-4" strokeWidth={1} />
-                  //       </Button>
-                  //     </form>
-                  //   )}
-                  // </SpotlightCard>
                   <ProfileListItem
                     key={`${playerObj.profile?.id}-${index}`}
                     player={playerObj}
@@ -288,38 +177,44 @@ export default async function MatchDetailsPage({
                     IntroSlot={
                       <form
                         action={setWinner.bind(null, {
-                          matchId: match.id!,
                           winnerId: playerObj.profile!.id!,
+                          matchId: match.id!,
+                          game: match.game!,
+                          location: match.location!,
+                          players: match.players!.map((p) => ({
+                            profile_id: p.profile_id,
+                            points: p.points,
+                          })),
                         })}
                       >
-                        <button
-                          type="submit"
-                          className={`
-                            cursor-pointer size-10 flex items-center justify-center
-                            disabled:opacity-100
+                        <button type="submit">
+                          <ExagonalBadge
+                            variant="default"
+                            className={`
+                            cursor-pointer size-10 hover:scale-105 transition-all ease-in-out
                             ${
                               playerObj.profile?.id === match.winner?.id
                                 ? 'bg-amber-100 text-amber-500'
                                 : 'bg-indigo-50/5'
                             }
                           `}
-                          disabled={playerObj.profile?.id === match.winner?.id}
-                          style={{
-                            clipPath:
-                              'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
-                          }}
-                        >
-                          <TrophyIcon className="size-7" strokeWidth={1} />
+                          >
+                            <TrophyIcon className="size-7" strokeWidth={1} />
+                          </ExagonalBadge>
                         </button>
                       </form>
                     }
                     StatsSlot={
-                      <PointsPopover
-                        gameId={match.game!.id}
-                        matchId={match.id!}
-                        playerId={playerObj.profile!.id!}
-                        startingPoints={playerObj.points || 0}
-                      />
+                      match.game &&
+                      match.location && (
+                        <PointsPopover
+                          game={match.game}
+                          location={match.location}
+                          matchId={match.id!}
+                          playerId={playerObj.profile!.id!}
+                          startingPoints={playerObj.points || 0}
+                        />
+                      )
                     }
                     AdminActionsSlot={
                       role === ROLE.Admin && (
@@ -353,6 +248,24 @@ export default async function MatchDetailsPage({
                           </form>
                         </>
                       )
+                    }
+                    DescriptionSlot={
+                      <div className="flex gap-2">
+                        <ExagonalBadge variant="red">
+                          {
+                            profileGames.find(
+                              ({ profile_id }) =>
+                                profile_id === playerObj.profile!.id!,
+                            )?.points
+                          }
+                        </ExagonalBadge>
+                        <ExagonalBadge variant="blue">
+                          {profileLocations.find(
+                            ({ profile_id }) =>
+                              profile_id === playerObj.profile!.id!,
+                          )?.points || 0}
+                        </ExagonalBadge>
+                      </div>
                     }
                   />
                 ))}

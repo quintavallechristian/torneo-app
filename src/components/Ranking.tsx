@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/empty';
 import React from 'react';
 import { DicesIcon } from 'lucide-react';
-import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { getLocationRanking } from '@/lib/location';
 import ProfileListItem from './ProfileListItem';
 import { getGameRanking } from '@/lib/game';
@@ -19,8 +18,6 @@ interface RankingProps {
 }
 
 export default async function Ranking({ locationId, gameId }: RankingProps) {
-  const { role } = await getAuthenticatedUserWithProfile();
-
   if (!locationId && !gameId) {
     return (
       <Empty>

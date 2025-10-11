@@ -14,6 +14,7 @@ interface ProfileListItemProps {
   IntroSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
   StatsSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
   AdminActionsSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
+  DescriptionSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
 }
 
 export default async function ProfileListItem({
@@ -24,6 +25,7 @@ export default async function ProfileListItem({
   IntroSlot,
   StatsSlot,
   AdminActionsSlot,
+  DescriptionSlot,
 }: ProfileListItemProps) {
   const { profile } = await getAuthenticatedUserWithProfile();
 
@@ -44,6 +46,8 @@ export default async function ProfileListItem({
       {index}
     </button>
   );
+
+  const defaultDescriptionArea = null;
 
   const defaultStatsArea = (
     <button className="cursor-pointer focus:outline-none">
@@ -78,7 +82,6 @@ export default async function ProfileListItem({
       <div className="flex flex-col gap-2 ml-4">
         {renderSlot(IntroSlot, defaultIntro)}
       </div>
-
       {/* --- AVATAR --- */}
       <div>
         <Avatar className="size-10">
@@ -95,17 +98,17 @@ export default async function ProfileListItem({
           )}
         </Avatar>
       </div>
-
       {/* --- USERNAME --- */}
-      <div
-        className={`font-bold text-lg ${
-          relevant ? 'opacity-100' : 'opacity-50'
-        }`}
-      >
-        {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}
+      <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>
+        <div className="font-semibold">
+          {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}
+        </div>
+      </div>
+      <div className="text-xs font-regular text-slate-200">
+        {renderSlot(DescriptionSlot, defaultDescriptionArea)}
       </div>
       <div className="ml-auto flex items-center gap-2">
-        {/* --- POINTS POPOVER --- */}
+        {/* --- STATS AREA --- */}
         {
           <div className="text-right ml-auto">
             {renderSlot(StatsSlot, defaultStatsArea)}
