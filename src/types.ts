@@ -1,5 +1,11 @@
 import z from 'zod';
 
+export enum GAME_STATS_STATE {
+  InCollection = 'in_collection',
+  Favourite = 'favourite',
+  InWishlist = 'in_wishlist',
+}
+
 export enum ROLE {
   Admin = 'Admin',
   User = 'User',

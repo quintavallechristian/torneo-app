@@ -6,8 +6,8 @@ import {
   setFavouriteGame,
   setInCollectionGame,
   setInWishlistGame,
-} from './actions';
-import { Game } from '@/types';
+} from '../actions';
+import { Game, GAME_STATS_STATE } from '@/types';
 import {
   Tooltip,
   TooltipContent,
@@ -23,12 +23,12 @@ export default async function GamesPage({
   searchParams: { q?: string };
 }) {
   const query = searchParams.q || '';
-  const games: Game[] = await getGames(query);
+  const games: Game[] = await getGames(query, GAME_STATS_STATE.Favourite);
 
   return (
     <div className="max-w-2xl align-center mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Giochi</h1>
+        <h1 className="text-2xl font-bold">I tuoi preferiti</h1>
         <GameSearchInput defaultValue={query} />
       </div>
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { GameSearchBar } from '@/components/GameSearchBar/GameSearchBar';
+import { GameSearchPopover } from '@/components/GameSearchPopover/GameSearchPopover';
 import { DatePicker } from '@/components/DatePicker/DatePicker';
 import { createMatch, editMatch } from './actions';
 import { ZodErrors } from '@/components/ZodErrors';
@@ -131,7 +131,7 @@ export default function ClientMatchForm({
         >
           Gioco
         </label>
-        <GameSearchBar
+        <GameSearchPopover
           game={
             selectedGame
               ? {

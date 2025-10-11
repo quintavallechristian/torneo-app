@@ -30,12 +30,12 @@ export type SearchBarItem = {
   min_players: number | null;
 };
 
-type GameSearchBarProps = {
+type GameSearchPopoverProps = {
   game: SearchBarItem | null;
   onSelect?: (game: SearchBarItem | null) => void;
 };
 
-export function GameSearchBar({ onSelect, game }: GameSearchBarProps) {
+export function GameSearchPopover({ onSelect, game }: GameSearchPopoverProps) {
   const [open, setOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState(game);
   const [items, setItems] = useState<SearchBarItem[]>([]);

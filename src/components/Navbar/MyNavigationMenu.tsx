@@ -25,8 +25,22 @@ const gamesItems: { title: string; href: string; description: string }[] = [
   {
     title: 'Giochi',
     href: '/games',
-    description:
-      'A modal dialog that interrupts the user with important content and expects a response.',
+    description: 'Lista di tutti i giochi presenti nel database di Torneo.',
+  },
+  {
+    title: 'Preferiti',
+    href: '/games/favourites',
+    description: 'Lista dei tuoi giochi preferiti.',
+  },
+  {
+    title: 'Collezione',
+    href: '/games/collection',
+    description: 'Lista dei tuoi giochi in collezione.',
+  },
+  {
+    title: 'Desiderati',
+    href: '/games/wishlist',
+    description: 'Lista dei tuoi giochi desiderati.',
   },
 ];
 
