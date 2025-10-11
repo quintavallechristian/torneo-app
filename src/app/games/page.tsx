@@ -1,18 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
-import { LibraryBigIcon, SparklesIcon, StarIcon } from 'lucide-react';
-import {
-  setFavouriteGame,
-  setInCollectionGame,
-  setInWishlistGame,
-} from './actions';
 import { Game, SearchParams } from '@/types';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { getGames } from '@/lib/game';
 import { GameSearchInput } from '@/components/GameSearchInput/GameSearchInput';

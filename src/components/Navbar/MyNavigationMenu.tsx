@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Profile } from '@/types';
 
-export function MyNavigationMenu({ profile }: { profile: Profile }) {
+export function MyNavigationMenu({ profile }: { profile: Profile | null }) {
   const matchesItems: { title: string; href: string; description: string }[] = [
     {
       title: 'Partite',
