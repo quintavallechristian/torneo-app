@@ -1,11 +1,19 @@
-import { GameStats, LocationStats, Profile } from '@/types';
+import {
+  GameStats,
+  LocationStats,
+  Profile,
+  ROLE,
+  UserPermission,
+  UserRowPermission,
+} from '@/types';
 import { createClient } from '@/utils/supabase/server';
 import { User } from '@supabase/supabase-js';
 
 export async function getAuthenticatedUserWithProfile(): Promise<{
   user: User | null;
   profile: Profile | null;
-  role: string | null;
+  role: ROLE | null;
+  permissions?: UserPermission[];
 }> {
   const supabase = await createClient();
 
@@ -15,26 +23,59 @@ export async function getAuthenticatedUserWithProfile(): Promise<{
     return { user: null, profile: null, role: null };
   }
 
-  const { data: profileData, error: profileError } = await supabase
+  // Get profile
+  const {
+    data: profileData,
+    error: profileError,
+  }: { data: Profile | null; error: Error | null } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', userData.user.id)
     .single();
 
-  const { data: roleData } = await supabase
-    .from('users_roles')
-    .select('*, role:roles(*)')
-    .eq('user_id', userData.user.id)
-    .single();
+  if (profileError || !profileData) {
+    throw new Error('Errore nel recupero del profilo');
+  }
 
-  if (profileError) {
-    console.error('Errore nel recupero del profilo:', profileError);
+  // Get role
+  const {
+    data: roleData,
+    error: roleError,
+  }: { data: { role: { name: ROLE } } | null; error: Error | null } =
+    await supabase
+      .from('users_roles')
+      .select('*, role:roles(*)')
+      .eq('user_id', userData.user.id)
+      .single();
+
+  if (roleError || !roleData) {
+    throw new Error('Errore nel recupero del ruolo');
+  }
+
+  // Get permissions
+  const { data: permissionsData }: { data: UserRowPermission[] | null } =
+    await supabase
+      .from('users_permissions')
+      .select('*, permission:user_actions(action)')
+      .eq('user_id', userData.user.id);
+
+  console.log(permissionsData);
+
+  const permissions = [];
+  if (permissionsData) {
+    permissions.push(
+      ...permissionsData.map((p) => ({
+        locationId: p.location_id,
+        action: p.permission.action,
+      })),
+    );
   }
 
   return {
     user: userData.user,
     profile: profileData,
     role: roleData?.role.name,
+    permissions: permissions,
   };
 }
 

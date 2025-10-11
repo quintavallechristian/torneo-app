@@ -19,7 +19,14 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import { GameStats, LocationStats, Match, Player, ROLE } from '@/types';
+import {
+  GameStats,
+  LocationStats,
+  Match,
+  Player,
+  ROLE,
+  UserAction,
+} from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
@@ -33,6 +40,7 @@ import MatchCard from '@/components/MatchCard/MatchCard';
 import ProfileListItem from '@/components/ProfileListItem/ProfileListItem';
 import { setWinner } from '@/lib/match';
 import { ExagonalBadge } from '@/components/ui/exagonalBadge';
+import { canUser } from '@/lib/permissions';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -102,6 +110,10 @@ export default async function MatchDetailsPage({
     }
     profileLocations = data || [];
   }
+
+  const canSetWinner = await canUser(UserAction.SetWinner, {
+    placeId: match.location_id,
+  });
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -175,22 +187,23 @@ export default async function MatchDetailsPage({
                     relevant={!!playerObj.confirmed}
                     isWinner={playerObj.profile?.id === match.winner?.id}
                     IntroSlot={
-                      <form
-                        action={setWinner.bind(null, {
-                          winnerId: playerObj.profile!.id!,
-                          matchId: match.id!,
-                          game: match.game!,
-                          location: match.location!,
-                          players: match.players!.map((p) => ({
-                            profile_id: p.profile_id,
-                            points: p.points,
-                          })),
-                        })}
-                      >
-                        <button type="submit">
-                          <ExagonalBadge
-                            variant="default"
-                            className={`
+                      canSetWinner ? (
+                        <form
+                          action={setWinner.bind(null, {
+                            winnerId: playerObj.profile!.id!,
+                            matchId: match.id!,
+                            game: match.game!,
+                            location: match.location!,
+                            players: match.players!.map((p) => ({
+                              profile_id: p.profile_id,
+                              points: p.points,
+                            })),
+                          })}
+                        >
+                          <button type="submit">
+                            <ExagonalBadge
+                              variant="default"
+                              className={`
                             cursor-pointer size-10 hover:scale-105 transition-all ease-in-out
                             ${
                               playerObj.profile?.id === match.winner?.id
@@ -198,11 +211,14 @@ export default async function MatchDetailsPage({
                                 : 'bg-indigo-50/5'
                             }
                           `}
-                          >
-                            <TrophyIcon className="size-7" strokeWidth={1} />
-                          </ExagonalBadge>
-                        </button>
-                      </form>
+                            >
+                              <TrophyIcon className="size-7" strokeWidth={1} />
+                            </ExagonalBadge>
+                          </button>
+                        </form>
+                      ) : (
+                        ''
+                      )
                     }
                     StatsSlot={
                       match.game &&

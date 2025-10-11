@@ -10,12 +10,18 @@ export enum GAME_STATS_STATE {
   InWishlist = 'in_wishlist',
 }
 
+export enum UserAction {
+  ReadMatches = 'read:matches',
+  CreateMatch = 'create:match',
+  DeleteMatch = 'delete:match',
+  SetWinner = 'set:winner',
+  ManagePlatform = 'manage:platform',
+}
+
 export enum ROLE {
   Admin = 'Admin',
   User = 'User',
-  Moderator = 'Moderator',
-  PlaceAdmin = 'PlaceAdmin',
-  PlaceModerator = 'PlaceModerator',
+  Manager = 'Manager',
 }
 
 export enum MATCHSTATUS {
@@ -53,6 +59,17 @@ export const ProfileSchema = z.object({
   firstname: z.string().min(1).max(50).nullable(),
   lastname: z.string().min(1).max(50).nullable(),
 });
+
+export type UserRowPermission = {
+  id: number;
+  location_id: string;
+  permission: { action: UserAction };
+};
+
+export type UserPermission = {
+  locationId: string;
+  action: UserAction;
+};
 
 // extract the inferred type
 export type Profile = z.infer<typeof ProfileSchema> & {
