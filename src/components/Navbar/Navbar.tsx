@@ -30,7 +30,7 @@ export default async function Navbar() {
       <div>
         <Link href="/">Logo</Link>
       </div>
-      <MyNavigationMenu />
+      <MyNavigationMenu profile={profile} />
       <div className="flex items-center gap-4">
         {profile ? (
           <div>

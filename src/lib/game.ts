@@ -25,7 +25,11 @@ export async function getGames(
   const supabase = await createClient();
 
   if (!profile) {
-    const { data } = await supabase.from('games').select('*').limit(10);
+    const { data } = await supabase
+      .from('games')
+      .select('*')
+      .order('bgg_rank')
+      .limit(100);
     return data ?? [];
   } else if (filterBy !== null) {
     const { data } = await supabase

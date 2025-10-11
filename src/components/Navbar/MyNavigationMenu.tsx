@@ -11,49 +11,50 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import { Profile } from '@/types';
 
-const matchesItems: { title: string; href: string; description: string }[] = [
-  {
-    title: 'Partite',
-    href: '/matches',
-    description:
-      'A modal dialog that interrupts the user with important content and expects a response.',
-  },
-];
+export function MyNavigationMenu({ profile }: { profile: Profile }) {
+  const matchesItems: { title: string; href: string; description: string }[] = [
+    {
+      title: 'Partite',
+      href: '/matches',
+      description:
+        'A modal dialog that interrupts the user with important content and expects a response.',
+    },
+  ];
 
-const gamesItems: { title: string; href: string; description: string }[] = [
-  {
-    title: 'Giochi',
-    href: '/games',
-    description: 'Lista di tutti i giochi presenti nel database di Torneo.',
-  },
-  {
-    title: 'Preferiti',
-    href: '/games/favourites',
-    description: 'Lista dei tuoi giochi preferiti.',
-  },
-  {
-    title: 'Collezione',
-    href: '/games/collection',
-    description: 'Lista dei tuoi giochi in collezione.',
-  },
-  {
-    title: 'Desiderati',
-    href: '/games/wishlist',
-    description: 'Lista dei tuoi giochi desiderati.',
-  },
-];
+  const gamesItems: { title: string; href: string; description: string }[] = [
+    {
+      title: 'Giochi',
+      href: '/games',
+      description: 'Lista di tutti i giochi presenti nel database di Torneo.',
+    },
+    profile && {
+      title: 'Preferiti',
+      href: '/games/favourites',
+      description: 'Lista dei tuoi giochi preferiti.',
+    },
+    profile && {
+      title: 'Collezione',
+      href: '/games/collection',
+      description: 'Lista dei tuoi giochi in collezione.',
+    },
+    profile && {
+      title: 'Desiderati',
+      href: '/games/wishlist',
+      description: 'Lista dei tuoi giochi desiderati.',
+    },
+  ].filter(Boolean) as { title: string; href: string; description: string }[];
 
-const placesItems: { title: string; href: string; description: string }[] = [
-  {
-    title: 'Luoghi',
-    href: '/places',
-    description:
-      'A modal dialog that interrupts the user with important content and expects a response.',
-  },
-];
+  const placesItems: { title: string; href: string; description: string }[] = [
+    {
+      title: 'Luoghi',
+      href: '/places',
+      description:
+        'A modal dialog that interrupts the user with important content and expects a response.',
+    },
+  ];
 
-export function MyNavigationMenu() {
   return (
     <NavigationMenu viewport={false} className="z-50">
       <NavigationMenuList>

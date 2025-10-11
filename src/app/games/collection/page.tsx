@@ -1,21 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
-import { LibraryBigIcon, SparklesIcon, StarIcon } from 'lucide-react';
-import {
-  setFavouriteGame,
-  setInCollectionGame,
-  setInWishlistGame,
-} from '../actions';
 import { Game, GAME_STATS_STATE, SearchParams } from '@/types';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { getGames } from '@/lib/game';
 import { GameSearchInput } from '@/components/GameSearchInput/GameSearchInput';
+import GameStatsArea from '@/components/GameStatsArea/GameStatsArea';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 export default async function GamesPage({
   searchParams,
@@ -25,6 +16,7 @@ export default async function GamesPage({
   const { q } = await searchParams;
   const query = q || '';
   const games: Game[] = await getGames(query, GAME_STATS_STATE.InCollection);
+  const { profile } = await getAuthenticatedUserWithProfile();
 
   return (
     <div className="max-w-2xl align-center mx-auto py-10">
@@ -66,77 +58,7 @@ export default async function GamesPage({
                 )}
               </div>
             </div>
-            <div className="flex gap-2 items-center mt-1.5 ml-auto">
-              <form
-                action={setFavouriteGame.bind(null, {
-                  gameId: game.id!,
-                  status: !game.gameStats[0]?.favourite,
-                })}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="hover:scale-110" type="submit">
-                      <StarIcon
-                        className={`size-6  ${
-                          game.gameStats[0]?.favourite
-                            ? 'text-amber-300 hover:text-gray-600'
-                            : 'text-gray-400'
-                        }`}
-                      />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Aggiungi ai preferiti</p>
-                  </TooltipContent>
-                </Tooltip>
-              </form>
-              <form
-                action={setInCollectionGame.bind(null, {
-                  gameId: game.id!,
-                  status: !game.gameStats[0]?.in_collection,
-                })}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="hover:scale-110" type="submit">
-                      <LibraryBigIcon
-                        className={`size-6  ${
-                          game.gameStats[0]?.in_collection
-                            ? 'text-emerald-300 hover:text-gray-600'
-                            : 'text-gray-400'
-                        }`}
-                      />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Aggiungi alla collezione</p>
-                  </TooltipContent>
-                </Tooltip>
-              </form>
-              <form
-                action={setInWishlistGame.bind(null, {
-                  gameId: game.id!,
-                  status: !game.gameStats[0]?.in_wishlist,
-                })}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="hover:scale-110" type="submit">
-                      <SparklesIcon
-                        className={`size-6  ${
-                          game.gameStats[0]?.in_wishlist
-                            ? 'text-sky-300 hover:text-gray-600'
-                            : 'text-gray-400'
-                        }`}
-                      />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Aggiungi alla wishlist</p>
-                  </TooltipContent>
-                </Tooltip>
-              </form>
-            </div>
+            {profile && <GameStatsArea game={game} />}
           </SpotlightCard>
         ))}
       </div>
