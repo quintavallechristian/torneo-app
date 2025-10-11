@@ -19,14 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import {
-  GameStats,
-  LocationStats,
-  Match,
-  Player,
-  ROLE,
-  UserAction,
-} from '@/types';
+import { GameStats, LocationStats, Match, Player } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
@@ -40,7 +33,7 @@ import MatchCard from '@/components/MatchCard/MatchCard';
 import ProfileListItem from '@/components/ProfileListItem/ProfileListItem';
 import { setWinner } from '@/lib/match';
 import { ExagonalBadge } from '@/components/ui/exagonalBadge';
-import { canUser } from '@/lib/permissions';
+import { canUser, UserAction } from '@/lib/permissions';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -48,7 +41,7 @@ export default async function MatchDetailsPage({
   params,
 }: MatchDetailPageProps) {
   const { id } = await params;
-  const { profile, role } = await getAuthenticatedUserWithProfile();
+  const { profile } = await getAuthenticatedUserWithProfile();
   const supabase = await createClient();
   const { data: match, error } = await supabase
     .from('matches')
@@ -111,8 +104,18 @@ export default async function MatchDetailsPage({
     profileLocations = data || [];
   }
 
-  const canSetWinner = await canUser(UserAction.SetWinner, {
-    placeId: match.location_id,
+  const canUpdateMatchStats = await canUser(
+    UserAction.UpdateMatchStats,
+    {
+      locationId: match.location_id,
+    },
+    match.players?.some((p) => p.profile_id === profile?.id),
+  );
+
+  const canManagePlatform = await canUser(UserAction.ManagePlatform);
+
+  const canUpdateMatches = await canUser(UserAction.UpdateMatches, {
+    locationId: match.location_id,
   });
 
   return (
@@ -174,7 +177,7 @@ export default async function MatchDetailsPage({
                     </Button>
                   </form>
                 ))}
-              {(match.players || []).length > 0 && role === ROLE.Admin && (
+              {(match.players || []).length > 0 && canUpdateMatches && (
                 <>{match.id && <AddPlayerModal matchId={match.id} />}</>
               )}
             </h2>
@@ -187,7 +190,7 @@ export default async function MatchDetailsPage({
                     relevant={!!playerObj.confirmed}
                     isWinner={playerObj.profile?.id === match.winner?.id}
                     IntroSlot={
-                      canSetWinner ? (
+                      canUpdateMatchStats ? (
                         <form
                           action={setWinner.bind(null, {
                             winnerId: playerObj.profile!.id!,
@@ -221,8 +224,7 @@ export default async function MatchDetailsPage({
                       )
                     }
                     StatsSlot={
-                      match.game &&
-                      match.location && (
+                      match.game && match.location && canUpdateMatchStats ? (
                         <PointsPopover
                           game={match.game}
                           location={match.location}
@@ -230,10 +232,10 @@ export default async function MatchDetailsPage({
                           playerId={playerObj.profile!.id!}
                           startingPoints={playerObj.points || 0}
                         />
-                      )
+                      ) : null
                     }
                     AdminActionsSlot={
-                      role === ROLE.Admin && (
+                      canManagePlatform && (
                         <>
                           <form
                             action={confirmPlayer.bind(null, {
@@ -320,7 +322,7 @@ export default async function MatchDetailsPage({
                         </Button>
                       </form>
                     )}
-                    {role === ROLE.Admin && (
+                    {canUpdateMatches && (
                       <>{match.id && <AddPlayerModal matchId={match.id} />}</>
                     )}
                   </div>

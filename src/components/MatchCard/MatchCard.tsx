@@ -8,7 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
-import { Match, ROLE } from '@/types';
+import { Match } from '@/types';
 import {
   CalendarIcon,
   CrownIcon,
@@ -23,6 +23,7 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { formatMatchStatus, getMatchStatus } from '@/lib/match';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { canUser, UserAction } from '@/lib/permissions';
 
 interface MatchCardProps {
   match: Match;
@@ -31,8 +32,11 @@ interface MatchCardProps {
 
 export default async function MatchCard({ match, small }: MatchCardProps) {
   const matchStatus = getMatchStatus(match);
-  const { profile, role } = await getAuthenticatedUserWithProfile();
+  const { profile } = await getAuthenticatedUserWithProfile();
 
+  const canUpdateMatches = await canUser(UserAction.UpdateMatches, {
+    locationId: match.location_id,
+  });
   return (
     <SpotlightCard className="px-0 py-0">
       <div className="flex justify-between items-center p-4 gap-2">
@@ -179,7 +183,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
         </div>
       </div>
 
-      {!small && role === ROLE.Admin && (
+      {!small && canUpdateMatches && (
         <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
           <Button className="cursor-pointer" variant="secondary">
             <PencilIcon className="inline mr-2 h-4 w-4" />

@@ -1,8 +1,8 @@
+import { ROLE } from '@/lib/permissions';
 import {
   GameStats,
   LocationStats,
   Profile,
-  ROLE,
   UserPermission,
   UserRowPermission,
 } from '@/types';
@@ -58,8 +58,6 @@ export async function getAuthenticatedUserWithProfile(): Promise<{
       .from('users_permissions')
       .select('*, permission:user_actions(action)')
       .eq('user_id', userData.user.id);
-
-  console.log(permissionsData);
 
   const permissions = [];
   if (permissionsData) {

@@ -1,27 +1,20 @@
 import z from 'zod';
+import { ROLE, UserAction } from './lib/permissions';
 
 export type SearchParams = {
   q?: string;
 };
 
+export enum SCOPE {
+  Location = 'location',
+  Game = 'game',
+  Match = 'match',
+}
+
 export enum GAME_STATS_STATE {
   InCollection = 'in_collection',
   Favourite = 'favourite',
   InWishlist = 'in_wishlist',
-}
-
-export enum UserAction {
-  ReadMatches = 'read:matches',
-  CreateMatch = 'create:match',
-  DeleteMatch = 'delete:match',
-  SetWinner = 'set:winner',
-  ManagePlatform = 'manage:platform',
-}
-
-export enum ROLE {
-  Admin = 'Admin',
-  User = 'User',
-  Manager = 'Manager',
 }
 
 export enum MATCHSTATUS {
@@ -67,7 +60,9 @@ export type UserRowPermission = {
 };
 
 export type UserPermission = {
-  locationId: string;
+  locationId?: string;
+  gameId?: string;
+  matchId?: string;
   action: UserAction;
 };
 

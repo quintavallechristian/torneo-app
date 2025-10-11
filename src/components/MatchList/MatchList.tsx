@@ -6,13 +6,14 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import { Match, ROLE } from '@/types';
+import { Match } from '@/types';
 import React from 'react';
 import MatchCard from '../MatchCard/MatchCard';
 import { DicesIcon, PlusIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
+import { canUser, UserAction } from '@/lib/permissions';
 
 interface MatchListProps {
   matches: Match[] | undefined;
@@ -25,7 +26,7 @@ export default async function MatchList({
   locationId,
   gameId,
 }: MatchListProps) {
-  const { role } = await getAuthenticatedUserWithProfile();
+  const canCreateMatches = await canUser(UserAction.CreateMatches);
   return (
     <>
       {matches && matches.length > 0 ? (
@@ -45,7 +46,7 @@ export default async function MatchList({
           <EmptyDescription>Nessuna partita giocata</EmptyDescription>
           <EmptyContent>
             <div className="flex items-center gap-4">
-              {role === ROLE.Admin && (
+              {canCreateMatches && (
                 <Link
                   href={`/matches/new?place_id=${
                     locationId ? locationId : ''

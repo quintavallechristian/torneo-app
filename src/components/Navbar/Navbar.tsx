@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { ROLE } from '@/types';
 import { MyNavigationMenu } from './MyNavigationMenu';
+import { ROLE } from '@/lib/permissions';
 
 async function handleLogout() {
   'use server';
@@ -38,7 +38,11 @@ export default async function Navbar() {
               <DropdownMenuTrigger asChild>
                 <span
                   className={`cursor-pointer text-sm font-medium mr-4 ${
-                    role === ROLE.Admin ? 'text-red-300' : 'text-blue-300'
+                    role === ROLE.Admin
+                      ? 'text-red-300'
+                      : role === ROLE.User
+                      ? 'text-blue-300'
+                      : 'text-green-300'
                   }`}
                 >
                   {profile.username}
