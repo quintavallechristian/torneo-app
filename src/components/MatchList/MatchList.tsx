@@ -26,7 +26,10 @@ export default async function MatchList({
   locationId,
   gameId,
 }: MatchListProps) {
-  const canCreateMatches = await canUser(UserAction.CreateMatches);
+  const canCreateMatches = await canUser(UserAction.CreateMatches, {
+    locationId,
+    gameId,
+  });
   return (
     <>
       {matches && matches.length > 0 ? (
@@ -34,6 +37,17 @@ export default async function MatchList({
           {matches.map((match) => (
             <MatchCard key={match.id} match={match} small />
           ))}
+          <div className="flex items-center gap-4">
+            {canCreateMatches && (
+              <Link
+                href={`/matches/new?place_id=${
+                  locationId ? locationId : ''
+                }&game_id=${gameId ? gameId : ''}`}
+              >
+                <Button data-testid="Add match">Crea nuovo partita</Button>
+              </Link>
+            )}
+          </div>
         </div>
       ) : (
         <Empty>
@@ -52,7 +66,7 @@ export default async function MatchList({
                     locationId ? locationId : ''
                   }&game_id=${gameId ? gameId : ''}`}
                 >
-                  <Button variant="outline" size="sm" data-testid="Add player">
+                  <Button variant="outline" size="sm" data-testid="Add match">
                     <PlusIcon className="inline h-6 w-6" />
                   </Button>
                 </Link>
