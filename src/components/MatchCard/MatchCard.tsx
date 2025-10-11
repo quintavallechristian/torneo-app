@@ -6,7 +6,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import SpotlightCard from '@/components/SpotlightCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { Match, ROLE } from '@/types';
 import {
@@ -17,12 +17,12 @@ import {
   PencilIcon,
 } from 'lucide-react';
 import Image from 'next/image';
-import { Button } from './ui/button';
-import DeleteMatchButton from './DeleteMatchButton';
+import { Button } from '../ui/button';
+import DeleteMatchButton from '../DeleteMatchButton/DeleteMatchButton';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { formatMatchStatus, getMatchStatus } from '@/lib/match';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 interface MatchCardProps {
   match: Match;

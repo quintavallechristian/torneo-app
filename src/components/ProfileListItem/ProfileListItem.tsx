@@ -1,7 +1,7 @@
-import SpotlightCard from '@/components/SpotlightCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { Player } from '@/types';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 interface ProfileListItemProps {

@@ -5,7 +5,7 @@ import { ChevronLeft, StarIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
-import SpotlightCard from '@/components/SpotlightCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { Location, LocationStats } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
@@ -15,8 +15,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { setFavouriteLocation } from '../actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import MatchList from '@/components/MatchList';
-import Ranking from '@/components/Ranking';
+import MatchList from '@/components/MatchList/MatchList';
+import Ranking from '@/components/Ranking/Ranking';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;

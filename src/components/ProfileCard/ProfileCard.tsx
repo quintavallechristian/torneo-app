@@ -5,11 +5,11 @@ import {
   CardDescription,
   CardFooter,
 } from '@/components/ui/card';
-import SpotlightCard from '@/components/SpotlightCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { Profile } from '@/types';
 import Image from 'next/image';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 
 interface MatchCardProps {
   profile: Profile;

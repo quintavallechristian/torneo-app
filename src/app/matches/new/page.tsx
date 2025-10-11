@@ -1,4 +1,4 @@
-import SpotlightCard from '@/components/SpotlightCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import ClientMatchForm from '../ClientMatchForm';
 import { createClient } from '@/utils/supabase/server';
 import { Game, Location } from '@/types';

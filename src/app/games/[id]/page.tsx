@@ -17,8 +17,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import Image from 'next/image';
-import MatchCard from '@/components/MatchCard';
-import SpotlightCard from '@/components/SpotlightCard';
+import MatchCard from '@/components/MatchCard/MatchCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { GameStats, ROLE } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
@@ -36,8 +36,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import MatchList from '@/components/MatchList';
-import Ranking from '@/components/Ranking';
+import MatchList from '@/components/MatchList/MatchList';
+import Ranking from '@/components/Ranking/Ranking';
 
 interface GameDetaisPageProps {
   params: Promise<{ id: string }>;

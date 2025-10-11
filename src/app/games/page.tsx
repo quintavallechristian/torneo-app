@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
-import SpotlightCard from '@/components/SpotlightCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { LibraryBigIcon, SparklesIcon, StarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ export default async function GamesPage() {
   const { profile } = await getAuthenticatedUserWithProfile();
   const supabase = await createClient();
   let gameData: Game[] = [];
+
   if (!profile) {
     const { data } = await supabase.from('games').select('*').limit(10);
     gameData = data ?? [];

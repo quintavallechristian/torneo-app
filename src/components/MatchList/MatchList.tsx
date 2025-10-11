@@ -8,10 +8,10 @@ import {
 } from '@/components/ui/empty';
 import { Match, ROLE } from '@/types';
 import React from 'react';
-import MatchCard from './MatchCard';
+import MatchCard from '../MatchCard/MatchCard';
 import { DicesIcon, PlusIcon, Spotlight } from 'lucide-react';
-import { Button } from './ui/button';
-import SpotlightCard from './SpotlightCard';
+import { Button } from '../ui/button';
+import SpotlightCard from '../SpotlightCard/SpotlightCard';
 import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 

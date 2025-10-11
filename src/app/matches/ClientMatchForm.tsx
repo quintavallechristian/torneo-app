@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { GameSearchBar } from '@/components/GameSearchBar';
-import { DatePicker } from '@/components/DatePicker';
+import { GameSearchBar } from '@/components/GameSearchBar/GameSearchBar';
+import { DatePicker } from '@/components/DatePicker/DatePicker';
 import { createMatch, editMatch } from './actions';
 import { ZodErrors } from '@/components/ZodErrors';
 import { Game, Location, Match } from '@/types';
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';
-import { PlaceSearchBar } from '@/components/PlaceSearchBar';
+import { PlaceSearchBar } from '@/components/PlaceSearchBar/PlaceSearchBar';
 
 export default function ClientMatchForm({
   match,

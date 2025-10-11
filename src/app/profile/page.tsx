@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import ProfileCard from '@/components/ProfileCard';
-import MatchCard from '@/components/MatchCard';
+import ProfileCard from '@/components/ProfileCard/ProfileCard';
+import MatchCard from '@/components/MatchCard/MatchCard';
 import { createClient } from '@/utils/supabase/server';
 
 export default async function PrivatePage() {

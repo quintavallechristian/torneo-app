@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
-import SpotlightCard from '@/components/SpotlightCard';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { Button } from '@/components/ui/button';
 import { setFavouriteLocation } from './actions';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';

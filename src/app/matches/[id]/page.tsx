@@ -29,8 +29,8 @@ import {
   subscribeMatch,
   unsubscribeMatch,
 } from './actions';
-import MatchCard from '@/components/MatchCard';
-import ProfileListItem from '@/components/ProfileListItem';
+import MatchCard from '@/components/MatchCard/MatchCard';
+import ProfileListItem from '@/components/ProfileListItem/ProfileListItem';
 import { setWinner } from '@/lib/match';
 import { ExagonalBadge } from '@/components/ui/exagonalBadge';
 interface MatchDetailPageProps {

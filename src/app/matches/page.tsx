@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/server';
-import MatchCard from '@/components/MatchCard';
+import MatchCard from '@/components/MatchCard/MatchCard';
 
 export default async function matchesPage() {
   const supabase = await createClient();

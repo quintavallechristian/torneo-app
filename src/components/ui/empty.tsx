@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
-import SpotlightCard from '../SpotlightCard';
+import SpotlightCard from '../SpotlightCard/SpotlightCard';
 
 function Empty({ className, ...props }: React.ComponentProps<'div'>) {
   return (

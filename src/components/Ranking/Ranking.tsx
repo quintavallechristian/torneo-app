@@ -8,7 +8,7 @@ import {
 import React from 'react';
 import { DicesIcon } from 'lucide-react';
 import { getLocationRanking } from '@/lib/location';
-import ProfileListItem from './ProfileListItem';
+import ProfileListItem from '../ProfileListItem/ProfileListItem';
 import { getGameRanking } from '@/lib/game';
 import { Player } from '@/types';
 
