@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/popover';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-import { Location } from '@/types';
+import { Place } from '@/types';
 
 export type SearchBarItem = {
   value: string;
@@ -47,10 +47,10 @@ export function PlaceSearchBar({ onSelect, place }: PlaceSearchBarProps) {
       let active = true;
       async function fetchItems() {
         const { data, error } = await supabase
-          .from('locations')
+          .from('places')
           .select('id, name')
           .ilike('name', `%${search}%`);
-        const locations = data as Location[] | null;
+        const places = data as Place[] | null;
 
         if (!active) return;
         if (error) {
@@ -58,11 +58,11 @@ export function PlaceSearchBar({ onSelect, place }: PlaceSearchBarProps) {
           setItems([]);
           return;
         }
-        if (locations) {
+        if (places) {
           setItems(
-            locations.map((location) => ({
-              value: location.id,
-              label: location.name,
+            places.map((place) => ({
+              value: place.id,
+              label: place.name,
             })),
           );
         }

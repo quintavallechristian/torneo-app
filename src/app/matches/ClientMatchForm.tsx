@@ -7,7 +7,7 @@ import { GameSearchPopover } from '@/components/GameSearchPopover/GameSearchPopo
 import { DatePicker } from '@/components/DatePicker/DatePicker';
 import { createMatch, editMatch } from './actions';
 import { ZodErrors } from '@/components/ZodErrors';
-import { Game, Location, Match } from '@/types';
+import { Game, Place, Match } from '@/types';
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 import { PlaceSearchBar } from '@/components/PlaceSearchBar/PlaceSearchBar';
 
@@ -18,7 +18,7 @@ export default function ClientMatchForm({
 }: {
   match?: Match;
   game?: Game;
-  place?: Location;
+  place?: Place;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [errors, setErrors] = useState<any>(null);
@@ -41,10 +41,10 @@ export default function ClientMatchForm({
       : null;
 
   const preSelectedPlace =
-    match && match.location
+    match && match.place
       ? {
-          value: match.location.id,
-          label: match.location.name,
+          value: match.place.id,
+          label: match.place.name,
         }
       : place
       ? {

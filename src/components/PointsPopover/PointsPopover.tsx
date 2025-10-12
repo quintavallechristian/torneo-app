@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { updatePlayerPoints } from '@/lib/match';
-import { Game, Location } from '@/types';
+import { Game, Place } from '@/types';
 //import { createClient } from '@/utils/supabase/server';
 
 export async function PointsPopover({
@@ -18,7 +18,7 @@ export async function PointsPopover({
   startingPoints: number;
   game: Game;
   matchId: string;
-  location: Location;
+  place: Place;
   playerId: string;
 }) {
   // const supabase = await createClient();

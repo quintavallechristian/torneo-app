@@ -5,10 +5,10 @@ export enum UserAction {
   CreateMatches = 'create:matches',
   DeleteMatches = 'delete:matches',
   UpdateMatches = 'update:matches',
-  ReadLocations = 'read:locations',
-  CreateLocationes = 'create:locations',
-  DeleteLocationes = 'delete:locations',
-  UpdateLocationes = 'update:locations',
+  ReadPlaces = 'read:places',
+  CreatePlacees = 'create:places',
+  DeletePlacees = 'delete:places',
+  UpdatePlacees = 'update:places',
   UpdateMatchStats = 'update:match_stats',
   ManagePlatform = 'manage:platform',
 }
@@ -16,24 +16,24 @@ export enum UserAction {
 export enum ROLE {
   Admin = 'Admin',
   User = 'User',
-  Manager = 'Manager',
+  PlaceManager = 'PlaceManager',
 }
 
 export async function canUser(
   action: UserAction,
   context?: {
-    locationId?: string;
+    placeId?: string;
     gameId?: string;
   },
   forceTrue: boolean = false,
 ) {
   const { role, permissions } = await getAuthenticatedUserWithProfile();
   if (role === ROLE.Admin || forceTrue) return true;
-  if (role === ROLE.Manager) {
+  if (role === ROLE.PlaceManager) {
     return (
-      (context?.locationId &&
+      (context?.placeId &&
         permissions?.some(
-          (p) => p.locationId === context?.locationId && p.action === action,
+          (p) => p.placeId === context?.placeId && p.action === action,
         )) ||
       (context?.gameId &&
         permissions?.some(

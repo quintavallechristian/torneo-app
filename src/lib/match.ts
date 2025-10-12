@@ -1,8 +1,8 @@
 import {
   Game,
   GameStats,
-  Location,
-  LocationStats,
+  Place,
+  PlaceStats,
   Match,
   MATCHSTATUS,
   Player,
@@ -173,9 +173,9 @@ export async function updateGameElo(
     console.error('Error updating ELOs', error);
   }
 }
-export async function updateLocationElo(
+export async function updatePlaceElo(
   players: Pick<Player, 'profile_id' | 'points'>[],
-  location: Location,
+  place: Place,
 ) {
   const supabase = await createClient();
   const playersWithAllNeeded: {
@@ -188,9 +188,9 @@ export async function updateLocationElo(
   } = {};
 
   const { data } = await supabase
-    .from('profiles_locations')
-    .select<'profile_id, points', LocationStats>('profile_id, points')
-    .eq('location_id', location.id)
+    .from('profiles_places')
+    .select<'profile_id, points', PlaceStats>('profile_id, points')
+    .eq('place_id', place.id)
     .in(
       'profile_id',
       players.map((p) => p.profile_id),
@@ -259,14 +259,14 @@ export async function updateLocationElo(
 
     return {
       profile_id: playerId,
-      location_id: location.id,
+      place_id: place.id,
       points: newElo,
     };
   });
   console.log('Final ELO changes', rows);
 
-  const { error } = await supabase.from('profiles_locations').upsert(rows, {
-    onConflict: 'location_id,profile_id',
+  const { error } = await supabase.from('profiles_places').upsert(rows, {
+    onConflict: 'place_id,profile_id',
   });
 
   if (error) {
@@ -277,13 +277,13 @@ export async function updateLocationElo(
 export async function setWinner({
   matchId,
   players,
-  location,
+  place,
   game,
   winnerId,
 }: {
   matchId: string;
   players: Pick<Player, 'profile_id' | 'points'>[];
-  location: Location;
+  place: Place;
   game: Game;
   winnerId?: string;
 }) {
@@ -295,7 +295,7 @@ export async function setWinner({
     .eq('id', matchId);
   if (error) throw error;
   updateGameElo(players, game);
-  updateLocationElo(players, location);
+  updatePlaceElo(players, place);
   revalidatePath(`/matches/${matchId}`);
 }
 

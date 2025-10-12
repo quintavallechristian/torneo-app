@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import { GameStats, LocationStats, Match, Player } from '@/types';
+import { GameStats, PlaceStats, Match, Player } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
@@ -49,7 +49,7 @@ export default async function MatchDetailsPage({
       `
       *,
       game:games(*),
-      location:locations(*),
+      place:places(*),
       players:profiles_matches(
         *,
         profile:profiles(*)
@@ -87,12 +87,12 @@ export default async function MatchDetailsPage({
     profileGames = data || [];
   }
 
-  let profileLocations: LocationStats[] = [];
+  let profilePlaces: PlaceStats[] = [];
   if (match.players) {
     const { data } = await supabase
-      .from('profiles_locations')
-      .select<'profile_id, points', LocationStats>('profile_id, points')
-      .eq('location_id', match.location_id)
+      .from('profiles_places')
+      .select<'profile_id, points', PlaceStats>('profile_id, points')
+      .eq('place_id', match.place_id)
       .in(
         'profile_id',
         match.players.map((p) => p.profile_id),
@@ -101,13 +101,13 @@ export default async function MatchDetailsPage({
     if (error) {
       console.error('Errore nel recupero delle statistiche di gioco:', error);
     }
-    profileLocations = data || [];
+    profilePlaces = data || [];
   }
 
   const canUpdateMatchStats = await canUser(
     UserAction.UpdateMatchStats,
     {
-      locationId: match.location_id,
+      placeId: match.place_id,
     },
     match.players?.some((p) => p.profile_id === profile?.id),
   );
@@ -115,7 +115,7 @@ export default async function MatchDetailsPage({
   const canManagePlatform = await canUser(UserAction.ManagePlatform);
 
   const canUpdateMatches = await canUser(UserAction.UpdateMatches, {
-    locationId: match.location_id,
+    placeId: match.place_id,
   });
 
   return (
@@ -196,7 +196,7 @@ export default async function MatchDetailsPage({
                             winnerId: playerObj.profile!.id!,
                             matchId: match.id!,
                             game: match.game!,
-                            location: match.location!,
+                            place: match.place!,
                             players: match.players!.map((p) => ({
                               profile_id: p.profile_id,
                               points: p.points,
@@ -224,10 +224,10 @@ export default async function MatchDetailsPage({
                       )
                     }
                     StatsSlot={
-                      match.game && match.location && canUpdateMatchStats ? (
+                      match.game && match.place && canUpdateMatchStats ? (
                         <PointsPopover
                           game={match.game}
-                          location={match.location}
+                          place={match.place}
                           matchId={match.id!}
                           playerId={playerObj.profile!.id!}
                           startingPoints={playerObj.points || 0}
@@ -278,7 +278,7 @@ export default async function MatchDetailsPage({
                           }
                         </ExagonalBadge>
                         <ExagonalBadge variant="blue">
-                          {profileLocations.find(
+                          {profilePlaces.find(
                             ({ profile_id }) =>
                               profile_id === playerObj.profile!.id!,
                           )?.points || 0}

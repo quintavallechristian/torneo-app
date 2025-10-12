@@ -1,7 +1,7 @@
 import { ROLE } from '@/lib/permissions';
 import {
   GameStats,
-  LocationStats,
+  PlaceStats,
   Profile,
   UserPermission,
   UserRowPermission,
@@ -63,7 +63,7 @@ export async function getAuthenticatedUserWithProfile(): Promise<{
   if (permissionsData) {
     permissions.push(
       ...permissionsData.map((p) => ({
-        locationId: p.location_id,
+        placeId: p.place_id,
         action: p.permission.action,
       })),
     );
@@ -119,46 +119,44 @@ export async function getGameRanking(gameId: number): Promise<GameStats[]> {
   return gameStats;
 }
 
-export async function getLocationStatsPerProfile(
+export async function getPlaceStatsPerProfile(
   profileId: string,
-  locationId: number,
-): Promise<LocationStats> {
+  placeId: number,
+): Promise<PlaceStats> {
   const supabase = await createClient();
-  let { data: locationStats } = await supabase
-    .from('profiles_locations')
+  let { data: placeStats } = await supabase
+    .from('profiles_places')
     .select('*')
     .eq('profile_id', profileId)
-    .eq('location_id', locationId)
+    .eq('place_id', placeId)
     .maybeSingle();
-  if (!locationStats) {
+  if (!placeStats) {
     const { data, error } = await supabase
-      .from('profiles_locations')
+      .from('profiles_places')
       .insert({
         profile_id: profileId,
-        location_id: locationId,
+        place_id: placeId,
       })
       .select()
       .single();
     console.log(error);
-    locationStats = data;
+    placeStats = data;
   }
 
-  return locationStats;
+  return placeStats;
 }
 
-export async function getLocationRanking(
-  locationId: number,
-): Promise<LocationStats[]> {
+export async function getPlaceRanking(placeId: number): Promise<PlaceStats[]> {
   const supabase = await createClient();
-  let { data: locationStats } = await supabase
-    .from('profiles_locations')
+  let { data: placeStats } = await supabase
+    .from('profiles_places')
     .select('*')
-    .eq('location_id', locationId);
+    .eq('place_id', placeId);
 
-  if (!locationStats) {
+  if (!placeStats) {
     return [];
   }
 
-  locationStats = locationStats.sort((a, b) => b.points - a.points);
-  return locationStats;
+  placeStats = placeStats.sort((a, b) => b.points - a.points);
+  return placeStats;
 }

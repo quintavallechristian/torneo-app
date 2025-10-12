@@ -6,7 +6,7 @@ export type SearchParams = {
 };
 
 export enum SCOPE {
-  Location = 'location',
+  Place = 'place',
   Game = 'game',
   Match = 'match',
 }
@@ -32,7 +32,7 @@ export const createMatchSchema = (minPlayers: number, maxPlayers: number) =>
       .min(3, 'Nome partita troppo corto')
       .max(100, 'Nome partita troppo lungo'),
     game_id: z.string().min(1, 'Devi selezionare un gioco'),
-    location_id: z.string().min(1, 'Devi selezionare un luogo'),
+    place_id: z.string().min(1, 'Devi selezionare un luogo'),
     description: z.string().max(500, 'Descrizione troppo lunga').optional(),
     startAt: z.string().min(1, 'Devi selezionare una data di inizio'),
     endAt: z.string().min(1, 'Devi selezionare una data di fine'),
@@ -55,12 +55,12 @@ export const ProfileSchema = z.object({
 
 export type UserRowPermission = {
   id: number;
-  location_id: string;
+  place_id: string;
   permission: { action: UserAction };
 };
 
 export type UserPermission = {
-  locationId?: string;
+  placeId?: string;
   gameId?: string;
   matchId?: string;
   action: UserAction;
@@ -91,7 +91,7 @@ export type Game = {
   matches?: Match[];
   gameStats: GameStats[];
 };
-export type Location = {
+export type Place = {
   id: string;
   name: string;
   image: string;
@@ -100,12 +100,12 @@ export type Location = {
   longitude: number | null;
   description: string | null;
   matches?: Match[];
-  locationStats: LocationStats[];
+  placeStats: PlaceStats[];
 };
 export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;
   game?: Game;
-  location?: Location;
+  place?: Place;
   players?: Player[];
   winner?: Profile | null;
 };
@@ -139,7 +139,7 @@ export type GameStats = PlayerStats & {
   rating: number | null;
   favourite: boolean;
 };
-export type LocationStats = PlayerStats & {
-  location_id: string;
+export type PlaceStats = PlayerStats & {
+  place_id: string;
   favourite: boolean;
 };

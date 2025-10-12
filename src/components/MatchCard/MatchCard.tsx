@@ -35,7 +35,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
   const { profile } = await getAuthenticatedUserWithProfile();
 
   const canUpdateMatches = await canUser(UserAction.UpdateMatches, {
-    locationId: match.location_id,
+    placeId: match.place_id,
   });
   return (
     <SpotlightCard className="px-0 py-0">
@@ -124,10 +124,10 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
               <div className="flex items-center gap-1">
                 <MapPinIcon className="size-4 text-slate-500" />
                 <Link
-                  href={`/places/${match.location?.id}`}
+                  href={`/places/${match.place?.id}`}
                   className=" text-slate-600 dark:text-slate-400 hover:underline text-xs"
                 >
-                  {match.location?.name}
+                  {match.place?.name}
                 </Link>
               </div>
             </div>

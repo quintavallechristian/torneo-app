@@ -12,22 +12,21 @@ import MatchCard from '../MatchCard/MatchCard';
 import { DicesIcon, PlusIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
-import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { canUser, UserAction } from '@/lib/permissions';
 
 interface MatchListProps {
   matches: Match[] | undefined;
-  locationId?: string;
+  placeId?: string;
   gameId?: string;
 }
 
 export default async function MatchList({
   matches,
-  locationId,
+  placeId,
   gameId,
 }: MatchListProps) {
   const canCreateMatches = await canUser(UserAction.CreateMatches, {
-    locationId,
+    placeId,
     gameId,
   });
   return (
@@ -41,7 +40,7 @@ export default async function MatchList({
             {canCreateMatches && (
               <Link
                 href={`/matches/new?place_id=${
-                  locationId ? locationId : ''
+                  placeId ? placeId : ''
                 }&game_id=${gameId ? gameId : ''}`}
               >
                 <Button data-testid="Add match">Crea nuovo partita</Button>
@@ -63,7 +62,7 @@ export default async function MatchList({
               {canCreateMatches && (
                 <Link
                   href={`/matches/new?place_id=${
-                    locationId ? locationId : ''
+                    placeId ? placeId : ''
                   }&game_id=${gameId ? gameId : ''}`}
                 >
                   <Button variant="outline" size="sm" data-testid="Add match">

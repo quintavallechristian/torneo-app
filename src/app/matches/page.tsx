@@ -9,7 +9,7 @@ export default async function matchesPage() {
   const { data } = await supabase
     .from('matches')
     .select(
-      '*, game:games(*), location:locations(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
+      '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
     );
   const canCreateMatches = await canUser(UserAction.CreateMatches);
   return (

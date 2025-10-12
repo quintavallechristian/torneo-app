@@ -14,7 +14,7 @@ export async function createMatch(
 ): Promise<{ form: Match; errors: any }> {
   const name = formData.get('name') as string;
   const game_id = formData.get('game') as string;
-  const location_id = formData.get('place') as string;
+  const place_id = formData.get('place') as string;
   const description = formData.get('description') as string;
   const startAt = formData.get('startAt') as string;
   const endAt = formData.get('endAt') as string;
@@ -24,7 +24,7 @@ export async function createMatch(
   const form: Match = {
     name,
     game_id,
-    location_id,
+    place_id,
     description,
     startAt,
     endAt,
@@ -65,7 +65,7 @@ export async function editMatch(
 ): Promise<{ form: Match; errors: any }> {
   const name = formData.get('name') as string;
   const game_id = formData.get('game') as string;
-  const location_id = formData.get('place') as string;
+  const place_id = formData.get('place') as string;
   const description = formData.get('description') as string;
   const startAt = formData.get('startAt') as string;
   const endAt = formData.get('endAt') as string;
@@ -75,7 +75,7 @@ export async function editMatch(
   const form: Match = {
     name,
     game_id,
-    location_id,
+    place_id,
     description,
     startAt,
     endAt,

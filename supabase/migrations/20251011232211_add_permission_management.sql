@@ -1,8 +1,8 @@
-alter table "public"."profiles_locations" drop constraint "profiles_locations_game_id_fkey";
+alter table "public"."profiles_places" drop constraint "profiles_places_game_id_fkey";
 
 alter table "public"."profiles_games" drop constraint "profiles_games_profile_id_fkey";
 
-alter table "public"."profiles_locations" drop constraint "profiles_locations_profile_id_fkey";
+alter table "public"."profiles_places" drop constraint "profiles_places_profile_id_fkey";
 
 alter table "public"."profiles_matches" drop constraint "profiles_matches_profile_id_fkey";
 
@@ -18,7 +18,7 @@ create table "public"."users_permissions" (
     "created_at" timestamp with time zone not null default now(),
     "user_id" uuid default gen_random_uuid(),
     "user_action_id" bigint,
-    "location_id" bigint
+    "place_id" bigint
 );
 
 
@@ -30,13 +30,13 @@ alter table "public"."profiles_games" add column "in_wishlist" boolean not null 
 
 alter table "public"."profiles_games" add column "rating" double precision;
 
-alter table "public"."profiles_locations" add column "favourite" boolean not null default false;
+alter table "public"."profiles_places" add column "favourite" boolean not null default false;
 
 alter table "public"."profiles_matches" add column "confirmed" boolean not null default false;
 
 CREATE UNIQUE INDEX profiles_games_profile_id_game_id_key ON public.profiles_games USING btree (profile_id, game_id);
 
-CREATE UNIQUE INDEX profiles_locations_profile_id_location_id_key ON public.profiles_locations USING btree (profile_id, location_id);
+CREATE UNIQUE INDEX profiles_places_profile_id_place_id_key ON public.profiles_places USING btree (profile_id, place_id);
 
 CREATE UNIQUE INDEX user_actions_pkey ON public.user_actions USING btree (id);
 
@@ -46,13 +46,13 @@ alter table "public"."user_actions" add constraint "user_actions_pkey" PRIMARY K
 
 alter table "public"."users_permissions" add constraint "users_roles_permissions_pkey" PRIMARY KEY using index "users_roles_permissions_pkey";
 
-alter table "public"."profiles_locations" add constraint "profiles_locations_location_id_fkey" FOREIGN KEY (location_id) REFERENCES locations(id) not valid;
+alter table "public"."profiles_places" add constraint "profiles_places_place_id_fkey" FOREIGN KEY (place_id) REFERENCES places(id) not valid;
 
-alter table "public"."profiles_locations" validate constraint "profiles_locations_location_id_fkey";
+alter table "public"."profiles_places" validate constraint "profiles_places_place_id_fkey";
 
-alter table "public"."users_permissions" add constraint "users_roles_permissions_location_id_fkey" FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE not valid;
+alter table "public"."users_permissions" add constraint "users_roles_permissions_place_id_fkey" FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE not valid;
 
-alter table "public"."users_permissions" validate constraint "users_roles_permissions_location_id_fkey";
+alter table "public"."users_permissions" validate constraint "users_roles_permissions_place_id_fkey";
 
 alter table "public"."users_permissions" add constraint "users_roles_permissions_user_action_id_fkey" FOREIGN KEY (user_action_id) REFERENCES user_actions(id) not valid;
 
@@ -66,9 +66,9 @@ alter table "public"."profiles_games" add constraint "profiles_games_profile_id_
 
 alter table "public"."profiles_games" validate constraint "profiles_games_profile_id_fkey";
 
-alter table "public"."profiles_locations" add constraint "profiles_locations_profile_id_fkey" FOREIGN KEY (profile_id) REFERENCES profiles(id) ON UPDATE RESTRICT ON DELETE CASCADE not valid;
+alter table "public"."profiles_places" add constraint "profiles_places_profile_id_fkey" FOREIGN KEY (profile_id) REFERENCES profiles(id) ON UPDATE RESTRICT ON DELETE CASCADE not valid;
 
-alter table "public"."profiles_locations" validate constraint "profiles_locations_profile_id_fkey";
+alter table "public"."profiles_places" validate constraint "profiles_places_profile_id_fkey";
 
 alter table "public"."profiles_matches" add constraint "profiles_matches_profile_id_fkey" FOREIGN KEY (profile_id) REFERENCES profiles(id) ON UPDATE RESTRICT ON DELETE CASCADE not valid;
 

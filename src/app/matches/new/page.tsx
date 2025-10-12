@@ -1,7 +1,7 @@
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import ClientMatchForm from '../ClientMatchForm';
 import { createClient } from '@/utils/supabase/server';
-import { Game, Location } from '@/types';
+import { Game, Place } from '@/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function NewMatch({ searchParams }: any) {
@@ -37,14 +37,14 @@ export default async function NewMatch({ searchParams }: any) {
     game = gameData;
   }
 
-  let place: Location | undefined = undefined;
+  let place: Place | undefined = undefined;
   if (placeId) {
     const supabase = await createClient();
     const { data: placeData, error } = await supabase
-      .from('locations')
+      .from('places')
       .select('id, name')
       .eq('id', placeId)
-      .single<Location>();
+      .single<Place>();
 
     if (error || !placeData) {
       console.error('Errore nel recupero del luogo:', error);

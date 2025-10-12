@@ -7,18 +7,18 @@ import {
 } from '@/components/ui/empty';
 import React from 'react';
 import { DicesIcon } from 'lucide-react';
-import { getLocationRanking } from '@/lib/location';
+import { getPlaceRanking } from '@/lib/place';
 import ProfileListItem from '../ProfileListItem/ProfileListItem';
 import { getGameRanking } from '@/lib/game';
 import { Player } from '@/types';
 
 interface RankingProps {
-  locationId?: string;
+  placeId?: string;
   gameId?: string;
 }
 
-export default async function Ranking({ locationId, gameId }: RankingProps) {
-  if (!locationId && !gameId) {
+export default async function Ranking({ placeId, gameId }: RankingProps) {
+  if (!placeId && !gameId) {
     return (
       <Empty>
         <EmptyHeader>
@@ -32,8 +32,8 @@ export default async function Ranking({ locationId, gameId }: RankingProps) {
     );
   }
   let ranking: Player[] = [];
-  if (locationId) {
-    ranking = await getLocationRanking(locationId);
+  if (placeId) {
+    ranking = await getPlaceRanking(placeId);
   }
   if (gameId) {
     ranking = await getGameRanking(gameId);

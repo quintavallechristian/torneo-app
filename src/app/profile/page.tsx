@@ -20,7 +20,7 @@ export default async function PrivatePage() {
       `
       *,
       game:games(*),
-      location:locations(*),
+      place:places(*),
       winner:profiles(*),
       profiles_matches!inner(profile_id)
     `,
