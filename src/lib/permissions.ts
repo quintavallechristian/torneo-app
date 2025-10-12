@@ -17,6 +17,7 @@ export enum ROLE {
   Admin = 'Admin',
   User = 'User',
   PlaceManager = 'PlaceManager',
+  GameManager = 'GameManager',
 }
 
 export async function canUser(
@@ -31,14 +32,18 @@ export async function canUser(
   if (role === ROLE.Admin || forceTrue) return true;
   if (role === ROLE.PlaceManager) {
     return (
-      (context?.placeId &&
-        permissions?.some(
-          (p) => p.placeId === context?.placeId && p.action === action,
-        )) ||
-      (context?.gameId &&
-        permissions?.some(
-          (p) => p.gameId === context?.gameId && p.action === action,
-        ))
+      context?.placeId &&
+      permissions?.some(
+        (p) => p.placeId === context?.placeId && p.action === action,
+      )
+    );
+  }
+  if (role === ROLE.GameManager) {
+    return (
+      context?.gameId &&
+      permissions?.some(
+        (p) => p.gameId === context?.gameId && p.action === action,
+      )
     );
   }
   return false;

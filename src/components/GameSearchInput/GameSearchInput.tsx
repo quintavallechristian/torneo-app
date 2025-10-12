@@ -26,7 +26,7 @@ export function GameSearchInput({
     const handler = setTimeout(() => {
       const params = new URLSearchParams();
       if (search) params.set('q', search);
-      const currentPath = window.place.pathname;
+      const currentPath = window.location.pathname;
       router.push(`${currentPath}?${params.toString()}`);
     }, 400);
     return () => clearTimeout(handler);
