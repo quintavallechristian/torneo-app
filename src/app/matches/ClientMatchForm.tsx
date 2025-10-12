@@ -10,6 +10,7 @@ import { ZodErrors } from '@/components/ZodErrors';
 import { Game, Place, Match } from '@/types';
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 import { PlaceSearchBar } from '@/components/PlaceSearchBar/PlaceSearchBar';
+import PlaceListItem from '@/components/PlaceListItem/PlaceListItem';
 
 export default function ClientMatchForm({
   match,
@@ -39,6 +40,8 @@ export default function ClientMatchForm({
           max_players: game.max_players,
         }
       : null;
+
+  const preSelectedPlaceRaw = match && match.place ? match.place : place;
 
   const preSelectedPlace =
     match && match.place
@@ -150,28 +153,44 @@ export default function ClientMatchForm({
         >
           Luogo
         </label>
-        <PlaceSearchBar
-          place={
-            selectedPlace
-              ? {
-                  value: selectedPlace.value ?? '',
-                  label: selectedPlace.label ?? '',
-                }
-              : null
-          }
-          onSelect={setSelectedPlace}
-        />
-        <input
-          type="hidden"
-          name="game"
-          value={selectedGame ? selectedGame.value : ''}
-        />
-        <input
-          type="hidden"
-          name="place"
-          value={selectedPlace ? selectedPlace.value : ''}
-        />
-        {errors && <ZodErrors error={errors.game_id} />}
+        {preSelectedPlaceRaw ? (
+          <PlaceListItem
+            key={preSelectedPlaceRaw.id}
+            place={preSelectedPlaceRaw}
+            DescriptionSlot={
+              preSelectedPlaceRaw.address && (
+                <span>{preSelectedPlaceRaw.address}</span>
+              )
+            }
+            IntroSlot={''}
+            StatsSlot={''}
+          />
+        ) : (
+          <>
+            <PlaceSearchBar
+              place={
+                selectedPlace
+                  ? {
+                      value: selectedPlace.value ?? '',
+                      label: selectedPlace.label ?? '',
+                    }
+                  : null
+              }
+              onSelect={setSelectedPlace}
+            />
+            <input
+              type="hidden"
+              name="game"
+              value={selectedGame ? selectedGame.value : ''}
+            />
+            <input
+              type="hidden"
+              name="place"
+              value={selectedPlace ? selectedPlace.value : ''}
+            />
+            {errors && <ZodErrors error={errors.game_id} />}
+          </>
+        )}
       </div>
       <div>
         <label />

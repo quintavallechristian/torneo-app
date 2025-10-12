@@ -8,74 +8,78 @@ import {
 } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 import { User } from '@supabase/supabase-js';
+import { cache } from 'react';
 
-export async function getAuthenticatedUserWithProfile(): Promise<{
-  user: User | null;
-  profile: Profile | null;
-  role: ROLE | null;
-  permissions?: UserPermission[];
-}> {
-  const supabase = await createClient();
+export const getAuthenticatedUserWithProfile = cache(
+  async (): Promise<{
+    user: User | null;
+    profile: Profile | null;
+    role: ROLE | null;
+    permissions?: UserPermission[];
+  }> => {
+    console.log('called');
+    const supabase = await createClient();
 
-  const { data: userData, error: userError } = await supabase.auth.getUser();
+    const { data: userData, error: userError } = await supabase.auth.getUser();
 
-  if (userError || !userData.user) {
-    return { user: null, profile: null, role: null };
-  }
+    if (userError || !userData.user) {
+      return { user: null, profile: null, role: null };
+    }
 
-  // Get profile
-  const {
-    data: profileData,
-    error: profileError,
-  }: { data: Profile | null; error: Error | null } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', userData.user.id)
-    .single();
-
-  if (profileError || !profileData) {
-    throw new Error('Errore nel recupero del profilo');
-  }
-
-  // Get role
-  const {
-    data: roleData,
-    error: roleError,
-  }: { data: { role: { name: ROLE } } | null; error: Error | null } =
-    await supabase
-      .from('users_roles')
-      .select('*, role:roles(*)')
+    // Get profile
+    const {
+      data: profileData,
+      error: profileError,
+    }: { data: Profile | null; error: Error | null } = await supabase
+      .from('profiles')
+      .select('*')
       .eq('user_id', userData.user.id)
       .single();
 
-  if (roleError || !roleData) {
-    throw new Error('Errore nel recupero del ruolo');
-  }
+    if (profileError || !profileData) {
+      throw new Error('Errore nel recupero del profilo');
+    }
 
-  // Get permissions
-  const { data: permissionsData }: { data: UserRowPermission[] | null } =
-    await supabase
-      .from('users_permissions')
-      .select('*, permission:user_actions(action)')
-      .eq('user_id', userData.user.id);
+    // Get role
+    const {
+      data: roleData,
+      error: roleError,
+    }: { data: { role: { name: ROLE } } | null; error: Error | null } =
+      await supabase
+        .from('users_roles')
+        .select('*, role:roles(*)')
+        .eq('user_id', userData.user.id)
+        .single();
 
-  const permissions = [];
-  if (permissionsData) {
-    permissions.push(
-      ...permissionsData.map((p) => ({
-        placeId: p.place_id,
-        action: p.permission.action,
-      })),
-    );
-  }
+    if (roleError || !roleData) {
+      throw new Error('Errore nel recupero del ruolo');
+    }
 
-  return {
-    user: userData.user,
-    profile: profileData,
-    role: roleData?.role.name,
-    permissions: permissions,
-  };
-}
+    // Get permissions
+    const { data: permissionsData }: { data: UserRowPermission[] | null } =
+      await supabase
+        .from('users_permissions')
+        .select('*, permission:user_actions(action)')
+        .eq('user_id', userData.user.id);
+
+    const permissions = [];
+    if (permissionsData) {
+      permissions.push(
+        ...permissionsData.map((p) => ({
+          placeId: p.place_id,
+          action: p.permission.action,
+        })),
+      );
+    }
+
+    return {
+      user: userData.user,
+      profile: profileData,
+      role: roleData?.role.name,
+      permissions: permissions,
+    };
+  },
+);
 
 export async function getGameStatsPerProfile(
   profileId: string,

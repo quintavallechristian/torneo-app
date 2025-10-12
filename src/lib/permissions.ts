@@ -6,9 +6,9 @@ export enum UserAction {
   DeleteMatches = 'delete:matches',
   UpdateMatches = 'update:matches',
   ReadPlaces = 'read:places',
-  CreatePlacees = 'create:places',
-  DeletePlacees = 'delete:places',
-  UpdatePlacees = 'update:places',
+  CreatePlaces = 'create:places',
+  DeletePlaces = 'delete:places',
+  UpdatePlaces = 'update:places',
   UpdateMatchStats = 'update:match_stats',
   ManagePlatform = 'manage:platform',
 }
@@ -39,6 +39,7 @@ export async function canUser(
     );
   }
   if (role === ROLE.GameManager) {
+    console.log('gg');
     return (
       context?.gameId &&
       permissions?.some(
@@ -46,5 +47,6 @@ export async function canUser(
       )
     );
   }
+  console.log('ehd');
   return false;
 }

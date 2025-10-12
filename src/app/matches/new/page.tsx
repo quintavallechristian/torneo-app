@@ -42,7 +42,7 @@ export default async function NewMatch({ searchParams }: any) {
     const supabase = await createClient();
     const { data: placeData, error } = await supabase
       .from('places')
-      .select('id, name')
+      .select('id, name, address')
       .eq('id', placeId)
       .single<Place>();
 
