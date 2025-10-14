@@ -13,42 +13,41 @@ import {
 import { toast } from 'sonner';
 import { PlusIcon } from 'lucide-react';
 import { PlayerSearchBar } from '../PlayerSearchBar/PlayerSearchBar';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addPlayer } from '@/lib/server/match';
+import { Match } from '@/types';
 
-type AddPlayerModalProps = { matchId: string };
+type AddPlayerModalProps = { match: Match };
 
-export function AddPlayerModal({ matchId }: AddPlayerModalProps) {
+export function AddPlayerModal({ match }: AddPlayerModalProps) {
   const [open, setOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState('');
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!selectedPlayer) {
-      toast.error('Seleziona un giocatore.');
-      return;
-    }
-    startTransition(async () => {
-      try {
-        await addPlayer({ profile_id: selectedPlayer, match_id: matchId });
+  function addPlayerAction(profileId: string, match: Match) {
+    addPlayer({
+      profileId,
+      match: match!,
+    })
+      .then((data) => {
+        if (data.success) {
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
         router.refresh();
         setSelectedPlayer('');
-        toast.success('Giocatore aggiunto con successo!');
         setOpen(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
+      })
+      .catch((err) => {
         if (err.message === '23505') {
           toast.error('Giocatore già aggiunto a questa partita.');
         } else {
           toast.error('Impossibile aggiungere il giocatore.');
         }
-        return;
-      }
-    });
-  };
+      });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -61,31 +60,29 @@ export function AddPlayerModal({ matchId }: AddPlayerModalProps) {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Aggiungi giocatore</DialogTitle>
-            <DialogDescription>
-              Aggiungi un nuovo giocatore al torneo.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Aggiungi giocatore</DialogTitle>
+          <DialogDescription>
+            Aggiungi un nuovo giocatore al torneo.
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="grid gap-4">
-            <div className="grid gap-3">
-              <PlayerSearchBar onSelect={setSelectedPlayer} />
-              <input type="hidden" name="profile_id" value={selectedPlayer} />
-              <input type="hidden" name="match_id" value={matchId} />
-            </div>
+        <div className="grid gap-4">
+          <div className="grid gap-3">
+            <PlayerSearchBar onSelect={setSelectedPlayer} />
+            <input type="hidden" name="profile_id" value={selectedPlayer} />
+            <input type="hidden" name="match_id" value={match.id} />
           </div>
+        </div>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Chiudi</Button>
-            </DialogClose>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? 'Aggiungendo...' : 'Aggiungi'}
-            </Button>
-          </DialogFooter>
-        </form>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Chiudi</Button>
+          </DialogClose>
+          <Button onClick={() => addPlayerAction(selectedPlayer, match)}>
+            Aggiungi
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

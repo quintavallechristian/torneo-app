@@ -8,31 +8,41 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { updatePlayerPoints } from '@/lib/server/match';
-import { Game, Place } from '@/types';
+import { Match } from '@/types';
+import { toast } from 'sonner';
 //import { createClient } from '@/utils/supabase/server';
 
 export function PointsPopover({
   startingPoints,
-  matchId,
+  match,
+  placeId,
   playerId,
 }: {
   startingPoints: number;
-  game: Game;
-  matchId: string;
-  place: Place;
+  match: Match;
+  placeId: string;
   playerId: string;
 }) {
-  // const supabase = await createClient();
-  // const { data: scoreSheet, error } = await supabase
-  //   .from('score_sheets')
-  //   .select('*')
-  //   .eq('game_id', gameId)
-  //   .single<any>();
-
-  // if (error) {
-  //   console.log('Errore nel recupero del score sheet:', error);
-  // }
-  // const field = { value: false };
+  function updatePlayerPointsAction(formData: FormData) {
+    const points = formData.get('points') as string;
+    console.log(points);
+    updatePlayerPoints({
+      match: match,
+      profileId: playerId,
+      placeId,
+      points: parseInt(points, 10),
+    })
+      .then((data) => {
+        if (data.success) {
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
+      })
+      .catch(() => {
+        toast.error('Errore nel confermare il vincitore');
+      });
+  }
 
   return (
     <Popover>
@@ -44,7 +54,7 @@ export function PointsPopover({
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
-        <form action={updatePlayerPoints}>
+        <form action={updatePlayerPointsAction}>
           <div className="grid gap-4">
             <div className="space-y-2">
               <h4 className="leading-none font-medium">Aggiorna punti</h4>
@@ -86,8 +96,6 @@ export function PointsPopover({
                 >
                   Totale
                 </Label>
-                <input type="hidden" name="matchId" value={matchId} />
-                <input type="hidden" name="playerId" value={playerId} />
                 <Input
                   name="points"
                   id="points"

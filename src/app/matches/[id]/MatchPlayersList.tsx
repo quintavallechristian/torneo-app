@@ -31,7 +31,7 @@ import ProfileListItem from '@/components/ProfileListItem/ProfileListItem';
 import { setWinner } from '@/lib/server/match';
 import { ExagonalBadge } from '@/components/ui/exagonalBadge';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
-import { useActionState, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 interface MatchPlayersListProps {
   profile: Profile | null;
@@ -50,15 +50,70 @@ export default function MatchPlayersList({
   canUpdateMatchStats,
   canUpdateMatches,
 }: MatchPlayersListProps) {
-  const [adminControlToggled, setAdminControlToggled] = useState(true);
-  const [state, setWinnerAction] = useActionState(setWinner, null);
+  const [adminControlToggled, setAdminControlToggled] = useState(false);
 
-  // Mostra il toast quando cambia lo stato
-  useEffect(() => {
-    if (!state) return;
-    if (state.success) toast.success(state.message);
-    else toast.error(state.message);
-  }, [state]);
+  function removePlayerAction(profileId: string) {
+    const confirm = window.confirm(
+      'Sei sicuro di voler rimuovere questo giocatore dalla partita?',
+    );
+    if (!confirm) return;
+    removePlayer({
+      match,
+      profileId,
+      placeId: match.place_id!,
+    })
+      .then((data) => {
+        if (data.success) {
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
+      })
+      .catch(() => {
+        toast.error('Errore nel rimuovere il giocatore');
+      });
+  }
+
+  function confirmPlayerAction(profileId: string) {
+    confirmPlayer({
+      match,
+      profileId,
+      placeId: match.place_id!,
+    })
+      .then((data) => {
+        if (data.success) {
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
+      })
+      .catch(() => {
+        toast.error('Errore nel confermare il giocatore');
+      });
+  }
+
+  function setWinnerAction(profileId: string) {
+    setWinner({
+      winnerId: profileId,
+      match: match!,
+      game: match.game!,
+      place: match.place!,
+      players: match.players!.map((p) => ({
+        profile_id: p.profile_id,
+        points: p.points,
+      })),
+    })
+      .then((data) => {
+        if (data.success) {
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
+      })
+      .catch(() => {
+        toast.error('Errore nel confermare il vincitore');
+      });
+  }
 
   return (
     <section className="mt-8">
@@ -97,7 +152,7 @@ export default function MatchPlayersList({
         {(match.players || []).length > 0 &&
           canUpdateMatches &&
           adminControlToggled && (
-            <div>{match.id && <AddPlayerModal matchId={match.id} />}</div>
+            <div>{match.id && <AddPlayerModal match={match} />}</div>
           )}
         <div className="ml-auto">
           {(match.players || []).length > 0 &&
@@ -136,23 +191,14 @@ export default function MatchPlayersList({
               relevant={!!playerObj.confirmed}
               isWinner={playerObj.profile?.id === match.winner?.id}
               IntroSlot={
-                true ? (
-                  <form
-                    action={setWinnerAction.bind(null, {
-                      winnerId: playerObj.profile!.id!,
-                      match: match!,
-                      game: match.game!,
-                      place: match.place!,
-                      players: match.players!.map((p) => ({
-                        profile_id: p.profile_id,
-                        points: p.points,
-                      })),
-                    })}
+                !adminControlToggled ? (
+                  <button
+                    type="submit"
+                    onClick={() => setWinnerAction(playerObj.profile!.id!)}
                   >
-                    <button type="submit">
-                      <ExagonalBadge
-                        variant="default"
-                        className={`
+                    <ExagonalBadge
+                      variant="default"
+                      className={`
                             cursor-pointer size-10 hover:scale-105 transition-all ease-in-out
                             ${
                               playerObj.profile?.id === match.winner?.id
@@ -160,11 +206,10 @@ export default function MatchPlayersList({
                                 : 'bg-indigo-50/5'
                             }
                           `}
-                      >
-                        <TrophyIcon className="size-7" strokeWidth={1} />
-                      </ExagonalBadge>
-                    </button>
-                  </form>
+                    >
+                      <TrophyIcon className="size-7" strokeWidth={1} />
+                    </ExagonalBadge>
+                  </button>
                 ) : (
                   ''
                 )
@@ -173,9 +218,8 @@ export default function MatchPlayersList({
                 !adminControlToggled ? (
                   match.game && match.place && canUpdateMatchStats ? (
                     <PointsPopover
-                      game={match.game}
                       place={match.place}
-                      matchId={match.id!}
+                      match={match}
                       playerId={playerObj.profile!.id!}
                       startingPoints={playerObj.points || 0}
                     />
@@ -189,32 +233,27 @@ export default function MatchPlayersList({
                 canUpdateMatchStats && (
                   <div className="w-24 grid grid-cols-2 items-center gap-2 p-1 bg-red-900/20 dark:bg-red-50/20 rounded-lg">
                     {!playerObj.confirmed ? (
-                      <form
-                        action={confirmPlayer.bind(null, {
-                          matchId: match.id!,
-                          profileId: playerObj.profile!.id!,
-                        })}
+                      <Button
+                        variant="default"
+                        size="sm"
+                        type="submit"
+                        onClick={() =>
+                          confirmPlayerAction(playerObj.profile!.id!)
+                        }
                       >
-                        <Button variant="default" size="sm" type="submit">
-                          <UserRoundCheck className="size-4" strokeWidth={1} />
-                        </Button>
-                      </form>
+                        <UserRoundCheck className="size-4" strokeWidth={1} />
+                      </Button>
                     ) : (
                       <Check className="size-6 mx-auto" strokeWidth={1} />
                     )}
-                    <form
-                      action={removePlayer.bind(null, {
-                        matchId: match.id!,
-                        profileId: playerObj.profile!.id!,
-                      })}
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      type="submit"
+                      onClick={() => removePlayerAction(playerObj.profile!.id!)}
                     >
-                      <Button variant="destructive" size="sm" type="submit">
-                        <UserRoundX
-                          className="mx-auto size-4"
-                          strokeWidth={1}
-                        />
-                      </Button>
-                    </form>
+                      <UserRoundX className="mx-auto size-4" strokeWidth={1} />
+                    </Button>
                   </div>
                 )
               }

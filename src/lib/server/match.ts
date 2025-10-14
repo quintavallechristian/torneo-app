@@ -224,23 +224,19 @@ export async function updatePlaceElo(
     console.error('Error updating ELOs', error);
   }
 }
-
-export async function setWinner(
-  _: unknown,
-  {
-    match,
-    players,
-    place,
-    game,
-    winnerId,
-  }: {
-    match: Match;
-    players: Pick<Player, 'profile_id' | 'points'>[];
-    place: Place;
-    game: Game;
-    winnerId?: string;
-  },
-) {
+export async function setWinner({
+  match,
+  players,
+  place,
+  game,
+  winnerId,
+}: {
+  match: Match;
+  players: Pick<Player, 'profile_id' | 'points'>[];
+  place: Place;
+  game: Game;
+  winnerId?: string;
+}) {
   const supabase = await createClient();
   const { profile } = await getAuthenticatedUserWithProfile();
   const { error } = await supabase
@@ -267,25 +263,131 @@ export async function setWinner(
   return { success: true, message: 'Vincitore aggiornato con successo' };
 }
 
-export async function updatePlayerPoints(formData: FormData) {
-  const matchId = formData.get('matchId') as string;
-  const playerId = formData.get('playerId');
-  const points = formData.get('points');
+export async function confirmPlayer({
+  match,
+  profileId,
+  placeId,
+}: {
+  match: Match;
+  profileId: string;
+  placeId: string;
+}) {
+  const supabase = await createClient();
+
+  const { profile } = await getAuthenticatedUserWithProfile();
+
+  const canUpdateMatchStats = !!(await canUser(
+    UserAction.UpdateMatchStats,
+    {
+      placeId: placeId,
+    },
+    match.players?.some((p) => p.confirmed && p.profile_id === profile?.id),
+  ));
+  if (!canUpdateMatchStats) {
+    return {
+      success: false,
+      message: 'Non hai i permessi per aggiornare le statistiche',
+    };
+  }
+
+  const { error } = await supabase
+    .from('profiles_matches')
+    .update([{ confirmed: true }])
+    .eq('match_id', match.id)
+    .eq('profile_id', profileId);
+
+  if (error) {
+    console.error('Error creating profiles_matches:', error);
+    throw error;
+  }
+  revalidatePath(`/matches/${match.id}`);
+
+  return { success: true, message: 'Giocatore confermato con successo' };
+}
+
+export async function removePlayer({
+  match,
+  profileId,
+  placeId,
+}: {
+  match: Match;
+  profileId: string;
+  placeId: string;
+}) {
+  const supabase = await createClient();
+
+  const { profile } = await getAuthenticatedUserWithProfile();
+
+  const canUpdateMatchStats = !!(await canUser(
+    UserAction.UpdateMatchStats,
+    {
+      placeId: placeId,
+    },
+    match.players?.some((p) => p.confirmed && p.profile_id === profile?.id),
+  ));
+  if (!canUpdateMatchStats) {
+    return {
+      success: false,
+      message: 'Non hai i permessi per aggiornare le statistiche',
+    };
+  }
+
+  const { error } = await supabase
+    .from('profiles_matches')
+    .delete()
+    .eq('match_id', match.id)
+    .eq('profile_id', profileId);
+
+  if (error) {
+    console.error('Error removing player from match:', error);
+    throw error;
+  }
+  revalidatePath(`/matches/${match.id}`);
+
+  return { success: true, message: 'Giocatore rimosso con successo' };
+}
+
+export async function updatePlayerPoints({
+  match,
+  profileId,
+  placeId,
+  points,
+}: {
+  match: Match;
+  profileId: string;
+  placeId: string;
+  points: number;
+}) {
+  const { profile } = await getAuthenticatedUserWithProfile();
+  const canUpdateMatchStats = !!(await canUser(
+    UserAction.UpdateMatchStats,
+    {
+      placeId,
+    },
+    match.players?.some((p) => p.confirmed && p.profile_id === profile?.id),
+  ));
+  if (!canUpdateMatchStats) {
+    return {
+      success: false,
+      message: 'Non hai i permessi per aggiornare le statistiche',
+    };
+  }
   const supabase = await createClient();
   const { error } = await supabase
     .from('profiles_matches')
     .update({ points })
-    .eq('match_id', matchId)
-    .eq('profile_id', playerId);
+    .eq('match_id', match.id)
+    .eq('profile_id', profileId);
   if (error) throw error;
 
   await supabase
     .from('profiles_matches')
     .select('profile_id, points')
-    .eq('match_id', matchId)
+    .eq('match_id', match.id)
     .order('points', { ascending: false });
 
-  revalidatePath(`/matches/${matchId}`);
+  revalidatePath(`/matches/${match.id}`);
+  return { success: true, message: 'Punti aggiornati con successo' };
 }
 
 export async function createMatch(
@@ -391,30 +493,42 @@ export async function editMatch(
 }
 
 export async function addPlayer({
-  profile_id,
-  match_id,
+  profileId,
+  match,
 }: {
-  profile_id: string;
-  match_id: string;
-}) {
+  profileId: string;
+  match: Match;
+}): Promise<{ success: boolean; message: string }> {
   try {
+    const canUpdateMatches = !!(await canUser(UserAction.UpdateMatches, {
+      placeId: match.place_id,
+    }));
+    if (!canUpdateMatches) {
+      return {
+        success: false,
+        message: 'Non hai i permessi per aggiungere giocatori',
+      };
+    }
+
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('profiles_matches')
-      .insert([{ profile_id, match_id, confirmed: true }]);
+      .insert([{ profile_id: profileId, match_id: match.id, confirmed: true }]);
 
     if (error) {
       console.error('Error creating profiles_matches:', error);
       throw error;
     }
 
-    return data;
+    return { success: true, message: 'Giocatore aggiunto con successo' };
   } catch (err) {
-    console.error('Server action addPlayer error:', err);
     if (err && typeof err === 'object' && 'code' in err) {
-      throw (err as { code: unknown }).code;
+      return {
+        success: false,
+        message: (err as { code: unknown }).code as string,
+      };
     }
-    throw err;
+    return { success: false, message: err as string };
   }
 }
 
@@ -447,46 +561,4 @@ export async function unsubscribeMatch({ match_id }: { match_id: string }) {
     throw error;
   }
   revalidatePath(`/matches/${match_id}`);
-}
-
-export async function confirmPlayer({
-  matchId,
-  profileId,
-}: {
-  matchId: string;
-  profileId: string;
-}) {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('profiles_matches')
-    .update([{ confirmed: true }])
-    .eq('match_id', matchId)
-    .eq('profile_id', profileId);
-
-  if (error) {
-    console.error('Error creating profiles_matches:', error);
-    throw error;
-  }
-  revalidatePath(`/matches/${matchId}`);
-}
-
-export async function removePlayer({
-  matchId,
-  profileId,
-}: {
-  matchId: string;
-  profileId: string;
-}) {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('profiles_matches')
-    .delete()
-    .eq('match_id', matchId)
-    .eq('profile_id', profileId);
-
-  if (error) {
-    console.error('Error removing player from match:', error);
-    throw error;
-  }
-  revalidatePath(`/matches/${matchId}`);
 }
