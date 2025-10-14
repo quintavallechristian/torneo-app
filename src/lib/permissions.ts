@@ -31,10 +31,12 @@ export async function canUser(
   const { role, permissions } = await getAuthenticatedUserWithProfile();
   if (role === ROLE.Admin || forceTrue) return true;
   if (role === ROLE.PlaceManager) {
+    console.log(permissions, context, action);
     return (
       context?.placeId &&
       permissions?.some(
-        (p) => p.placeId === context?.placeId && p.action === action,
+        (p) =>
+          String(p.placeId) === String(context?.placeId) && p.action === action,
       )
     );
   }

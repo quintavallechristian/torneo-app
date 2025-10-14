@@ -314,8 +314,8 @@ export default function MatchPlayersList({
                   </Button>
                 </form>
               )}
-              {canUpdateMatches && (
-                <>{match.id && <AddPlayerModal matchId={match.id} />}</>
+              {canUpdateMatches && adminControlToggled && (
+                <>{match.id && <AddPlayerModal match={match} />}</>
               )}
             </div>
           </EmptyContent>

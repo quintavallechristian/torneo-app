@@ -66,7 +66,7 @@ export const getAuthenticatedUserWithProfile = cache(
     if (permissionsData) {
       permissions.push(
         ...permissionsData.map((p) => ({
-          placeId: p.place_id,
+          placeId: String(p.place_id),
           action: p.permission.action,
         })),
       );

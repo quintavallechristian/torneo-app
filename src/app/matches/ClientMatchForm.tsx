@@ -11,6 +11,7 @@ import { Game, Place, Match } from '@/types';
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 import { PlaceSearchBar } from '@/components/PlaceSearchBar/PlaceSearchBar';
 import PlaceListItem from '@/components/PlaceListItem/PlaceListItem';
+import { toast } from 'sonner';
 
 export default function ClientMatchForm({
   match,
@@ -78,16 +79,26 @@ export default function ClientMatchForm({
         match.id,
         selectedGame?.min_players ?? 1,
         selectedGame?.max_players ?? 10,
+        selectedPlace?.value,
       );
     } else {
+      const place = formData.get('place');
+      console.log('Place', place);
       res = await createMatch(
         formData,
         selectedGame?.min_players ?? 1,
         selectedGame?.max_players ?? 10,
+        selectedPlace?.value,
       );
     }
     if (res && res.errors) {
-      setErrors(res.errors);
+      if ('general' in res.errors) {
+        toast.error(res.errors.general);
+      } else {
+        toast.error('Ci sono degli errori nel form, controlla i campi.');
+        console.log(res.errors);
+        setErrors(res.errors);
+      }
     } else {
       setErrors(null);
     }

@@ -390,108 +390,6 @@ export async function updatePlayerPoints({
   return { success: true, message: 'Punti aggiornati con successo' };
 }
 
-export async function createMatch(
-  formData: FormData,
-  minAllowedPlayers: number,
-  maxAllowedPlayers: number,
-): Promise<{ form: Match; errors: any }> {
-  const name = formData.get('name') as string;
-  const game_id = formData.get('game') as string;
-  const place_id = formData.get('place') as string;
-  const description = formData.get('description') as string;
-  const startAt = formData.get('startAt') as string;
-  const endAt = formData.get('endAt') as string;
-  const min_players = Number(formData.get('min_players') ?? 0);
-  const max_players = Number(formData.get('max_players') ?? 0);
-
-  const form: Match = {
-    name,
-    game_id,
-    place_id,
-    description,
-    startAt,
-    endAt,
-    min_players,
-    max_players,
-  };
-
-  const validationResult = createMatchSchema(
-    minAllowedPlayers,
-    maxAllowedPlayers,
-  ).safeParse(form);
-
-  if (!validationResult.success) {
-    return {
-      form,
-      errors: z.flattenError(validationResult.error).fieldErrors,
-    };
-  }
-
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from('matches')
-    .insert([validationResult.data]);
-
-  if (error) {
-    console.error('Error creating match:', error);
-    return { form, errors: null };
-  } else {
-    redirect('/matches');
-  }
-}
-export async function editMatch(
-  formData: FormData,
-  matchId: string,
-  minAllowedPlayers: number,
-  maxAllowedPlayers: number,
-): Promise<{ form: Match; errors: any }> {
-  const name = formData.get('name') as string;
-  const game_id = formData.get('game') as string;
-  const place_id = formData.get('place') as string;
-  const description = formData.get('description') as string;
-  const startAt = formData.get('startAt') as string;
-  const endAt = formData.get('endAt') as string;
-  const min_players = Number(formData.get('min_players') ?? 0);
-  const max_players = Number(formData.get('max_players') ?? 0);
-
-  const form: Match = {
-    name,
-    game_id,
-    place_id,
-    description,
-    startAt,
-    endAt,
-    min_players,
-    max_players,
-  };
-
-  const validationResult = createMatchSchema(
-    minAllowedPlayers,
-    maxAllowedPlayers,
-  ).safeParse(form);
-
-  if (!validationResult.success) {
-    return {
-      form,
-      errors: z.flattenError(validationResult.error).fieldErrors,
-    };
-  }
-
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('matches')
-    .update([validationResult.data])
-    .eq('id', matchId);
-
-  if (error) {
-    console.error('Error updating match:', error);
-    return { form, errors: null };
-  } else {
-    redirect(`/matches/${matchId}`);
-  }
-}
-
 export async function addPlayer({
   profileId,
   match,
@@ -546,6 +444,7 @@ export async function subscribeMatch({ match_id }: { match_id: string }) {
   }
   revalidatePath(`/matches/${match_id}`);
 }
+
 export async function unsubscribeMatch({ match_id }: { match_id: string }) {
   const { profile } = await getAuthenticatedUserWithProfile();
   if (!profile) throw new Error('User not authenticated');
@@ -561,4 +460,128 @@ export async function unsubscribeMatch({ match_id }: { match_id: string }) {
     throw error;
   }
   revalidatePath(`/matches/${match_id}`);
+}
+
+export async function createMatch(
+  formData: FormData,
+  minAllowedPlayers: number,
+  maxAllowedPlayers: number,
+  placeId?: string,
+): Promise<{ form: Match | null; errors: any }> {
+  const name = formData.get('name') as string;
+  const game_id = formData.get('game') as string;
+  const canCreateMatches = !!(await canUser(UserAction.CreateMatches, {
+    placeId,
+  }));
+  if (!canCreateMatches) {
+    return {
+      form: null,
+      errors: {
+        general: ['Non hai i permessi per creare partite in questo luogo'],
+      },
+    };
+  }
+  const description = formData.get('description') as string;
+  const startAt = formData.get('startAt') as string;
+  const endAt = formData.get('endAt') as string;
+  const min_players = Number(formData.get('min_players') ?? 0);
+  const max_players = Number(formData.get('max_players') ?? 0);
+
+  const form: Match = {
+    name,
+    game_id,
+    place_id: String(placeId),
+    description,
+    startAt,
+    endAt,
+    min_players,
+    max_players,
+  };
+
+  const validationResult = createMatchSchema(
+    minAllowedPlayers,
+    maxAllowedPlayers,
+  ).safeParse(form);
+
+  if (!validationResult.success) {
+    return {
+      form,
+      errors: z.flattenError(validationResult.error).fieldErrors,
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('matches')
+    .insert([validationResult.data]);
+
+  if (error) {
+    console.error('Error creating match:', error);
+    return { form, errors: null };
+  } else {
+    redirect('/matches');
+  }
+}
+export async function editMatch(
+  formData: FormData,
+  matchId: string,
+  minAllowedPlayers: number,
+  maxAllowedPlayers: number,
+  placeId?: string,
+): Promise<{ form: Match | null; errors: any }> {
+  const canUpdateMatches = !!(await canUser(UserAction.UpdateMatches, {
+    placeId,
+  }));
+  if (!canUpdateMatches) {
+    return {
+      form: null,
+      errors: {
+        general: ['Non hai i permessi per modificare partite in questo luogo'],
+      },
+    };
+  }
+  const name = formData.get('name') as string;
+  const game_id = formData.get('game') as string;
+  const description = formData.get('description') as string;
+  const startAt = formData.get('startAt') as string;
+  const endAt = formData.get('endAt') as string;
+  const min_players = Number(formData.get('min_players') ?? 0);
+  const max_players = Number(formData.get('max_players') ?? 0);
+
+  const form: Match = {
+    name,
+    game_id,
+    place_id: String(placeId),
+    description,
+    startAt,
+    endAt,
+    min_players,
+    max_players,
+  };
+
+  const validationResult = createMatchSchema(
+    minAllowedPlayers,
+    maxAllowedPlayers,
+  ).safeParse(form);
+
+  if (!validationResult.success) {
+    return {
+      form,
+      errors: z.flattenError(validationResult.error).fieldErrors,
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('matches')
+    .update([validationResult.data])
+    .eq('id', matchId);
+
+  if (error) {
+    console.error('Error updating match:', error);
+    return { form, errors: null };
+  } else {
+    redirect(`/matches/${matchId}`);
+  }
 }
