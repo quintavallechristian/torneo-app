@@ -72,7 +72,7 @@ export default function PlaceListItem({
       `}
       spotlightColor={'rgba(0, 229, 255, 0.2)'}
     >
-      <div className="flex flex-col gap-2 ml-4">
+      <div className="flex flex-col gap-2">
         {renderSlot(IntroSlot, defaultIntro)}
       </div>
       {/* --- AVATAR --- */}

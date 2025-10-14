@@ -18,8 +18,13 @@ export function MyNavigationMenu({ profile }: { profile: Profile | null }) {
     {
       title: 'Partite',
       href: '/matches',
+      description: 'Lista di tutte le partite presenti nel database di Torneo.',
+    },
+    {
+      title: 'Mie partite',
+      href: '/matches/mine',
       description:
-        'A modal dialog that interrupts the user with important content and expects a response.',
+        'Lista di tutte le partite a cui partecipi o hai partecipato',
     },
   ];
 

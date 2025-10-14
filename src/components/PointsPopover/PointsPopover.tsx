@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,11 +7,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { updatePlayerPoints } from '@/lib/match';
+import { updatePlayerPoints } from '@/lib/server/match';
 import { Game, Place } from '@/types';
 //import { createClient } from '@/utils/supabase/server';
 
-export async function PointsPopover({
+export function PointsPopover({
   startingPoints,
   matchId,
   playerId,

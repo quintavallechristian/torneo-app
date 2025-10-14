@@ -14,8 +14,8 @@ import { toast } from 'sonner';
 import { PlusIcon } from 'lucide-react';
 import { PlayerSearchBar } from '../PlayerSearchBar/PlayerSearchBar';
 import { useState, useTransition } from 'react';
-import { addPlayer } from './actions';
 import { useRouter } from 'next/navigation';
+import { addPlayer } from '@/lib/server/match';
 
 type AddPlayerModalProps = { matchId: string };
 

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { GameSearchPopover } from '@/components/GameSearchPopover/GameSearchPopover';
 import { DatePicker } from '@/components/DatePicker/DatePicker';
-import { createMatch, editMatch } from './actions';
+import { createMatch, editMatch } from '@/lib/server/match';
 import { ZodErrors } from '@/components/ZodErrors';
 import { Game, Place, Match } from '@/types';
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';

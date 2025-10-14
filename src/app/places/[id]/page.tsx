@@ -13,10 +13,10 @@ import {
   getPlaceStatsPerProfile,
 } from '@/utils/auth-helpers';
 import { Badge } from '@/components/ui/badge';
-import { setFavouritePlace } from '../actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MatchList from '@/components/MatchList/MatchList';
 import Ranking from '@/components/Ranking/Ranking';
+import { setFavouritePlace } from '@/lib/server/place';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;

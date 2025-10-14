@@ -1,69 +1,20 @@
+'use server';
 import {
+  createMatchSchema,
   Game,
   GameStats,
+  Match,
   Place,
   PlaceStats,
-  Match,
-  MATCHSTATUS,
   Player,
 } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { canUser, UserAction } from '../permissions';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
+import { redirect } from 'next/navigation';
 
-export function formatMatchStatus(status: MATCHSTATUS): {
-  label: string;
-  color: string;
-} {
-  switch (status) {
-    case MATCHSTATUS.Scheduled:
-      return {
-        label: 'Programmata',
-        color: 'bg-yellow-200 text-yellow-900',
-      };
-    case MATCHSTATUS.Ongoing:
-      return {
-        label: 'In corso',
-        color: 'bg-green-200 text-green-900',
-      };
-    case MATCHSTATUS.Completed:
-      return {
-        label: 'Completata',
-        color: 'bg-blue-200 text-blue-900',
-      };
-    case MATCHSTATUS.Canceled:
-      return {
-        label: 'Annullata',
-        color: 'bg-red-200 text-red-900',
-      };
-    case MATCHSTATUS.WaitingForResults:
-      return {
-        label: 'In attesa di risultati',
-        color: 'bg-purple-200 text-purple-900',
-      };
-    default:
-      return {
-        label: 'Annullata',
-        color: 'bg-red-200 text-red-900',
-      };
-  }
-}
-
-export function getMatchStatus(match: Match) {
-  const now = new Date();
-  const startAt = new Date(match.startAt);
-  const endAt = new Date(match.endAt);
-  if (match.winner) {
-    return MATCHSTATUS.Completed;
-  }
-  if (now < startAt) {
-    return MATCHSTATUS.Scheduled;
-  } else if (now >= startAt && now <= endAt) {
-    return MATCHSTATUS.Ongoing;
-  } else if (now > endAt) {
-    return MATCHSTATUS.WaitingForResults;
-  }
-  return MATCHSTATUS.Canceled;
-}
+import * as z from 'zod';
 
 const K = 32;
 
@@ -274,33 +225,49 @@ export async function updatePlaceElo(
   }
 }
 
-export async function setWinner({
-  matchId,
-  players,
-  place,
-  game,
-  winnerId,
-}: {
-  matchId: string;
-  players: Pick<Player, 'profile_id' | 'points'>[];
-  place: Place;
-  game: Game;
-  winnerId?: string;
-}) {
-  'use server';
+export async function setWinner(
+  _: unknown,
+  {
+    match,
+    players,
+    place,
+    game,
+    winnerId,
+  }: {
+    match: Match;
+    players: Pick<Player, 'profile_id' | 'points'>[];
+    place: Place;
+    game: Game;
+    winnerId?: string;
+  },
+) {
   const supabase = await createClient();
+  const { profile } = await getAuthenticatedUserWithProfile();
   const { error } = await supabase
     .from('matches')
     .update({ winner_id: winnerId || players[0].profile_id })
-    .eq('id', matchId);
+    .eq('id', match.id);
   if (error) throw error;
+  const canUpdateMatchStats = !!(await canUser(
+    UserAction.UpdateMatchStats,
+    {
+      placeId: match.place_id,
+    },
+    match.players?.some((p) => p.confirmed && p.profile_id === profile?.id),
+  ));
+  if (!canUpdateMatchStats) {
+    return {
+      success: false,
+      message: 'Non hai i permessi per aggiornare le statistiche',
+    };
+  }
   updateGameElo(players, game);
   updatePlaceElo(players, place);
-  revalidatePath(`/matches/${matchId}`);
+  revalidatePath(`/matches/${match.id}`);
+  return { success: true, message: 'Vincitore aggiornato con successo' };
 }
 
 export async function updatePlayerPoints(formData: FormData) {
-  'use server';
   const matchId = formData.get('matchId') as string;
   const playerId = formData.get('playerId');
   const points = formData.get('points');
@@ -318,5 +285,208 @@ export async function updatePlayerPoints(formData: FormData) {
     .eq('match_id', matchId)
     .order('points', { ascending: false });
 
+  revalidatePath(`/matches/${matchId}`);
+}
+
+export async function createMatch(
+  formData: FormData,
+  minAllowedPlayers: number,
+  maxAllowedPlayers: number,
+): Promise<{ form: Match; errors: any }> {
+  const name = formData.get('name') as string;
+  const game_id = formData.get('game') as string;
+  const place_id = formData.get('place') as string;
+  const description = formData.get('description') as string;
+  const startAt = formData.get('startAt') as string;
+  const endAt = formData.get('endAt') as string;
+  const min_players = Number(formData.get('min_players') ?? 0);
+  const max_players = Number(formData.get('max_players') ?? 0);
+
+  const form: Match = {
+    name,
+    game_id,
+    place_id,
+    description,
+    startAt,
+    endAt,
+    min_players,
+    max_players,
+  };
+
+  const validationResult = createMatchSchema(
+    minAllowedPlayers,
+    maxAllowedPlayers,
+  ).safeParse(form);
+
+  if (!validationResult.success) {
+    return {
+      form,
+      errors: z.flattenError(validationResult.error).fieldErrors,
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('matches')
+    .insert([validationResult.data]);
+
+  if (error) {
+    console.error('Error creating match:', error);
+    return { form, errors: null };
+  } else {
+    redirect('/matches');
+  }
+}
+export async function editMatch(
+  formData: FormData,
+  matchId: string,
+  minAllowedPlayers: number,
+  maxAllowedPlayers: number,
+): Promise<{ form: Match; errors: any }> {
+  const name = formData.get('name') as string;
+  const game_id = formData.get('game') as string;
+  const place_id = formData.get('place') as string;
+  const description = formData.get('description') as string;
+  const startAt = formData.get('startAt') as string;
+  const endAt = formData.get('endAt') as string;
+  const min_players = Number(formData.get('min_players') ?? 0);
+  const max_players = Number(formData.get('max_players') ?? 0);
+
+  const form: Match = {
+    name,
+    game_id,
+    place_id,
+    description,
+    startAt,
+    endAt,
+    min_players,
+    max_players,
+  };
+
+  const validationResult = createMatchSchema(
+    minAllowedPlayers,
+    maxAllowedPlayers,
+  ).safeParse(form);
+
+  if (!validationResult.success) {
+    return {
+      form,
+      errors: z.flattenError(validationResult.error).fieldErrors,
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('matches')
+    .update([validationResult.data])
+    .eq('id', matchId);
+
+  if (error) {
+    console.error('Error updating match:', error);
+    return { form, errors: null };
+  } else {
+    redirect(`/matches/${matchId}`);
+  }
+}
+
+export async function addPlayer({
+  profile_id,
+  match_id,
+}: {
+  profile_id: string;
+  match_id: string;
+}) {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('profiles_matches')
+      .insert([{ profile_id, match_id, confirmed: true }]);
+
+    if (error) {
+      console.error('Error creating profiles_matches:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Server action addPlayer error:', err);
+    if (err && typeof err === 'object' && 'code' in err) {
+      throw (err as { code: unknown }).code;
+    }
+    throw err;
+  }
+}
+
+export async function subscribeMatch({ match_id }: { match_id: string }) {
+  const { profile } = await getAuthenticatedUserWithProfile();
+  if (!profile) throw new Error('User not authenticated');
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('profiles_matches')
+    .insert([{ profile_id: profile.id, match_id }]);
+
+  if (error) {
+    console.error('Error creating profiles_matches:', error);
+    throw error;
+  }
+  revalidatePath(`/matches/${match_id}`);
+}
+export async function unsubscribeMatch({ match_id }: { match_id: string }) {
+  const { profile } = await getAuthenticatedUserWithProfile();
+  if (!profile) throw new Error('User not authenticated');
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('profiles_matches')
+    .delete()
+    .eq('profile_id', profile.id)
+    .eq('match_id', match_id);
+
+  if (error) {
+    console.error('Error removing profiles_matches:', error);
+    throw error;
+  }
+  revalidatePath(`/matches/${match_id}`);
+}
+
+export async function confirmPlayer({
+  matchId,
+  profileId,
+}: {
+  matchId: string;
+  profileId: string;
+}) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('profiles_matches')
+    .update([{ confirmed: true }])
+    .eq('match_id', matchId)
+    .eq('profile_id', profileId);
+
+  if (error) {
+    console.error('Error creating profiles_matches:', error);
+    throw error;
+  }
+  revalidatePath(`/matches/${matchId}`);
+}
+
+export async function removePlayer({
+  matchId,
+  profileId,
+}: {
+  matchId: string;
+  profileId: string;
+}) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('profiles_matches')
+    .delete()
+    .eq('match_id', matchId)
+    .eq('profile_id', profileId);
+
+  if (error) {
+    console.error('Error removing player from match:', error);
+    throw error;
+  }
   revalidatePath(`/matches/${matchId}`);
 }

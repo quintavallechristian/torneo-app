@@ -1,10 +1,10 @@
+'use client';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
-import { Player } from '@/types';
+import { Player, Profile } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-
 interface ProfileListItemProps {
+  profile: Profile | null;
   player: Player;
   relevant?: boolean;
   isWinner?: boolean;
@@ -17,7 +17,8 @@ interface ProfileListItemProps {
   DescriptionSlot?: React.ReactNode | ((player: Player) => React.ReactNode);
 }
 
-export default async function ProfileListItem({
+export default function ProfileListItem({
+  profile,
   player,
   relevant = true,
   isWinner = false,
@@ -27,8 +28,6 @@ export default async function ProfileListItem({
   AdminActionsSlot,
   DescriptionSlot,
 }: ProfileListItemProps) {
-  const { profile } = await getAuthenticatedUserWithProfile();
-
   const defaultIntro = (
     <button
       type="submit"
@@ -79,7 +78,11 @@ export default async function ProfileListItem({
         isWinner ? 'rgba(255, 255, 0, 0.188)' : 'rgba(0, 229, 255, 0.2)'
       }
     >
-      <div className="flex flex-col gap-2 ml-4">
+      {/* --- ADMIN ACTIONS --- */}
+      <div className="flex gap-2">
+        {renderSlot(AdminActionsSlot, defaultAdminActions)}
+      </div>
+      <div className="flex flex-col gap-2">
         {renderSlot(IntroSlot, defaultIntro)}
       </div>
       {/* --- AVATAR --- */}
@@ -99,13 +102,15 @@ export default async function ProfileListItem({
         </Avatar>
       </div>
       {/* --- USERNAME --- */}
-      <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>
-        <div className="font-semibold">
-          {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}
+      <div className="grid grid-cols-2 gap-2">
+        <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>
+          <div className="font-semibold">
+            {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}
+          </div>
         </div>
-      </div>
-      <div className="text-xs font-regular text-slate-200">
-        {renderSlot(DescriptionSlot, defaultDescriptionArea)}
+        <div className="text-xs font-regular text-slate-200">
+          {renderSlot(DescriptionSlot, defaultDescriptionArea)}
+        </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
         {/* --- STATS AREA --- */}
@@ -114,11 +119,6 @@ export default async function ProfileListItem({
             {renderSlot(StatsSlot, defaultStatsArea)}
           </div>
         }
-
-        {/* --- ADMIN ACTIONS --- */}
-        <div className="flex gap-2">
-          {renderSlot(AdminActionsSlot, defaultAdminActions)}
-        </div>
       </div>
     </SpotlightCard>
   );

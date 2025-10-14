@@ -20,7 +20,7 @@ import Image from 'next/image';
 import { Button } from '../ui/button';
 import DeleteMatchButton from '../DeleteMatchButton/DeleteMatchButton';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { formatMatchStatus, getMatchStatus } from '@/lib/match';
+import { formatMatchStatus, getMatchStatus } from '@/lib/client/match';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { canUser, UserAction } from '@/lib/permissions';

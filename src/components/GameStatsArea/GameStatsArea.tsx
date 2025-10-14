@@ -6,7 +6,7 @@ import {
   setFavouriteGame,
   setInCollectionGame,
   setInWishlistGame,
-} from '@/app/games/actions';
+} from '@/lib/server/game';
 
 interface MatchCardProps {
   game: Game;

@@ -1,14 +1,12 @@
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import Image from 'next/image';
-import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { Button } from '@/components/ui/button';
-import { setFavouritePlace } from './actions';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { PencilIcon, StarIcon } from 'lucide-react';
 import { Place } from '@/types';
 import PlaceListItem from '@/components/PlaceListItem/PlaceListItem';
 import { canUser, UserAction } from '@/lib/permissions';
+import { setFavouritePlace } from '@/lib/server/place';
 
 export default async function PlacesPage() {
   const supabase = await createClient();
@@ -47,31 +45,6 @@ export default async function PlacesPage() {
 
       <div className="border-0 py-0 px-0">
         {placeData?.map((place) => (
-          // <SpotlightCard
-          //   key={place.id}
-          //   className="flex justify-between items-center gap-4 my-2 px-2 py-2 shadow-xl  bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
-          //   spotlightColor="rgba(0, 229, 255, 0.2)"
-          // >
-          //   <div className="flex items-center gap-4">
-          //     <Image
-          //       src={place.image || '/placeholder.png'}
-          //       alt={place.name}
-          //       width={64}
-          //       height={64}
-          //       className="rounded-2xl border-1 w-16 h-16 object-cover dark:bg-emerald-800/20 bg-emerald-500"
-          //     />
-          //     <div>
-          //       <Link href={`/places/${place.id}`}>{place.name}</Link>
-          //       {place.address && (
-          //         <p className="text-xs text-muted-foreground">
-          //           {place.address}
-          //         </p>
-          //       )}
-          //     </div>
-          //   </div>
-          //   <div>
-          //   </div>
-          // </SpotlightCard>
           <PlaceListItem
             key={place.id}
             place={place}

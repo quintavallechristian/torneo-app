@@ -3,7 +3,7 @@ import Image from 'next/image';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { Game, GAME_STATS_STATE, SearchParams } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { getGames } from '@/lib/game';
+import { getGames } from '@/lib/server/game';
 import { GameSearchInput } from '@/components/GameSearchInput/GameSearchInput';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import GameStatsArea from '@/components/GameStatsArea/GameStatsArea';

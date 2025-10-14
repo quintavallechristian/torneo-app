@@ -24,12 +24,7 @@ import {
   getGameRanking,
   getGameStatsPerProfile,
 } from '@/utils/auth-helpers';
-import { getGame, updateGame } from './actions';
-import {
-  setFavouriteGame,
-  setInCollectionGame,
-  setInWishlistGame,
-} from '../actions';
+
 import {
   Tooltip,
   TooltipContent,
@@ -37,6 +32,13 @@ import {
 } from '@/components/ui/tooltip';
 import MatchList from '@/components/MatchList/MatchList';
 import Ranking from '@/components/Ranking/Ranking';
+import {
+  getGame,
+  setFavouriteGame,
+  setInCollectionGame,
+  setInWishlistGame,
+  updateGame,
+} from '@/lib/server/game';
 
 interface GameDetaisPageProps {
   params: Promise<{ id: string }>;

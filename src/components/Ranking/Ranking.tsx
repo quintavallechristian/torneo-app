@@ -7,9 +7,9 @@ import {
 } from '@/components/ui/empty';
 import React from 'react';
 import { DicesIcon } from 'lucide-react';
-import { getPlaceRanking } from '@/lib/place';
+import { getPlaceRanking } from '@/lib/server/place';
 import ProfileListItem from '../ProfileListItem/ProfileListItem';
-import { getGameRanking } from '@/lib/game';
+import { getGameRanking } from '@/lib/server/game';
 import { Player } from '@/types';
 
 interface RankingProps {
