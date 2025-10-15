@@ -33,6 +33,7 @@ import { ExagonalBadge } from '@/components/ui/exagonalBadge';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import StatsExagon from '@/components/StatsExagon/StatsExagon';
 interface MatchPlayersListProps {
   profile: Profile | null;
   match: Match;
@@ -40,7 +41,7 @@ interface MatchPlayersListProps {
   profilePlaces: PlaceStats[];
   canManagePlatform: boolean;
   canUpdateMatchStats: boolean;
-  canUpdateMatches: boolean;
+  canManagePlaces: boolean;
 }
 export default function MatchPlayersList({
   profile,
@@ -48,7 +49,7 @@ export default function MatchPlayersList({
   profileGames,
   profilePlaces,
   canUpdateMatchStats,
-  canUpdateMatches,
+  canManagePlaces,
 }: MatchPlayersListProps) {
   const [adminControlToggled, setAdminControlToggled] = useState(false);
 
@@ -150,7 +151,7 @@ export default function MatchPlayersList({
           </div>
         )}
         {(match.players || []).length > 0 &&
-          canUpdateMatches &&
+          canManagePlaces &&
           adminControlToggled && (
             <div>{match.id && <AddPlayerModal match={match} />}</div>
           )}
@@ -196,19 +197,19 @@ export default function MatchPlayersList({
                     type="submit"
                     onClick={() => setWinnerAction(playerObj.profile!.id!)}
                   >
-                    <ExagonalBadge
-                      variant="default"
+                    <StatsExagon
+                      medium
                       className={`
-                            cursor-pointer size-10 hover:scale-105 transition-all ease-in-out
+                            cursor-pointer size-8 hover:scale-105 transition-all ease-in-out
                             ${
                               playerObj.profile?.id === match.winner?.id
                                 ? 'bg-amber-100 text-amber-500'
                                 : 'bg-indigo-50/5'
                             }
                           `}
-                    >
-                      <TrophyIcon className="size-7" strokeWidth={1} />
-                    </ExagonalBadge>
+                      stat={<TrophyIcon className="size-5" strokeWidth={1} />}
+                      variant={null}
+                    />
                   </button>
                 ) : (
                   ''
@@ -218,7 +219,7 @@ export default function MatchPlayersList({
                 !adminControlToggled ? (
                   match.game && match.place && canUpdateMatchStats ? (
                     <PointsPopover
-                      place={match.place}
+                      placeId={match.place.id}
                       match={match}
                       playerId={playerObj.profile!.id!}
                       startingPoints={playerObj.points || 0}
@@ -260,20 +261,28 @@ export default function MatchPlayersList({
               DescriptionSlot={
                 !adminControlToggled && (
                   <div className="flex gap-2">
-                    <ExagonalBadge variant="red">
-                      {
+                    <StatsExagon
+                      small
+                      stat={
                         profileGames.find(
                           ({ profile_id }) =>
                             profile_id === playerObj.profile!.id!,
-                        )?.points
+                        )?.points || 0
                       }
-                    </ExagonalBadge>
-                    <ExagonalBadge variant="blue">
-                      {profilePlaces.find(
-                        ({ profile_id }) =>
-                          profile_id === playerObj.profile!.id!,
-                      )?.points || 0}
-                    </ExagonalBadge>
+                      label="Punti"
+                      variant="red"
+                    />
+                    <StatsExagon
+                      small
+                      stat={
+                        profilePlaces.find(
+                          ({ profile_id }) =>
+                            profile_id === playerObj.profile!.id!,
+                        )?.points || 0
+                      }
+                      label="Punti"
+                      variant="blue"
+                    />
                   </div>
                 )
               }
@@ -314,7 +323,7 @@ export default function MatchPlayersList({
                   </Button>
                 </form>
               )}
-              {canUpdateMatches && adminControlToggled && (
+              {canManagePlaces && adminControlToggled && (
                 <>{match.id && <AddPlayerModal match={match} />}</>
               )}
             </div>

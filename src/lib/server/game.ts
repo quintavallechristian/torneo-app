@@ -5,6 +5,8 @@ import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { parseStringPromise } from 'xml2js';
 import { isBefore, subDays } from 'date-fns';
+import { decode } from 'html-entities';
+import clsx from 'clsx';
 
 export async function getGameRanking(GameId?: string) {
   const supabase = await createClient();
@@ -53,9 +55,12 @@ export async function getGames(
         '*, gameStats:profiles_games(profile_id, favourite, in_collection, in_wishlist, rating)',
       )
       .eq('gameStats.profile_id', profile.id)
+      .or('bgg_rank.neq.-1,bgg_rank.is.null')
       .ilike('name', `%${query}%`)
-      .order('bgg_rank')
-      .limit(100);
+      .order('bgg_rank', { ascending: true, nullsFirst: false })
+      .order('bgg_rating', { ascending: false })
+      .order('updated_at', { ascending: false })
+      .limit(26);
     return data ?? [];
   }
 }
@@ -131,8 +136,6 @@ export async function setInWishlistGame({
   revalidatePath(`/places`);
 }
 
-import { decode } from 'html-entities';
-
 export async function getGame(gameId: string) {
   const supabase = await createClient();
   let game, error;
@@ -164,7 +167,7 @@ export async function getGame(gameId: string) {
   return { game, error };
 }
 
-export async function updateGame(game: Game) {
+export async function updateGame(game: Game): Promise<Game> {
   const supabase = await createClient();
   const updateAt = game.updated_at;
   let gameDescription = decode(game.description);
@@ -183,9 +186,8 @@ export async function updateGame(game: Game) {
 
   // Se la descrizione non esiste, la recuperiamo dall'API esterna e la salviamo nel database
   if (!updateAt || isBefore(updateAt, subDays(Date.now(), 30))) {
+    console.log('chiamata bgg per gioco: ' + game.name + ' - ' + game.id);
     try {
-      // Nota: Per rendere il codice più robusto, dovresti anche gestire il caso
-      // in cui game.bgg_id non esista.
       const response = await fetch(
         `https://boardgamegeek.com/xmlapi2/thing?id=${game.id}&stats=1`,
       );
@@ -233,7 +235,7 @@ export async function updateGame(game: Game) {
           ) / 100
         : null;
 
-      bgg_rank =
+      const retrieved_bgg_rank =
         parsedData?.items?.item?.[0]?.statistics?.[0]?.ratings?.[0]?.ranks?.[0].rank.find(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (r: any) => r?.$.name === 'boardgame',
@@ -256,8 +258,9 @@ export async function updateGame(game: Game) {
           age,
           bgg_rating,
           bgg_weight,
-          bgg_rank,
-          //updated_at: new Date(),
+          bgg_rank:
+            retrieved_bgg_rank === 'Not Ranked' ? -1 : retrieved_bgg_rank,
+          updated_at: new Date(),
         })
         .eq('id', game.id);
 
@@ -265,6 +268,7 @@ export async function updateGame(game: Game) {
         console.error(
           "Errore nell'aggiornamento della descrizione:",
           updateError,
+          bgg_rank,
         );
       }
     } catch (apiError) {
@@ -275,7 +279,10 @@ export async function updateGame(game: Game) {
     }
   }
   return {
-    gameDescription,
+    id: game.id,
+    name: game.name,
+    updated_at: game.updated_at,
+    description: gameDescription,
     image,
     thumbnail,
     min_players,

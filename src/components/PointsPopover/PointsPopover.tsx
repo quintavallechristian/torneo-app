@@ -25,7 +25,6 @@ export function PointsPopover({
 }) {
   function updatePlayerPointsAction(formData: FormData) {
     const points = formData.get('points') as string;
-    console.log(points);
     updatePlayerPoints({
       match: match,
       profileId: playerId,

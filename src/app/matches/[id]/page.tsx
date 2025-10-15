@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import { GameStats, PlaceStats, Match } from '@/types';
+import { GameStats, PlaceStats, Match, UserAction } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import MatchCard from '@/components/MatchCard/MatchCard';
-import { canUser, UserAction } from '@/lib/permissions';
+import { canUser } from '@/lib/permissions';
 import MatchPlayersList from './MatchPlayersList';
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
@@ -79,7 +79,7 @@ export default async function MatchDetailsPage({
   }
 
   const canUpdateMatchStats = !!(await canUser(
-    UserAction.UpdateMatchStats,
+    UserAction.ManagePlaces,
     {
       placeId: match.place_id,
     },
@@ -88,7 +88,7 @@ export default async function MatchDetailsPage({
 
   const canManagePlatform = !!(await canUser(UserAction.ManagePlatform));
 
-  const canUpdateMatches = !!(await canUser(UserAction.UpdateMatches, {
+  const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
     placeId: match.place_id,
   }));
 
@@ -116,7 +116,7 @@ export default async function MatchDetailsPage({
             profilePlaces={profilePlaces}
             canManagePlatform={canManagePlatform}
             canUpdateMatchStats={canUpdateMatchStats}
-            canUpdateMatches={canUpdateMatches}
+            canManagePlaces={canManagePlaces}
           />
         </>
       ) : (

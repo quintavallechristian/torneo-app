@@ -12,7 +12,8 @@ import MatchCard from '../MatchCard/MatchCard';
 import { DicesIcon, PlusIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
-import { canUser, UserAction } from '@/lib/permissions';
+import { UserAction } from '@/types';
+import { canUser } from '@/lib/permissions';
 
 interface MatchListProps {
   matches: Match[] | undefined;
@@ -25,7 +26,7 @@ export default async function MatchList({
   placeId,
   gameId,
 }: MatchListProps) {
-  const canCreateMatches = await canUser(UserAction.CreateMatches, {
+  const canManagePlaces = await canUser(UserAction.ManagePlaces, {
     placeId,
     gameId,
   });
@@ -37,7 +38,7 @@ export default async function MatchList({
             <MatchCard key={match.id} match={match} small />
           ))}
           <div className="flex items-center gap-4">
-            {canCreateMatches && (
+            {canManagePlaces && (
               <Link
                 href={`/matches/new?place_id=${
                   placeId ? placeId : ''
@@ -59,7 +60,7 @@ export default async function MatchList({
           <EmptyDescription>Nessuna partita giocata</EmptyDescription>
           <EmptyContent>
             <div className="flex items-center gap-4">
-              {canCreateMatches && (
+              {canManagePlaces && (
                 <Link
                   href={`/matches/new?place_id=${
                     placeId ? placeId : ''

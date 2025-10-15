@@ -12,7 +12,6 @@ export default async function PrivatePage() {
   if (!user || !profile) {
     redirect('/login');
   }
-  console.log(profile.id);
   const supabase = await createClient();
   const { data: matches } = await supabase
     .from('matches')

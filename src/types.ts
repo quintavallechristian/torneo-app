@@ -1,5 +1,23 @@
 import z from 'zod';
-import { ROLE, UserAction } from './lib/permissions';
+export enum UserAction {
+  ManagePlatform = 'manage:platform',
+  ManagePlaces = 'manage:places',
+  ManageGames = 'manage:games',
+  CreateMatches = 'create:matches',
+  DeleteMatches = 'delete:matches',
+  UpdateMatches = 'update:matches',
+  ReadPlaces = 'read:places',
+  CreatePlaces = 'create:places',
+  DeletePlaces = 'delete:places',
+  UpdatePlaces = 'update:places',
+}
+
+export enum ROLE {
+  Admin = 'Admin',
+  User = 'User',
+  PlaceManager = 'PlaceManager',
+  GameManager = 'GameManager',
+}
 
 export type SearchParams = {
   q?: string;
@@ -89,7 +107,7 @@ export type Game = {
   updated_at: string | null;
   thumbnail: string | null;
   matches?: Match[];
-  gameStats: GameStats[];
+  gameStats?: GameStats[];
 };
 export type Place = {
   id: string;

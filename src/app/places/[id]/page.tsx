@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MatchList from '@/components/MatchList/MatchList';
 import Ranking from '@/components/Ranking/Ranking';
 import { setFavouritePlace } from '@/lib/server/place';
+import PlaceCard from '@/components/PlaceCard/PlaceCard';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -104,83 +105,12 @@ export default async function PlaceDetailsPage({
           </Button>
         </Link>
       </div>
-      <SpotlightCard spotlightColor="rgba(0, 229, 255, 0.2)">
-        {placeStats && (
-          <SpotlightCard className="px-4 py-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-lg font-bold">Le tue statistiche</div>
-                <div className="flex flex-wrap gap-4 mt-2">
-                  <Badge className="bg-green-200 text-green-900">
-                    Vittorie: {placeStats.win}
-                  </Badge>
-                  <Badge className="bg-red-200 text-red-900">
-                    Sconfitte: {placeStats.loss}
-                  </Badge>
-                  <Badge className="bg-yellow-200 text-yellow-900">
-                    Pareggi: {placeStats.draw}
-                  </Badge>
-                  <Badge className="bg-purple-200 text-purple-900">
-                    Minuti giocati: {placeStats.minutes_played}
-                  </Badge>
-                </div>
-              </div>
-              <div className="text-lg font-medium text-right">
-                <div>ELO: {placeStats.points}</div>
-                <div>Pos: {positionInPlace}</div>
-              </div>
-            </div>
-          </SpotlightCard>
-        )}
-        <div className="flex flex-col md:flex-row gap-6 items-center">
-          <div className="flex-shrink-0">
-            <Image
-              src={place.image || '/placeholder.png'}
-              alt={place.name}
-              width={150}
-              height={150}
-              className="rounded-2xl border-1 object-cover dark:bg-emerald-800/20 bg-emerald-500"
-            />
-          </div>
-          <div className="flex-1 w-full">
-            <div className="pb-8">
-              <CardTitle className="text-3xl font-bold text-primary mb-2 items-center gap-2 flex justify-between">
-                <div>{place.name}</div>
-                <form
-                  action={setFavouritePlace.bind(null, {
-                    placeId: place.id!,
-                    status: !place.placeStats[0]?.favourite,
-                  })}
-                >
-                  <Button
-                    variant="link"
-                    className="hover:scale-110"
-                    type="submit"
-                  >
-                    <StarIcon
-                      className={`size-6  ${
-                        place.placeStats[0]?.favourite
-                          ? 'text-amber-300 hover:text-gray-600'
-                          : 'text-gray-400'
-                      }`}
-                    />
-                  </Button>
-                </form>
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                {place.address}
-              </CardDescription>
-            </div>
-            <div className="space-y-4">
-              {place.description && (
-                <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted  text-gray-700  text-sm">
-                  <p className="whitespace-pre-line">{place.description}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </SpotlightCard>
+      <PlaceCard
+        place={place}
+        small={false}
+        placeStats={placeStats}
+        positionInPlace={positionInPlace}
+      />
       <section className="mt-8">
         <Tabs defaultValue="matches">
           <TabsList>

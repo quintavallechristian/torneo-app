@@ -2,11 +2,10 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { Button } from '@/components/ui/button';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { PencilIcon, StarIcon } from 'lucide-react';
 import { Place } from '@/types';
-import PlaceListItem from '@/components/PlaceListItem/PlaceListItem';
-import { canUser, UserAction } from '@/lib/permissions';
-import { setFavouritePlace } from '@/lib/server/place';
+import { UserAction } from '@/types';
+import { canUser } from '@/lib/permissions';
+import PlaceCard from '@/components/PlaceCard/PlaceCard';
 
 export default async function PlacesPage() {
   const supabase = await createClient();
@@ -32,7 +31,7 @@ export default async function PlacesPage() {
     await Promise.all(
       placeData.map(async (place) => {
         canUpdatePlacesMap[place.id] =
-          (await canUser(UserAction.UpdatePlaces, {
+          (await canUser(UserAction.ManagePlaces, {
             placeId: place.id,
           })) || false;
       }),
@@ -40,62 +39,33 @@ export default async function PlacesPage() {
   }
 
   return (
-    <div className="max-w-2xl align-center mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Luoghi</h1>
-
-      <div className="border-0 py-0 px-0">
-        {placeData?.map((place) => (
-          <PlaceListItem
-            key={place.id}
-            place={place}
-            index={placeData.indexOf(place) + 1}
-            DescriptionSlot={place.address && <span>{place.address}</span>}
-            ActionsSlot={
-              <form
-                action={setFavouritePlace.bind(null, {
-                  placeId: place.id!,
-                  status: !place.placeStats[0]?.favourite,
-                })}
-              >
-                <Button
-                  variant="link"
-                  className="hover:scale-110"
-                  type="submit"
-                >
-                  <StarIcon
-                    className={`size-6  ${
-                      place.placeStats[0]?.favourite
-                        ? 'text-amber-300 hover:text-gray-600'
-                        : 'text-gray-400'
-                    }`}
-                  />
-                </Button>
-              </form>
-            }
-            AdminActionsSlot={
-              canUpdatePlacesMap[place.id] && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="hover:scale-110"
-                >
-                  <Link href={`/places/${place.id}/edit`}>
-                    <PencilIcon />
-                  </Link>
-                </Button>
-              )
-            }
-          />
-        ))}
-        {canManagePlatform && (
-          <div className="flex justify-center">
-            <Button className="mt-4" asChild>
-              <Link href="/places/new">Crea nuovo luogo</Link>
-            </Button>
-          </div>
-        )}
-      </div>
+    <div className="max-w-[90%] mx-auto py-10 px-4">
+      <h1 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
+        Luoghi
+      </h1>
+      {placeData && placeData.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {placeData.map((place) => (
+            <PlaceCard
+              key={place.id}
+              place={place}
+              placeStats={place.placeStats[0]}
+              small={true}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="italic text-muted-foreground text-center">
+          Nessun luogo disponibile.
+        </p>
+      )}
+      {canManagePlatform && (
+        <div className="flex justify-center">
+          <Button className="mt-4" asChild>
+            <Link href="/places/new">Crea nuovo luogo</Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

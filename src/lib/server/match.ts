@@ -10,7 +10,8 @@ import {
 } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { canUser, UserAction } from '../permissions';
+import { UserAction } from '@/types';
+import { canUser } from '../permissions';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { redirect } from 'next/navigation';
 
@@ -245,7 +246,7 @@ export async function setWinner({
     .eq('id', match.id);
   if (error) throw error;
   const canUpdateMatchStats = !!(await canUser(
-    UserAction.UpdateMatchStats,
+    UserAction.ManagePlaces,
     {
       placeId: match.place_id,
     },
@@ -277,7 +278,7 @@ export async function confirmPlayer({
   const { profile } = await getAuthenticatedUserWithProfile();
 
   const canUpdateMatchStats = !!(await canUser(
-    UserAction.UpdateMatchStats,
+    UserAction.ManagePlaces,
     {
       placeId: placeId,
     },
@@ -319,7 +320,7 @@ export async function removePlayer({
   const { profile } = await getAuthenticatedUserWithProfile();
 
   const canUpdateMatchStats = !!(await canUser(
-    UserAction.UpdateMatchStats,
+    UserAction.ManagePlaces,
     {
       placeId: placeId,
     },
@@ -360,7 +361,7 @@ export async function updatePlayerPoints({
 }) {
   const { profile } = await getAuthenticatedUserWithProfile();
   const canUpdateMatchStats = !!(await canUser(
-    UserAction.UpdateMatchStats,
+    UserAction.ManagePlaces,
     {
       placeId,
     },
@@ -398,10 +399,10 @@ export async function addPlayer({
   match: Match;
 }): Promise<{ success: boolean; message: string }> {
   try {
-    const canUpdateMatches = !!(await canUser(UserAction.UpdateMatches, {
+    const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
       placeId: match.place_id,
     }));
-    if (!canUpdateMatches) {
+    if (!canManagePlaces) {
       return {
         success: false,
         message: 'Non hai i permessi per aggiungere giocatori',
@@ -470,10 +471,10 @@ export async function createMatch(
 ): Promise<{ form: Match | null; errors: any }> {
   const name = formData.get('name') as string;
   const game_id = formData.get('game') as string;
-  const canCreateMatches = !!(await canUser(UserAction.CreateMatches, {
+  const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
     placeId,
   }));
-  if (!canCreateMatches) {
+  if (!canManagePlaces) {
     return {
       form: null,
       errors: {
@@ -530,10 +531,10 @@ export async function editMatch(
   maxAllowedPlayers: number,
   placeId?: string,
 ): Promise<{ form: Match | null; errors: any }> {
-  const canUpdateMatches = !!(await canUser(UserAction.UpdateMatches, {
+  const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
     placeId,
   }));
-  if (!canUpdateMatches) {
+  if (!canManagePlaces) {
     return {
       form: null,
       errors: {

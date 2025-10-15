@@ -1,24 +1,5 @@
+import { ROLE, UserAction } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-
-export enum UserAction {
-  ReadMatches = 'read:matches',
-  CreateMatches = 'create:matches',
-  DeleteMatches = 'delete:matches',
-  UpdateMatches = 'update:matches',
-  ReadPlaces = 'read:places',
-  CreatePlaces = 'create:places',
-  DeletePlaces = 'delete:places',
-  UpdatePlaces = 'update:places',
-  UpdateMatchStats = 'update:match_stats',
-  ManagePlatform = 'manage:platform',
-}
-
-export enum ROLE {
-  Admin = 'Admin',
-  User = 'User',
-  PlaceManager = 'PlaceManager',
-  GameManager = 'GameManager',
-}
 
 export async function canUser(
   action: UserAction,
@@ -31,7 +12,6 @@ export async function canUser(
   const { role, permissions } = await getAuthenticatedUserWithProfile();
   if (role === ROLE.Admin || forceTrue) return true;
   if (role === ROLE.PlaceManager) {
-    console.log(permissions, context, action);
     return (
       context?.placeId &&
       permissions?.some(
@@ -41,7 +21,6 @@ export async function canUser(
     );
   }
   if (role === ROLE.GameManager) {
-    console.log('gg');
     return (
       context?.gameId &&
       permissions?.some(
@@ -49,6 +28,5 @@ export async function canUser(
       )
     );
   }
-  console.log('ehd');
   return false;
 }

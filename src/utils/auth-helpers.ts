@@ -1,13 +1,14 @@
-import { ROLE } from '@/lib/permissions';
 import {
   GameStats,
   PlaceStats,
   Profile,
+  ROLE,
   UserPermission,
   UserRowPermission,
 } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 import { User } from '@supabase/supabase-js';
+import clsx from 'clsx';
 import { cache } from 'react';
 
 export const getAuthenticatedUserWithProfile = cache(

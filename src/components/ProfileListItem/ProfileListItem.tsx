@@ -79,9 +79,12 @@ export default function ProfileListItem({
       }
     >
       {/* --- ADMIN ACTIONS --- */}
-      <div className="flex gap-2">
-        {renderSlot(AdminActionsSlot, defaultAdminActions)}
-      </div>
+      {renderSlot(AdminActionsSlot, defaultAdminActions) && (
+        <div className="flex gap-2">
+          {renderSlot(AdminActionsSlot, defaultAdminActions)}
+          ciao
+        </div>
+      )}
       <div className="flex flex-col gap-2">
         {renderSlot(IntroSlot, defaultIntro)}
       </div>
@@ -102,7 +105,7 @@ export default function ProfileListItem({
         </Avatar>
       </div>
       {/* --- USERNAME --- */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 items-center">
         <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>
           <div className="font-semibold">
             {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}

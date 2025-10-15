@@ -13,7 +13,7 @@ import {
 import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { MyNavigationMenu } from './MyNavigationMenu';
-import { ROLE } from '@/lib/permissions';
+import { ROLE } from '@/types';
 
 async function handleLogout() {
   'use server';
@@ -30,7 +30,7 @@ export default async function Navbar() {
       <div>
         <Link href="/">Logo</Link>
       </div>
-      <MyNavigationMenu profile={profile} />
+      <MyNavigationMenu profile={profile} role={role} />
       <div className="flex items-center gap-4">
         {profile ? (
           <div>

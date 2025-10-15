@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
 import Link from 'next/link';
+import * as React from 'react';
 
 import {
   NavigationMenu,
@@ -11,22 +11,28 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { Profile } from '@/types';
+import { Profile, ROLE } from '@/types';
 
-export function MyNavigationMenu({ profile }: { profile: Profile | null }) {
+export function MyNavigationMenu({
+  profile,
+  role,
+}: {
+  profile: Profile | null;
+  role: ROLE;
+}) {
   const matchesItems: { title: string; href: string; description: string }[] = [
     {
       title: 'Partite',
       href: '/matches',
       description: 'Lista di tutte le partite presenti nel database di Torneo.',
     },
-    {
+    profile && {
       title: 'Mie partite',
       href: '/matches/mine',
       description:
         'Lista di tutte le partite a cui partecipi o hai partecipato',
     },
-  ];
+  ].filter(Boolean) as { title: string; href: string; description: string }[];
 
   const gamesItems: { title: string; href: string; description: string }[] = [
     {
@@ -55,10 +61,20 @@ export function MyNavigationMenu({ profile }: { profile: Profile | null }) {
     {
       title: 'Luoghi',
       href: '/places',
-      description:
-        'A modal dialog that interrupts the user with important content and expects a response.',
+      description: 'Lista di tutti i luoghi presenti nel database.',
     },
-  ];
+    profile && {
+      title: 'Preferiti',
+      href: '/places/favourites',
+      description: 'Lista di tutti i tuoi luoghi preferiti.',
+    },
+    profile &&
+      role !== ROLE.User && {
+        title: 'Gestiti',
+        href: '/places/managed',
+        description: 'Lista di tutti i tuoi luoghi gestiti.',
+      },
+  ].filter(Boolean) as { title: string; href: string; description: string }[];
 
   return (
     <NavigationMenu viewport={false} className="z-50">

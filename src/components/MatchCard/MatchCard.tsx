@@ -23,7 +23,8 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { formatMatchStatus, getMatchStatus } from '@/lib/client/match';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { canUser, UserAction } from '@/lib/permissions';
+import { UserAction } from '@/types';
+import { canUser } from '@/lib/permissions';
 
 interface MatchCardProps {
   match: Match;
@@ -34,7 +35,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
   const matchStatus = getMatchStatus(match);
   const { profile } = await getAuthenticatedUserWithProfile();
 
-  const canUpdateMatches = await canUser(UserAction.UpdateMatches, {
+  const canManagePlaces = await canUser(UserAction.ManagePlaces, {
     placeId: match.place_id,
   });
   return (
@@ -95,7 +96,9 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
               alt={match.game.name}
               width={small ? 120 : 220}
               height={small ? 120 : 220}
-              className="rounded-2xl shadow-lg object-cover border border-muted"
+              className={`rounded-2xl shadow-lg object-cover border border-muted ${
+                small ? 'size-32' : ''
+              }`}
             />
           </div>
         )}
@@ -183,7 +186,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
         </div>
       </div>
 
-      {!small && canUpdateMatches && (
+      {!small && canManagePlaces && (
         <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
           <Button className="cursor-pointer" variant="secondary">
             <PencilIcon className="inline mr-2 h-4 w-4" />
