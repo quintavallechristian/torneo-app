@@ -38,9 +38,6 @@ export default async function PlaceCard({
   });
   return (
     <SpotlightCard className="px-0 py-0">
-      {placeStats && !small && (
-        <StatsCard stats={placeStats} position={positionInPlace!} />
-      )}
       <div className="flex flex-col md:flex-row p-4">
         <div className="flex-shrink-0">
           <Image
@@ -119,6 +116,11 @@ export default async function PlaceCard({
           </CardContent>
         </div>
       </div>
+      {placeStats && !small && positionInPlace > 0 && (
+        <div className="px-4 mb-8">
+          <StatsCard stats={placeStats} position={positionInPlace!} />
+        </div>
+      )}
       {!small && canManagePlaces && (
         <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
           <Button className="cursor-pointer" variant="secondary">

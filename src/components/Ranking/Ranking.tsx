@@ -43,6 +43,19 @@ export default async function Ranking({ placeId, gameId }: RankingProps) {
 
   return (
     <>
+      {ranking.length === 0 && (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <DicesIcon />
+            </EmptyMedia>
+          </EmptyHeader>
+          <EmptyTitle>Nessun dato</EmptyTitle>
+          <EmptyDescription>
+            Nessun giocatore ha ancora guadagnato punti in questo locale.
+          </EmptyDescription>
+        </Empty>
+      )}
       {ranking.map((player, index) => (
         <ProfileListItem
           key={player.id}

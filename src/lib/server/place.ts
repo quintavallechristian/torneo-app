@@ -4,6 +4,7 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { canUser } from '../permissions';
+import { uploadImage, replaceImage } from './storage';
 
 import * as z from 'zod';
 import { redirect } from 'next/navigation';
@@ -15,6 +16,7 @@ export async function getPlaceRanking(placeId?: string) {
     .from('profiles_places')
     .select('*, profile:profiles(*)')
     .eq('place_id', placeId)
+    .gt('points', 0)
     .order('points', { ascending: false });
 
   if (error) throw error;
@@ -62,13 +64,36 @@ export async function createPlace(
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
   const address = formData.get('address') as string;
-  const image = formData.get('image') as string;
+  const imageFile = formData.get('image') as File | null;
+
+  // Upload dell'immagine se presente
+  let imageUrl: string | null = null;
+  if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+    const { url, error: uploadError } = await uploadImage(
+      imageFile,
+      'places-images',
+      'places',
+    );
+
+    if (uploadError || !url) {
+      return {
+        form: null,
+        errors: {
+          image: [
+            `Errore durante il caricamento dell'immagine: ${uploadError}`,
+          ],
+        },
+      };
+    }
+
+    imageUrl = url;
+  }
 
   const form: Place = {
     name,
     description,
     address,
-    image,
+    image: imageUrl,
   };
 
   const validationResult = PlaceSchema.safeParse(form);
@@ -122,16 +147,52 @@ export async function editPlace(
       },
     };
   }
+
+  const supabase = await createClient();
+
+  // Recupera il place esistente per ottenere l'URL dell'immagine attuale
+  const { data: existingPlace } = await supabase
+    .from('places')
+    .select('image')
+    .eq('id', placeId)
+    .single<Place>();
+
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
   const address = formData.get('address') as string;
-  const image = formData.get('image') as string;
+  const imageFile = formData.get('image') as File | null;
+
+  // Gestione dell'immagine
+  let imageUrl: string | null = existingPlace?.image ?? null;
+
+  if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+    // Se c'è una nuova immagine, sostituisci quella vecchia
+    const { url, error: uploadError } = await replaceImage(
+      imageFile,
+      existingPlace?.image ?? undefined,
+      'places-images',
+      'places',
+    );
+
+    if (uploadError || !url) {
+      return {
+        form: null,
+        errors: {
+          image: [
+            `Errore durante il caricamento dell'immagine: ${uploadError}`,
+          ],
+        },
+      };
+    }
+
+    imageUrl = url;
+  }
 
   const form: Place = {
     name,
     description,
     address,
-    image,
+    image: imageUrl,
   };
 
   const validationResult = PlaceSchema.safeParse(form);
@@ -143,7 +204,6 @@ export async function editPlace(
     };
   }
 
-  const supabase = await createClient();
   const { error } = await supabase
     .from('places')
     .update([validationResult.data])

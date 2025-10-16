@@ -158,7 +158,9 @@ export async function getPlaceRanking(placeId: number): Promise<PlaceStats[]> {
   let { data: placeStats } = await supabase
     .from('profiles_places')
     .select('*')
-    .eq('place_id', placeId);
+    .eq('place_id', placeId)
+    .gt('points', 0)
+    .order('points', { ascending: false });
 
   if (!placeStats) {
     return [];

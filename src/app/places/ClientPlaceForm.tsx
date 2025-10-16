@@ -13,14 +13,25 @@ export default function ClientPlaceForm({ place }: { place?: Place }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [errors, setErrors] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function action(formData: FormData) {
+    setIsLoading(true);
+
+    // Aggiungi il file immagine al FormData se presente
+    if (selectedImage) {
+      formData.set('image', selectedImage);
+    }
+
     let res;
     if (place && place.id) {
       res = await editPlace(formData, place.id);
     } else {
       res = await createPlace(formData);
     }
+
+    setIsLoading(false);
+
     if (res && res.errors) {
       if ('general' in res.errors) {
         toast.error(res.errors.general);
@@ -93,7 +104,6 @@ export default function ClientPlaceForm({ place }: { place?: Place }) {
           Immagine
         </label>
         <ImageDropArea
-          name="image"
           onImageSelect={(file) => setSelectedImage(file)}
           onImageRemove={() => setSelectedImage(null)}
           defaultImageUrl={place?.image || undefined}
@@ -104,9 +114,14 @@ export default function ClientPlaceForm({ place }: { place?: Place }) {
       <div className="flex items-center justify-center mt-6">
         <Button
           type="submit"
-          className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-800 text-white font-semibold py-2 rounded-lg transition-all shadow-md"
+          disabled={isLoading}
+          className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-800 text-white font-semibold py-2 rounded-lg transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {place ? 'Aggiorna partita' : 'Crea partita'}
+          {isLoading
+            ? 'Caricamento...'
+            : place
+            ? 'Aggiorna locale'
+            : 'Crea locale'}
         </Button>
       </div>
     </form>

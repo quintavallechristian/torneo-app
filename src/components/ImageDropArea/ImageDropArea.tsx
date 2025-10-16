@@ -12,7 +12,6 @@ interface ImageDropAreaProps {
   defaultImageUrl?: string;
   maxSizeMB?: number;
   className?: string;
-  name?: string;
 }
 
 export default function ImageDropArea({
@@ -21,7 +20,6 @@ export default function ImageDropArea({
   defaultImageUrl,
   maxSizeMB = 5,
   className,
-  name = 'image',
 }: ImageDropAreaProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(
@@ -106,7 +104,7 @@ export default function ImageDropArea({
   return (
     <div className={cn('w-full', className)}>
       {!preview ? (
-        <div
+        <label
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -121,7 +119,6 @@ export default function ImageDropArea({
         >
           <input
             type="file"
-            name={name}
             accept="image/*"
             onChange={handleFileInput}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -143,7 +140,7 @@ export default function ImageDropArea({
               PNG, JPG, GIF fino a {maxSizeMB}MB
             </p>
           </div>
-        </div>
+        </label>
       ) : (
         <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-700">
           <Image src={preview} alt="Preview" fill className="object-cover" />

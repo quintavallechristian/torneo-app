@@ -20,7 +20,7 @@ interface PlaceCardProps {
 
 export default function StatsCard({ stats, position, small }: PlaceCardProps) {
   return (
-    <SpotlightCard className="px-4 py-4 mx-4 my-4">
+    <SpotlightCard className="px-4 py-4">
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
           <AccordionTrigger className="items-center p-0 hover:underline-0">
