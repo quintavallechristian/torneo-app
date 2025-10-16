@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { CalendarIcon } from 'lucide-react';
+import { parse } from 'date-fns';
+import { it } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -18,9 +20,7 @@ type DatePickerProps = {
 };
 
 function formatDate(date: Date | undefined) {
-  if (!date) {
-    return '';
-  }
+  if (!date) return '';
 
   return date.toLocaleDateString('it-IT', {
     day: '2-digit',
@@ -30,9 +30,7 @@ function formatDate(date: Date | undefined) {
 }
 
 function isValidDate(date: Date | undefined) {
-  if (!date) {
-    return false;
-  }
+  if (!date) return false;
   return !isNaN(date.getTime());
 }
 
@@ -42,23 +40,39 @@ export function DatePicker({ defaultDate, onSelect }: DatePickerProps) {
   const [month, setMonth] = React.useState<Date | undefined>(date);
   const [value, setValue] = React.useState(formatDate(date));
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value.trim();
+    setValue(inputValue);
+
+    // Formati accettati
+    const formats = ['d MMMM yyyy', 'dd/MM/yyyy', 'dd-MM-yyyy'];
+
+    let parsedDate: Date | null = null;
+    for (const fmt of formats) {
+      const d = parse(inputValue, fmt, new Date(), { locale: it });
+      if (isValidDate(d)) {
+        parsedDate = d;
+        break;
+      }
+    }
+
+    if (parsedDate) {
+      setDate(parsedDate);
+      setMonth(parsedDate);
+      setValue(formatDate(parsedDate));
+      onSelect?.(parsedDate);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <div className="relative flex gap-2">
         <Input
           id="date"
           value={value}
-          placeholder="Seleziona data"
+          placeholder="Es. 22 ottobre 2025"
           className="bg-background pr-10"
-          onChange={(e) => {
-            const date = new Date(e.target.value);
-            setValue(e.target.value);
-            if (isValidDate(date)) {
-              setDate(date);
-              setMonth(date);
-              onSelect?.(date);
-            }
-          }}
+          onChange={handleInputChange}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown') {
               e.preventDefault();
@@ -66,6 +80,7 @@ export function DatePicker({ defaultDate, onSelect }: DatePickerProps) {
             }
           }}
         />
+
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -77,6 +92,7 @@ export function DatePicker({ defaultDate, onSelect }: DatePickerProps) {
               <span className="sr-only">Select date</span>
             </Button>
           </PopoverTrigger>
+
           <PopoverContent
             className="w-auto overflow-hidden p-0"
             align="end"
@@ -90,10 +106,13 @@ export function DatePicker({ defaultDate, onSelect }: DatePickerProps) {
               month={month}
               onMonthChange={setMonth}
               onSelect={(date) => {
-                setDate(date);
-                setValue(formatDate(date));
-                setOpen(false);
-                onSelect?.(date);
+                if (date) {
+                  setDate(date);
+                  setMonth(date);
+                  setValue(formatDate(date));
+                  setOpen(false);
+                  onSelect?.(date);
+                }
               }}
             />
           </PopoverContent>

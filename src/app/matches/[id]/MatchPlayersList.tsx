@@ -9,6 +9,7 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty';
 import {
+  Badge,
   Check,
   DicesIcon,
   LockIcon,
@@ -29,7 +30,7 @@ import {
 } from '@/lib/server/match';
 import ProfileListItem from '@/components/ProfileListItem/ProfileListItem';
 import { setWinner } from '@/lib/server/match';
-import { ExagonalBadge } from '@/components/ui/exagonalBadge';
+import { BadgeVariant, ExagonalBadge } from '@/components/ui/exagonalBadge';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -198,17 +199,14 @@ export default function MatchPlayersList({
                     onClick={() => setWinnerAction(playerObj.profile!.id!)}
                   >
                     <StatsExagon
+                      className="cursor-pointer hover:scale-110"
                       medium
-                      className={`
-                            cursor-pointer size-8 hover:scale-105 transition-all ease-in-out
-                            ${
-                              playerObj.profile?.id === match.winner?.id
-                                ? 'bg-amber-100 text-amber-500'
-                                : 'bg-indigo-50/5'
-                            }
-                          `}
                       stat={<TrophyIcon className="size-5" strokeWidth={1} />}
-                      variant={null}
+                      variant={
+                        playerObj.profile?.id === match.winner?.id
+                          ? BadgeVariant.gold
+                          : BadgeVariant.opaque
+                      }
                     />
                   </button>
                 ) : (
@@ -270,7 +268,6 @@ export default function MatchPlayersList({
                         )?.points || 0
                       }
                       label="Punti"
-                      variant="red"
                     />
                     <StatsExagon
                       small
@@ -281,7 +278,7 @@ export default function MatchPlayersList({
                         )?.points || 0
                       }
                       label="Punti"
-                      variant="blue"
+                      variant={BadgeVariant.blue}
                     />
                   </div>
                 )

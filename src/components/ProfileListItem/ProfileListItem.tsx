@@ -3,6 +3,9 @@ import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { Player, Profile } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import StatsExagon from '../StatsExagon/StatsExagon';
+import { Badge } from 'lucide-react';
+import { BadgeVariant } from '../ui/exagonalBadge';
 interface ProfileListItemProps {
   profile: Profile | null;
   player: Player;
@@ -29,8 +32,17 @@ export default function ProfileListItem({
   DescriptionSlot,
 }: ProfileListItemProps) {
   const defaultIntro = (
-    <button
-      type="submit"
+    <StatsExagon
+      medium
+      variant={
+        index === 1
+          ? BadgeVariant.gold
+          : index === 2
+          ? BadgeVariant.silver
+          : index === 3
+          ? BadgeVariant.bronze
+          : BadgeVariant.opaque
+      }
       className={`
         cursor-pointer size-10 flex items-center justify-center ring-offset-1
         ${index === 1 ? 'bg-yellow-400 ring-amber-200 text-white' : ''}
@@ -38,22 +50,19 @@ export default function ProfileListItem({
         ${index === 3 ? 'bg-amber-600 ring-amber-500 text-white' : ''}
         ${!index || index > 3 ? 'bg-indigo-50/5' : ''}
       `}
-      style={{
-        clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)',
-      }}
-    >
-      {index}
-    </button>
+      stat={index}
+    />
   );
 
   const defaultDescriptionArea = null;
 
   const defaultStatsArea = (
-    <button className="cursor-pointer focus:outline-none">
-      <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
-        {player.points || 0} pts
-      </span>
-    </button>
+    <StatsExagon
+      medium
+      stat={player.points || 0}
+      label="ELO"
+      className={`${relevant ? 'opacity-100' : 'opacity-50'}`}
+    />
   );
 
   const defaultAdminActions = null;
@@ -82,7 +91,6 @@ export default function ProfileListItem({
       {renderSlot(AdminActionsSlot, defaultAdminActions) && (
         <div className="flex gap-2">
           {renderSlot(AdminActionsSlot, defaultAdminActions)}
-          ciao
         </div>
       )}
       <div className="flex flex-col gap-2">
@@ -95,7 +103,7 @@ export default function ProfileListItem({
             <AvatarImage src={player.profile.image} />
           ) : (
             <AvatarFallback
-              className={`uppercase border-1 text-white bg-indigo-800 ${
+              className={`uppercase border-2 text-white bg-indigo-800 ${
                 player.profile?.id === profile?.id ? 'border-emerald-500' : ''
               }`}
             >

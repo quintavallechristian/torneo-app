@@ -2,14 +2,14 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { Button } from '@/components/ui/button';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { Place } from '@/types';
+import { Place, ROLE } from '@/types';
 import { UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
 
 export default async function PlacesPage() {
   const supabase = await createClient();
-  const { profile } = await getAuthenticatedUserWithProfile();
+  const { profile, role } = await getAuthenticatedUserWithProfile();
   let placeData: Place[] = [];
   if (!profile) {
     const { data } = await supabase.from('places').select('*').limit(10);
@@ -24,16 +24,17 @@ export default async function PlacesPage() {
       .limit(100);
     placeData = data?.sort((a, b) => b.matches.length - a.matches.length) || [];
   }
-  const canManagePlatform = await canUser(UserAction.ManagePlatform);
 
   const canUpdatePlacesMap: Record<string, boolean> = {};
   if (profile) {
     await Promise.all(
       placeData.map(async (place) => {
-        canUpdatePlacesMap[place.id] =
-          (await canUser(UserAction.ManagePlaces, {
-            placeId: place.id,
-          })) || false;
+        if (place.id) {
+          canUpdatePlacesMap[place.id] =
+            (await canUser(UserAction.ManagePlaces, {
+              placeId: place.id,
+            })) || false;
+        }
       }),
     );
   }
@@ -49,7 +50,7 @@ export default async function PlacesPage() {
             <PlaceCard
               key={place.id}
               place={place}
-              placeStats={place.placeStats[0]}
+              placeStats={place.placeStats?.[0]}
               small={true}
             />
           ))}
@@ -59,7 +60,7 @@ export default async function PlacesPage() {
           Nessun luogo disponibile.
         </p>
       )}
-      {canManagePlatform && (
+      {role === ROLE.PlaceManager && (
         <div className="flex justify-center">
           <Button className="mt-4" asChild>
             <Link href="/places/new">Crea nuovo luogo</Link>

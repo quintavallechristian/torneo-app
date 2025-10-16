@@ -11,6 +11,7 @@ import { getPlaceRanking } from '@/lib/server/place';
 import ProfileListItem from '../ProfileListItem/ProfileListItem';
 import { getGameRanking } from '@/lib/server/game';
 import { Player } from '@/types';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 interface RankingProps {
   placeId?: string;
@@ -18,6 +19,7 @@ interface RankingProps {
 }
 
 export default async function Ranking({ placeId, gameId }: RankingProps) {
+  const { profile } = await getAuthenticatedUserWithProfile();
   if (!placeId && !gameId) {
     return (
       <Empty>
@@ -42,7 +44,12 @@ export default async function Ranking({ placeId, gameId }: RankingProps) {
   return (
     <>
       {ranking.map((player, index) => (
-        <ProfileListItem key={player.id} player={player} index={index + 1} />
+        <ProfileListItem
+          key={player.id}
+          player={player}
+          profile={profile}
+          index={index + 1}
+        />
       ))}
     </>
   );

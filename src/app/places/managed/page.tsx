@@ -3,6 +3,8 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { Place, ROLE, UserAction } from '@/types';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
 import ForbiddenArea from '@/components/ForbiddenArea/ForbiddenArea';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default async function PlacesPage() {
   const supabase = await createClient();
@@ -39,7 +41,7 @@ export default async function PlacesPage() {
             <PlaceCard
               key={place.id}
               place={place}
-              placeStats={place.placeStats[0]}
+              placeStats={place.placeStats?.[0]}
               small={true}
             />
           ))}
@@ -49,6 +51,13 @@ export default async function PlacesPage() {
           title="Nessun luogo"
           message="Non gestisci nessun luogo."
         />
+      )}
+      {role === ROLE.PlaceManager && (
+        <div className="flex justify-center">
+          <Button className="mt-4" asChild>
+            <Link href="/places/new">Crea nuovo luogo</Link>
+          </Button>
+        </div>
       )}
     </div>
   ) : (

@@ -5,7 +5,10 @@ import { redirect } from 'next/navigation';
 
 import { createClient } from '@/utils/supabase/server';
 
-export async function signup(formData: FormData) {
+export async function signup(
+  { manager }: { manager: boolean },
+  formData: FormData,
+) {
   const supabase = await createClient();
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
@@ -51,7 +54,7 @@ export async function signup(formData: FormData) {
 
     const { data: roleData, error: roleError } = await supabase
       .from('users_roles')
-      .insert([{ user_id: data.user?.id, role_id: 2 }]);
+      .insert([{ user_id: data.user?.id, role_id: manager ? 3 : 2 }]);
 
     if (roleError) {
       console.error('Error assigning role:', roleError);

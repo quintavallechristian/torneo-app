@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { signup } from './actions';
+import { signup } from '../actions';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { DatePicker } from '@/components/DatePicker/DatePicker';
 import { useState } from 'react';
@@ -15,28 +15,28 @@ export default function SignupPage() {
   >();
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex items-center justify-center py-8 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800">
       <SpotlightCard className="max-w-2xl w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">
             <Link
               href="/matches"
-              className="flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
+              className="flex items-center text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-colors"
             >
               <ChevronLeft className="inline mr-2 h-4 w-4" />
               Indietro
             </Link>
           </Button>
         </div>
-        <h1 className="text-3xl font-extrabold text-indigo-700 dark:text-indigo-400 mb-2 text-center">
-          Crea il tuo account
+        <h1 className="text-3xl font-extrabold text-emerald-700 dark:text-emerald-400 mb-2 text-center">
+          Crea il tuo account gestore
         </h1>
         <p className="text-gray-500 dark:text-gray-300 text-center mb-6">
           Benvenuto! Registrati per partecipare alle partite e gestire il tuo
           profilo.
         </p>
         <form
-          action={signup.bind(null, { manager: false })}
+          action={signup.bind(null, { manager: true })}
           className="space-y-4"
         >
           <div className="flex gap-4">
@@ -53,7 +53,7 @@ export default function SignupPage() {
                 name="firstname"
                 autoComplete="given-name"
                 required
-                className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               />
             </div>
             <div className="w-1/2">
@@ -69,7 +69,7 @@ export default function SignupPage() {
                 name="lastname"
                 autoComplete="family-name"
                 required
-                className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               />
             </div>
           </div>
@@ -86,7 +86,7 @@ export default function SignupPage() {
               name="email"
               autoComplete="email"
               required
-              className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
             />
             <label
               htmlFor="username"
@@ -99,7 +99,7 @@ export default function SignupPage() {
               id="username"
               name="username"
               required
-              className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
             />
           </div>
           <div className="flex gap-4">
@@ -115,7 +115,7 @@ export default function SignupPage() {
                 id="password"
                 name="password"
                 required
-                className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               />
             </div>
             <div className="w-1/2">
@@ -130,7 +130,7 @@ export default function SignupPage() {
                 id="confirm_password"
                 name="confirm_password"
                 required
-                className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               />
             </div>
           </div>
@@ -170,7 +170,7 @@ export default function SignupPage() {
                 id="country"
                 name="country"
                 required
-                className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               />
             </div>
           </div>
@@ -179,12 +179,12 @@ export default function SignupPage() {
               Registrati
             </Button>
             <span className="text-xs mt-2 text-gray-400 dark:text-gray-500 text-center">
-              Hai un locale?{' '}
+              Non hai un locale?{' '}
               <Link
-                href="/signup/manager"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                href="/signup"
+                className="text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                Registratati come gestore
+                Registratati come utente
               </Link>
             </span>
           </div>

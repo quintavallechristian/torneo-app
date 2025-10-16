@@ -42,7 +42,7 @@ export default async function PlacesPage() {
             <PlaceCard
               key={place.id}
               place={place}
-              placeStats={place.placeStats[0]}
+              placeStats={place.placeStats?.[0]}
               small={true}
             />
           ))}

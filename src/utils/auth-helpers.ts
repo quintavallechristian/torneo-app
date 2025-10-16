@@ -38,7 +38,9 @@ export const getAuthenticatedUserWithProfile = cache(
       .single();
 
     if (profileError || !profileData) {
-      throw new Error('Errore nel recupero del profilo');
+      throw new Error('Errore nel recupero del profilo', {
+        cause: profileData,
+      });
     }
 
     // Get role

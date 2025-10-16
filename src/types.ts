@@ -62,6 +62,14 @@ export const createMatchSchema = (minPlayers: number, maxPlayers: number) =>
       .max(maxPlayers, `Numero massimo di giocatori è ${maxPlayers}`),
   });
 
+export const PlaceSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3).max(100),
+  image: z.string().nullable(),
+  description: z.string().min(3).max(2000).nullable(),
+  address: z.string().min(3).max(2000),
+});
+
 export const ProfileSchema = z.object({
   id: z.string().optional(),
   username: z.string().min(3).max(30),
@@ -109,16 +117,11 @@ export type Game = {
   matches?: Match[];
   gameStats?: GameStats[];
 };
-export type Place = {
-  id: string;
-  name: string;
-  image: string;
-  address: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  description: string | null;
+export type Place = z.infer<typeof PlaceSchema> & {
+  latitude?: number;
+  longitude?: number;
   matches?: Match[];
-  placeStats: PlaceStats[];
+  placeStats?: PlaceStats[];
 };
 export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;

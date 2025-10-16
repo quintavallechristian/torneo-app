@@ -66,41 +66,40 @@ export default async function PlaceCard({
               <Link href={`/places/${place.id}`} className="hover:underline">
                 {place.name}
               </Link>
-              {placeStats && (
-                <div className="ml-auto flex gap-2 items-center">
-                  <form
-                    action={setFavouritePlace.bind(null, {
-                      placeId: place.id!,
-                      status: !placeStats?.favourite,
-                    })}
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="link"
-                          className="hover:scale-110"
-                          type="submit"
-                        >
-                          <StarIcon
-                            className={`size-6  ${
-                              placeStats?.favourite
-                                ? 'text-amber-300 hover:text-gray-600'
-                                : 'text-gray-400'
-                            }`}
-                          />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          {placeStats?.favourite
-                            ? 'Rimuovi dai preferiti'
-                            : 'Aggiungi ai preferiti'}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </form>
-                </div>
-              )}
+
+              <div className="ml-auto flex gap-2 items-center">
+                <form
+                  action={setFavouritePlace.bind(null, {
+                    placeId: place.id!,
+                    status: !placeStats?.favourite,
+                  })}
+                >
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="link"
+                        className="hover:scale-110"
+                        type="submit"
+                      >
+                        <StarIcon
+                          className={`size-6  ${
+                            placeStats?.favourite
+                              ? 'text-amber-300 hover:text-gray-600'
+                              : 'text-gray-400'
+                          }`}
+                        />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        {placeStats?.favourite
+                          ? 'Rimuovi dai preferiti'
+                          : 'Aggiungi ai preferiti'}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </form>
+              </div>
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               {place.address}

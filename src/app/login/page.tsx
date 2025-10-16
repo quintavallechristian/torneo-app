@@ -3,11 +3,12 @@ import { login } from './actions';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
+      <SpotlightCard>
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">
             <Link
@@ -24,7 +25,7 @@ export default function LoginPage() {
             Accedi al tuo account
           </h1>
           <p className="text-gray-500 dark:text-gray-300">
-            Entra per gestire i tuoi partite e partecipare alle competizioni!
+            Entra per gestire le tue partite e partecipare alle competizioni!
           </p>
         </div>
         <form action={login} className="space-y-6">
@@ -61,13 +62,10 @@ export default function LoginPage() {
             />
           </div>
           <div className="flex flex-col gap-2 mt-4">
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-semibold"
-            >
+            <Button type="submit" className="w-full">
               Login
             </Button>
-            <span className="text-xs text-gray-400 dark:text-gray-500 text-center">
+            <span className="text-xs mt-2 text-gray-400 dark:text-gray-500 text-center">
               Non hai un account?{' '}
               <Link
                 href="/signup"
@@ -78,7 +76,7 @@ export default function LoginPage() {
             </span>
           </div>
         </form>
-      </div>
+      </SpotlightCard>
     </div>
   );
 }
