@@ -46,71 +46,83 @@ export default function ClientPlaceForm({ place }: { place?: Place }) {
   }
 
   return (
-    <form action={action} className="space-y-4">
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          Nome locale
-        </label>
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          required
-          className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-          defaultValue={place?.name}
-        />
-        {errors && <ZodErrors error={errors.name} />}
+    <form action={action} className="space-y-6 w-full">
+      {/* Layout con immagine a sinistra e campi a destra */}
+      <div className="flex flex-col lg:flex-row gap-6 w-full">
+        {/* Colonna Immagine - Sinistra */}
+        <div className="flex-shrink-0">
+          <label
+            htmlFor="image"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Immagine
+          </label>
+          <ImageDropArea
+            onImageSelect={(file) => setSelectedImage(file)}
+            onImageRemove={() => setSelectedImage(null)}
+            defaultImageUrl={place?.image || undefined}
+            maxSizeMB={1}
+            size="md"
+          />
+          {errors && <ZodErrors error={errors.image} />}
+        </div>
+
+        {/* Colonna Campi - Destra */}
+        <div className="flex-1 space-y-4">
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Nome locale
+            </label>
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              required
+              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              defaultValue={place?.name}
+            />
+            {errors && <ZodErrors error={errors.name} />}
+          </div>
+          <div>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Descrizione
+            </label>
+            <Textarea
+              id="description"
+              name="description"
+              rows={5}
+              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              defaultValue={place?.description || ''}
+            />
+            {errors && <ZodErrors error={errors.description} />}
+          </div>
+          <div>
+            <label
+              htmlFor="address"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Indirizzo
+            </label>
+            <Input
+              type="text"
+              id="address"
+              name="address"
+              required
+              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              defaultValue={place?.address || ''}
+            />
+            {errors && <ZodErrors error={errors.address} />}
+          </div>
+        </div>
       </div>
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          Descrizione
-        </label>
-        <Textarea
-          id="description"
-          name="description"
-          className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-          defaultValue={place?.description || ''}
-        />
-        {errors && <ZodErrors error={errors.description} />}
-      </div>
-      <div>
-        <label
-          htmlFor="address"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          Indirizzo
-        </label>
-        <Input
-          type="text"
-          id="address"
-          name="address"
-          required
-          className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-          defaultValue={place?.address || ''}
-        />
-        {errors && <ZodErrors error={errors.address} />}
-      </div>
-      <div>
-        <label
-          htmlFor="image"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          Immagine
-        </label>
-        <ImageDropArea
-          onImageSelect={(file) => setSelectedImage(file)}
-          onImageRemove={() => setSelectedImage(null)}
-          defaultImageUrl={place?.image || undefined}
-          maxSizeMB={5}
-        />
-        {errors && <ZodErrors error={errors.image} />}
-      </div>
+
+      {/* Bottone Submit */}
       <div className="flex items-center justify-center mt-6">
         <Button
           type="submit"

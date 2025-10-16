@@ -12,6 +12,7 @@ interface ImageDropAreaProps {
   defaultImageUrl?: string;
   maxSizeMB?: number;
   className?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
 export default function ImageDropArea({
@@ -20,6 +21,7 @@ export default function ImageDropArea({
   defaultImageUrl,
   maxSizeMB = 5,
   className,
+  size = 'md',
 }: ImageDropAreaProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(
@@ -101,15 +103,33 @@ export default function ImageDropArea({
     onImageRemove?.();
   }, [onImageRemove]);
 
+  // Mappa delle dimensioni predefinite (quadrate)
+  const sizeClasses = {
+    sm: 'w-32 h-32', // 128px
+    md: 'w-48 h-48', // 160px
+    lg: 'w-60 h-60', // 240px
+    xl: 'w-80 h-80', // 320px
+    full: 'w-full aspect-square', // Full width, mantiene aspect ratio
+  };
+
+  // Dimensioni icona e testo in base alla size
+  const contentSize = {
+    sm: { icon: 'w-8 h-8', text: 'text-xs', subtext: 'text-[10px]' },
+    md: { icon: 'w-10 h-10', text: 'text-sm', subtext: 'text-xs' },
+    lg: { icon: 'w-12 h-12', text: 'text-sm', subtext: 'text-xs' },
+    xl: { icon: 'w-14 h-14', text: 'text-base', subtext: 'text-sm' },
+    full: { icon: 'w-12 h-12', text: 'text-sm', subtext: 'text-xs' },
+  };
+
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn(sizeClasses[size], className)}>
       {!preview ? (
         <label
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={cn(
-            'relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-all',
+            'relative flex flex-col items-center justify-center w-full h-full border-2 border-dashed rounded-lg cursor-pointer transition-all p-4',
             'hover:bg-gray-50 dark:hover:bg-gray-800/50',
             isDragging
               ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
@@ -123,26 +143,37 @@ export default function ImageDropArea({
             onChange={handleFileInput}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+          <div className="flex flex-col items-center justify-center text-center">
             <Upload
               className={cn(
-                'w-12 h-12 mb-4 transition-colors',
+                contentSize[size].icon,
+                'mb-2 transition-colors',
                 isDragging
                   ? 'text-emerald-500'
                   : 'text-gray-400 dark:text-gray-500',
               )}
             />
-            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-semibold">Clicca per caricare</span> o
-              trascina qui
+            <p
+              className={cn(
+                contentSize[size].text,
+                'mb-1 text-gray-600 dark:text-gray-300',
+              )}
+            >
+              <span className="font-semibold">Clicca per caricare</span>
+              <br />o trascina qui
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p
+              className={cn(
+                contentSize[size].subtext,
+                'text-gray-500 dark:text-gray-400',
+              )}
+            >
               PNG, JPG, GIF fino a {maxSizeMB}MB
             </p>
           </div>
         </label>
       ) : (
-        <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-700">
+        <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-700">
           <Image src={preview} alt="Preview" fill className="object-cover" />
           <Button
             type="button"

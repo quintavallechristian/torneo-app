@@ -46,7 +46,7 @@ export default async function PlaceCard({
             width={small ? 120 : 220}
             height={small ? 120 : 220}
             className={`rounded-2xl shadow-lg object-cover border border-muted  dark:bg-emerald-800/20 bg-emerald-500 ${
-              small ? 'size-24' : ''
+              small ? 'size-24' : 'aspect-square'
             }`}
             priority
           />
@@ -116,7 +116,7 @@ export default async function PlaceCard({
           </CardContent>
         </div>
       </div>
-      {placeStats && !small && positionInPlace > 0 && (
+      {placeStats && !small && positionInPlace && positionInPlace > 0 && (
         <div className="px-4 mb-8">
           <StatsCard stats={placeStats} position={positionInPlace!} />
         </div>

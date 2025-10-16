@@ -35,7 +35,7 @@ export default async function EditPlace({ params }: PlaceEditPageProps) {
   }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 py-8">
-      <SpotlightCard className="min-w-lg">
+      <SpotlightCard className="min-w-2xl">
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-extrabold text-emerald-700 dark:text-emerald-400 mb-2">
             Modifica il tuo locale
