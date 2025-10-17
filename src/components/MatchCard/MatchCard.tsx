@@ -64,6 +64,21 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
               <span className="text-sm text-amber-500 truncate">
                 {match.winner.username}
               </span>
+              <Avatar
+                className={`size-5 ${
+                  match.winner?.id === profile?.id ? 'border-emerald-500' : ''
+                }`}
+              >
+                {match.winner?.image ? (
+                  <AvatarImage src={match.winner.image} />
+                ) : (
+                  <AvatarFallback
+                    className={`uppercase border-1 text-white bg-indigo-800`}
+                  >
+                    {match.winner?.username.charAt(0)}
+                  </AvatarFallback>
+                )}
+              </Avatar>
             </div>
           </div>
         ) : (
@@ -143,6 +158,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                   : 'Descrizione non disponibile'}
               </div>
             )}
+
             {match.players && (
               <div className="flex">
                 {match.players.map(

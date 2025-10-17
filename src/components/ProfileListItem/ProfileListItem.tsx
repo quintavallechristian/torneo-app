@@ -111,12 +111,7 @@ export default function ProfileListItem({
         </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
-        {/* --- STATS AREA --- */}
-        {
-          <div className="text-right ml-auto">
-            {renderSlot(StatsSlot, defaultStatsArea)}
-          </div>
-        }
+        {renderSlot(StatsSlot, defaultStatsArea)}
       </div>
     </SpotlightCard>
   );

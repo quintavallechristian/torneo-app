@@ -146,8 +146,10 @@ export async function getGame(gameId: string) {
         `
             *, 
             matches:matches(*, 
-            game:games(name, image, id), 
-            place:places(name, id)),
+              game:games(name, image, id), 
+              place:places(name, id),
+              winner:profiles(*), players:profiles_matches(*, profile:profiles(*))
+            ),
             gameStats:profiles_games(profile_id, favourite, in_collection, in_wishlist, rating)
             `,
       )

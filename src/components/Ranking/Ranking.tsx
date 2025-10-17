@@ -63,9 +63,7 @@ export default async function Ranking({ placeId, gameId }: RankingProps) {
           player={player}
           profile={profile}
           index={index + 1}
-          StatsSlot={
-            <StatsExagon size="md" stat={player.points || 0} label="ELO" />
-          }
+          StatsSlot={<StatsExagon size="lg" stat={player.points || 0} />}
         />
       ))}
     </>
