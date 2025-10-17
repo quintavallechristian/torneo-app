@@ -42,13 +42,6 @@ export default function ProfileListItem({
           ? BadgeVariant.bronze
           : BadgeVariant.opaque
       }
-      className={`
-        cursor-pointer size-10 flex items-center justify-center ring-offset-1
-        ${index === 1 ? 'bg-yellow-400 ring-amber-200 text-white' : ''}
-        ${index === 2 ? 'bg-slate-400 ring-slate-200 text-white' : ''}
-        ${index === 3 ? 'bg-amber-600 ring-amber-500 text-white' : ''}
-        ${!index || index > 3 ? 'bg-indigo-50/5' : ''}
-      `}
       stat={index}
     />
   );
