@@ -11,7 +11,7 @@ export default async function PlacesPage() {
   const { profile, permissions, role } =
     await getAuthenticatedUserWithProfile();
   let placeData: Place[] = [];
-  if (profile && role === ROLE.PlaceManager) {
+  if (profile && (role === ROLE.PlaceManager || role === ROLE.Admin)) {
     const placeIds =
       permissions
         ?.filter((p) => p.action === UserAction.ManagePlaces)
@@ -30,7 +30,7 @@ export default async function PlacesPage() {
     placeData = data?.sort((a, b) => b.matches.length - a.matches.length) || [];
   }
 
-  return profile && role === ROLE.PlaceManager ? (
+  return profile && (role === ROLE.PlaceManager || role === ROLE.Admin) ? (
     <div className="max-w-[90%] mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
         Luoghi gestiti

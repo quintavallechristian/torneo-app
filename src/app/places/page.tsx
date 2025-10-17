@@ -60,7 +60,7 @@ export default async function PlacesPage() {
           Nessun luogo disponibile.
         </p>
       )}
-      {role === ROLE.PlaceManager && (
+      {(role === ROLE.PlaceManager || role === ROLE.Admin) && (
         <div className="flex justify-center">
           <Button className="mt-4" asChild>
             <Link href="/places/new">Crea nuovo luogo</Link>

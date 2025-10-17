@@ -53,11 +53,11 @@ export async function createPlace(formData: FormData): Promise<{
   errors: { general?: string[]; image?: string[] } | null;
 }> {
   const { user, role } = await getAuthenticatedUserWithProfile();
-  if (!user || role !== ROLE.PlaceManager) {
+  if (!user || (role !== ROLE.PlaceManager && role !== ROLE.Admin)) {
     return {
       form: null,
       errors: {
-        general: ['Non hai i permessi per creare partite in questo luogo'],
+        general: ['Non hai i permessi per creare un locale'],
       },
     };
   }
