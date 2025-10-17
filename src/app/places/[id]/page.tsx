@@ -1,22 +1,17 @@
 'use server';
 import { Button } from '@/components/ui/button';
-import { CardDescription, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, StarIcon } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import Image from 'next/image';
-import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import { Place, PlaceStats } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
   getPlaceRanking,
   getPlaceStatsPerProfile,
 } from '@/utils/auth-helpers';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MatchList from '@/components/MatchList/MatchList';
 import Ranking from '@/components/Ranking/Ranking';
-import { setFavouritePlace } from '@/lib/server/place';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
 
 interface PlaceDetailsPageProps {

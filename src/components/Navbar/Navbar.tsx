@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { MyNavigationMenu } from './MyNavigationMenu';
+import { MyNavigationMenu, MobileMenuButton } from './MyNavigationMenu';
 import { ROLE } from '@/types';
+import { Button } from '../ui/button';
 
 async function handleLogout() {
   'use server';
@@ -27,7 +28,8 @@ export default async function Navbar() {
 
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-      <div>
+      <div className="flex items-center gap-4">
+        <MobileMenuButton profile={profile} role={role} />
         <Link href="/">Logo</Link>
       </div>
       <MyNavigationMenu profile={profile} role={role} />
@@ -53,7 +55,9 @@ export default async function Navbar() {
                   <Link href="/profile">My Account</Link>
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/profile/edit">Impostazioni</Link>
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
@@ -65,9 +69,9 @@ export default async function Navbar() {
             </DropdownMenu>
           </div>
         ) : (
-          <div>
+          <Button variant="ghost">
             <Link href="/login">Login</Link>
-          </div>
+          </Button>
         )}
         <ModeToggle />
       </div>

@@ -12,6 +12,7 @@ import ProfileListItem from '../ProfileListItem/ProfileListItem';
 import { getGameRanking } from '@/lib/server/game';
 import { Player } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
+import StatsExagon from '../StatsExagon/StatsExagon';
 
 interface RankingProps {
   placeId?: string;
@@ -62,6 +63,9 @@ export default async function Ranking({ placeId, gameId }: RankingProps) {
           player={player}
           profile={profile}
           index={index + 1}
+          StatsSlot={
+            <StatsExagon size="md" stat={player.points || 0} label="ELO" />
+          }
         />
       ))}
     </>

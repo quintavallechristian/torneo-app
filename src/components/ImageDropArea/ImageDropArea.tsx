@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ImageDropAreaProps {
@@ -180,14 +180,10 @@ export default function ImageDropArea({
             onClick={handleRemove}
             size="icon"
             variant="destructive"
-            className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-lg z-10"
+            className="absolute top-2 right-2 size-6 shadow-lg z-10"
           >
             <X className="h-4 w-4" />
           </Button>
-          <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-md text-xs flex items-center gap-1 z-10">
-            <ImageIcon className="h-3 w-3" />
-            Immagine caricata
-          </div>
         </div>
       )}
       {error && (

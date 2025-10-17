@@ -15,7 +15,7 @@ export default function SignupPage() {
   >();
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex items-center justify-center py-8">
       <SpotlightCard className="max-w-2xl w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">

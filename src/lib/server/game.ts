@@ -6,7 +6,6 @@ import { revalidatePath } from 'next/cache';
 import { parseStringPromise } from 'xml2js';
 import { isBefore, subDays } from 'date-fns';
 import { decode } from 'html-entities';
-import clsx from 'clsx';
 
 export async function getGameRanking(GameId?: string) {
   const supabase = await createClient();
@@ -15,6 +14,7 @@ export async function getGameRanking(GameId?: string) {
     .from('profiles_games')
     .select('*, profile:profiles(*)')
     .eq('game_id', GameId)
+    .gt('points', 0)
     .order('points', { ascending: false });
 
   if (error) throw error;
@@ -182,7 +182,7 @@ export async function updateGame(game: Game): Promise<Game> {
   let designer = game.designer;
   let bgg_rating = game.bgg_rating;
   let bgg_weight = game.bgg_weight;
-  let bgg_rank = game.bgg_rank;
+  const bgg_rank = game.bgg_rank;
 
   // Se la descrizione non esiste, la recuperiamo dall'API esterna e la salviamo nel database
   if (!updateAt || isBefore(updateAt, subDays(Date.now(), 30))) {

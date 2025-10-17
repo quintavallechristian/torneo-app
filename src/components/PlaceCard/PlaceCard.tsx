@@ -38,7 +38,13 @@ export default async function PlaceCard({
   });
   return (
     <SpotlightCard className="px-0 py-0">
-      <div className="flex flex-col md:flex-row p-4">
+      <div
+        className={`flex p-4 ${
+          small
+            ? 'text-sm flex-row'
+            : 'text-base flex-col items-center md:flex-row gap-4'
+        }`}
+      >
         <div className="flex-shrink-0">
           <Image
             src={avatarUrl}
@@ -46,7 +52,7 @@ export default async function PlaceCard({
             width={small ? 120 : 220}
             height={small ? 120 : 220}
             className={`rounded-2xl shadow-lg object-cover border border-muted  dark:bg-emerald-800/20 bg-emerald-500 ${
-              small ? 'size-24' : 'aspect-square'
+              small ? 'size-24' : 'aspect-'
             }`}
             priority
           />

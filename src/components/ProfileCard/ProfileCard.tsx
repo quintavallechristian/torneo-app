@@ -2,7 +2,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
   CardFooter,
 } from '@/components/ui/card';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
@@ -10,51 +9,89 @@ import React from 'react';
 import { Profile } from '@/types';
 import Image from 'next/image';
 import { Button } from '../ui/button';
+import Link from 'next/link';
+import { PencilIcon } from 'lucide-react';
+import StatsShowcase from '../StatsShowcase/StatsShowcase';
 
-interface MatchCardProps {
+interface ProfileCardProps {
   profile: Profile;
+  small?: boolean;
 }
 
-export default async function ProfileCard({ profile }: MatchCardProps) {
+export default async function ProfileCard({
+  profile,
+  small = false,
+}: ProfileCardProps) {
   const avatarUrl = profile?.image || '/placeholder.png';
+  const fullName = profile?.firstname
+    ? `${profile.firstname} ${profile.lastname ?? ''}`.trim()
+    : 'Utente';
+
   return (
     <SpotlightCard className="px-0 py-0">
-      <div className="flex flex-col md:flex-row gap-8 items-center p-8">
+      <div
+        className={`flex p-4 ${
+          small
+            ? 'text-sm flex-row'
+            : 'text-base flex-col items-center md:flex-row gap-4'
+        }`}
+      >
         <div className="flex-shrink-0">
           <Image
             src={avatarUrl}
             alt={profile?.username || 'Avatar'}
-            width={120}
-            height={120}
-            className="rounded-2xl shadow-lg object-cover border border-muted bg-white"
+            width={small ? 120 : 220}
+            height={small ? 120 : 220}
+            className={`rounded-2xl shadow-lg object-cover border border-muted dark:bg-indigo-800/20 bg-indigo-500 ${
+              small ? 'size-24' : ''
+            }`}
             priority
           />
         </div>
-        <div className="flex-1 w-full">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 mb-2 flex items-center gap-2">
-              {profile?.firstname
-                ? `${profile.firstname} ${profile.lastname ?? ''}`
-                : 'Utente'}
+        <div className="flex-1 w-full self-start">
+          <CardHeader className="pb-2 pr-0">
+            <CardTitle
+              className={`py-0
+                ${
+                  small
+                    ? 'text-lg font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex gap-2'
+                    : 'text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex gap-2'
+                }`}
+            >
+              <Link href={`/profile`} className="hover:underline">
+                @{profile?.username ?? 'username'}
+              </Link>
             </CardTitle>
-            <CardDescription className="text-muted-foreground text-lg">
-              @{profile?.username ?? 'username'}
-            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col gap-1">
-              <span className="font-semibold text-gray-700">Email:</span>
-              <span className="text-indigo-700 dark:text-indigo-400">
-                {profile.username}
-              </span>
-            </div>
+          <CardContent className="space-y-4 w-full">
+            {!small && profile.username && (
+              <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700 space-y-2">
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold">Nome:</span>
+                  <span className="text-indigo-700 dark:text-indigo-900">
+                    {fullName}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold">Email:</span>
+                  <span className="text-indigo-700 dark:text-indigo-900">
+                    {profile.username}
+                  </span>
+                </div>
+              </div>
+            )}
+            <StatsShowcase size="xl" />
           </CardContent>
-          <div className="mt-6"></div>
         </div>
       </div>
-      <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
-        <Button variant="secondary">Modifica profilo</Button>
-      </CardFooter>
+      {!small && (
+        <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
+          <Button className="cursor-pointer" variant="secondary">
+            <PencilIcon className="inline mr-2 h-4 w-4" />
+            <Link href="/profile/edit">Modifica profilo</Link>
+          </Button>
+        </CardFooter>
+      )}
     </SpotlightCard>
   );
 }

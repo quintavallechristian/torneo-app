@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { GameStats, PlaceStats } from '@/types';
-import { ExagonalBadge } from '../ui/exagonalBadge';
+import { BadgeVariant } from '../ui/exagonalBadge';
 import {
   Accordion,
   AccordionContent,
@@ -29,12 +29,16 @@ export default function StatsCard({ stats, position, small }: PlaceCardProps) {
                 <div className="text-lg font-bold">Le tue statistiche</div>
               </div>
               <div className="text-lg font-medium text-right flex gap-4">
-                <StatsExagon small={small} stat={stats.points} label="ELO" />
                 <StatsExagon
-                  small={small}
+                  size={small ? 'sm' : 'md'}
+                  stat={stats.points}
+                  label="ELO"
+                />
+                <StatsExagon
+                  size={small ? 'sm' : 'md'}
                   stat={position}
                   label="POS"
-                  variant="amber"
+                  variant={BadgeVariant.amber}
                 />
               </div>
             </div>

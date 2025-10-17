@@ -61,7 +61,7 @@ export function PlaceSearchBar({ onSelect, place }: PlaceSearchBarProps) {
         if (places) {
           setItems(
             places.map((place) => ({
-              value: place.id,
+              value: place.id || '',
               label: place.name,
             })),
           );

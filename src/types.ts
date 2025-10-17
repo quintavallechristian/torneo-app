@@ -71,10 +71,8 @@ export const PlaceSchema = z.object({
 });
 
 export const ProfileSchema = z.object({
-  id: z.string().optional(),
   username: z.string().min(3).max(30),
   image: z.string().url().nullable(),
-  role: z.nativeEnum(ROLE).default(ROLE.User),
   firstname: z.string().min(1).max(50).nullable(),
   lastname: z.string().min(1).max(50).nullable(),
 });
@@ -94,6 +92,8 @@ export type UserPermission = {
 
 // extract the inferred type
 export type Profile = z.infer<typeof ProfileSchema> & {
+  id: string;
+  role: ROLE;
   matches?: Match[];
 };
 

@@ -9,7 +9,6 @@ interface PlaceEditPageProps {
   params: Promise<{ id: string }>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function EditPlace({ params }: PlaceEditPageProps) {
   const { id } = await params;
   const supabase = await createClient();

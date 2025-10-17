@@ -7,7 +7,7 @@ import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex items-center justify-center">
       <SpotlightCard>
         <div className="mb-6 flex items-center justify-between">
           <Button className="" variant="ghost" size="sm">

@@ -85,7 +85,9 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
       </div>
       <div
         className={`flex px-4 pb-6 ${
-          small ? 'text-sm flex-row' : 'text-base flex-col md:flex-row gap-4'
+          small
+            ? 'text-sm flex-row'
+            : 'text-base flex-col md:flex-row gap-4 items-center'
         }`}
       >
         {/* Immagine del gioco se disponibile */}
@@ -153,16 +155,18 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                               {player.profile?.id === match.winner?.id && (
                                 <div className="size-20 -right-6 -top-6 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
                               )}
-                              <Avatar>
+                              <Avatar
+                                className={` ${
+                                  player.profile?.id === profile?.id
+                                    ? 'border-emerald-500'
+                                    : ''
+                                }`}
+                              >
                                 {player.profile?.image ? (
                                   <AvatarImage src={player.profile.image} />
                                 ) : (
                                   <AvatarFallback
-                                    className={`uppercase border-1 text-white bg-indigo-800 ${
-                                      player.profile?.id === profile?.id
-                                        ? 'border-emerald-500'
-                                        : ''
-                                    }`}
+                                    className={`uppercase border-1 text-white bg-indigo-800`}
                                   >
                                     {player.profile?.username.charAt(0)}
                                   </AvatarFallback>

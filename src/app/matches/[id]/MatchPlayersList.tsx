@@ -9,7 +9,6 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty';
 import {
-  Badge,
   Check,
   DicesIcon,
   LockIcon,
@@ -30,7 +29,7 @@ import {
 } from '@/lib/server/match';
 import ProfileListItem from '@/components/ProfileListItem/ProfileListItem';
 import { setWinner } from '@/lib/server/match';
-import { BadgeVariant, ExagonalBadge } from '@/components/ui/exagonalBadge';
+import { BadgeVariant } from '@/components/ui/exagonalBadge';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -200,7 +199,7 @@ export default function MatchPlayersList({
                   >
                     <StatsExagon
                       className="cursor-pointer hover:scale-110"
-                      medium
+                      size="lg"
                       stat={<TrophyIcon className="size-5" strokeWidth={1} />}
                       variant={
                         playerObj.profile?.id === match.winner?.id
@@ -217,7 +216,7 @@ export default function MatchPlayersList({
                 !adminControlToggled ? (
                   match.game && match.place && canUpdateMatchStats ? (
                     <PointsPopover
-                      placeId={match.place.id}
+                      placeId={match.place.id || ''}
                       match={match}
                       playerId={playerObj.profile!.id!}
                       startingPoints={playerObj.points || 0}
@@ -260,24 +259,22 @@ export default function MatchPlayersList({
                 !adminControlToggled && (
                   <div className="flex gap-2">
                     <StatsExagon
-                      small
+                      size="md"
                       stat={
                         profileGames.find(
                           ({ profile_id }) =>
                             profile_id === playerObj.profile!.id!,
                         )?.points || 0
                       }
-                      label="Punti"
                     />
                     <StatsExagon
-                      small
+                      size="md"
                       stat={
                         profilePlaces.find(
                           ({ profile_id }) =>
                             profile_id === playerObj.profile!.id!,
                         )?.points || 0
                       }
-                      label="Punti"
                       variant={BadgeVariant.blue}
                     />
                   </div>

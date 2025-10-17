@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import Navbar from '@/components/Navbar/Navbar';
 import { Toaster } from 'sonner';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { MyAurora } from '@/components/Aurora/MyAurora';
 
 export const metadata: Metadata = {
   title: 'PartitApp',
@@ -25,6 +26,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
+          <div className="h-full w-full fixed top-0 left-0 -z-10 opacity-20">
+            <MyAurora />
+          </div>
           {children}
           <SpeedInsights />
           <Toaster />

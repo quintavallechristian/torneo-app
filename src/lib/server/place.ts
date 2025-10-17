@@ -48,9 +48,10 @@ export async function setFavouritePlace({
   revalidatePath(`/places`);
 }
 
-export async function createPlace(
-  formData: FormData,
-): Promise<{ form: Place | null; errors: any }> {
+export async function createPlace(formData: FormData): Promise<{
+  form: Place | null;
+  errors: { general?: string[]; image?: string[] } | null;
+}> {
   const { user, role } = await getAuthenticatedUserWithProfile();
   if (!user || role !== ROLE.PlaceManager) {
     return {
@@ -132,10 +133,14 @@ export async function createPlace(
 
   redirect('/places');
 }
+
 export async function editPlace(
   formData: FormData,
   placeId?: string,
-): Promise<{ form: Place | null; errors: any }> {
+): Promise<{
+  form: Place | null;
+  errors: { general?: string[]; image?: string[] } | null;
+}> {
   const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
     placeId,
   }));

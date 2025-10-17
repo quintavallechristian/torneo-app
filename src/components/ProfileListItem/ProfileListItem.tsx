@@ -4,7 +4,6 @@ import React from 'react';
 import { Player, Profile } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import StatsExagon from '../StatsExagon/StatsExagon';
-import { Badge } from 'lucide-react';
 import { BadgeVariant } from '../ui/exagonalBadge';
 interface ProfileListItemProps {
   profile: Profile | null;
@@ -33,7 +32,7 @@ export default function ProfileListItem({
 }: ProfileListItemProps) {
   const defaultIntro = (
     <StatsExagon
-      medium
+      size="md"
       variant={
         index === 1
           ? BadgeVariant.gold
@@ -56,14 +55,7 @@ export default function ProfileListItem({
 
   const defaultDescriptionArea = null;
 
-  const defaultStatsArea = (
-    <StatsExagon
-      medium
-      stat={player.points || 0}
-      label="ELO"
-      className={`${relevant ? 'opacity-100' : 'opacity-50'}`}
-    />
-  );
+  const defaultStatsArea = null;
 
   const defaultAdminActions = null;
 
@@ -98,14 +90,16 @@ export default function ProfileListItem({
       </div>
       {/* --- AVATAR --- */}
       <div>
-        <Avatar className="size-10">
+        <Avatar
+          className={`size-10 ${
+            player.profile?.id === profile?.id ? 'border-emerald-500' : ''
+          }`}
+        >
           {player.profile?.image ? (
             <AvatarImage src={player.profile.image} />
           ) : (
             <AvatarFallback
-              className={`uppercase border-2 text-white bg-indigo-800 ${
-                player.profile?.id === profile?.id ? 'border-emerald-500' : ''
-              }`}
+              className={`uppercase border-2 text-white bg-indigo-800`}
             >
               {player.profile?.username.charAt(0)}
             </AvatarFallback>

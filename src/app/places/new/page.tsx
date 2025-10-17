@@ -1,7 +1,6 @@
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import ClientPlaceForm from '../ClientPlaceForm';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function NewPlace() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 py-8">

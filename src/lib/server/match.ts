@@ -468,7 +468,10 @@ export async function createMatch(
   minAllowedPlayers: number,
   maxAllowedPlayers: number,
   placeId?: string,
-): Promise<{ form: Match | null; errors: any }> {
+): Promise<{
+  form: Match | null;
+  errors: { general?: string[] } | Record<string, string[]> | null;
+}> {
   const name = formData.get('name') as string;
   const game_id = formData.get('game') as string;
   const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
@@ -530,7 +533,10 @@ export async function editMatch(
   minAllowedPlayers: number,
   maxAllowedPlayers: number,
   placeId?: string,
-): Promise<{ form: Match | null; errors: any }> {
+): Promise<{
+  form: Match | null;
+  errors: { general?: string[] } | Record<string, string[]> | null;
+}> {
   const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
     placeId,
   }));
