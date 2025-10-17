@@ -20,7 +20,9 @@ export default function EmptyArea({
 }) {
   return (
     <Empty
-      className={`mx-auto w-full px-0 ${className ? className : 'max-w-2xl'}`}
+      className={`mx-auto w-full px-0 rounded-2xl ${
+        className ? className : 'max-w-2xl'
+      }`}
     >
       <EmptyHeader className="max-w-2xl">
         <EmptyMedia variant="icon">
