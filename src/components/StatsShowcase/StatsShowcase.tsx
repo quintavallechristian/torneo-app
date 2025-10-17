@@ -38,7 +38,7 @@ export default async function StatsShowcase({
   const totalWins =
     allProfileGames?.reduce((sum, game) => sum + (game.win || 0), 0) || 0;
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 justify-items-center">
+    <div className="grid grid-cols-3 md:grid-cols-5 gap-4 justify-items-center">
       <StatsExagon
         hideLabel={hideLabels}
         size={size}

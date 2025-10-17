@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
+import MyAvatar from '@/components/MyAvatar/MyAvatar';
 
 export default async function HomePage() {
   const { profile } = await getAuthenticatedUserWithProfile();
@@ -82,19 +83,26 @@ export default async function HomePage() {
 
   return (
     <div className="max-w-[90%] mx-auto py-10 px-4">
-      <h1 className="text-4xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
-        Benvenuto, {profile.username}!
+      <h1 className="flex gap-4 items-center font-bold mb-8 text-indigo-700 dark:text-indigo-400">
+        <MyAvatar
+          className="size-14 md:size-20 text-xs"
+          isOwn={true}
+          image={profile?.image}
+          placeholder={profile?.username.charAt(0)}
+        />
+        <div className="text-2xl md:text-4xl">
+          Benvenuto, {profile.username}!
+        </div>
       </h1>
 
       {/* Sezione Statistiche */}
       <section className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-300 flex items-center gap-2">
-            <TrophyIcon className="h-6 w-6" />
-            Le mie statistiche
-          </h2>
+        <div className="hidden md:block">
+          <StatsShowcase size="xxl" />
         </div>
-        <StatsShowcase size="xxl" />
+        <div className="block md:hidden">
+          <StatsShowcase size="xl" />
+        </div>
       </section>
 
       {/* Sezione Le Mie Partite */}

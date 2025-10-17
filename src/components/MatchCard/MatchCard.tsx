@@ -16,15 +16,17 @@ import {
   MapPinIcon,
   PencilIcon,
 } from 'lucide-react';
-import Image from 'next/image';
 import { Button } from '../ui/button';
 import DeleteMatchButton from '../DeleteMatchButton/DeleteMatchButton';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { formatMatchStatus, getMatchStatus } from '@/lib/client/match';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
+import MyAvatar from '../MyAvatar/MyAvatar';
+import FlipCard from '../FlipCard/FlipCard';
+
+const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
 interface MatchCardProps {
   match: Match;
@@ -64,21 +66,12 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
               <span className="text-sm text-amber-500 truncate">
                 {match.winner.username}
               </span>
-              <Avatar
-                className={`size-5 ${
-                  match.winner?.id === profile?.id ? 'border-emerald-500' : ''
-                }`}
-              >
-                {match.winner?.image ? (
-                  <AvatarImage src={match.winner.image} />
-                ) : (
-                  <AvatarFallback
-                    className={`uppercase border-1 text-white bg-indigo-800`}
-                  >
-                    {match.winner?.username.charAt(0)}
-                  </AvatarFallback>
-                )}
-              </Avatar>
+              <MyAvatar
+                className="size-5 text-xs"
+                isOwn={match.winner?.id === profile?.id}
+                image={match.winner?.image}
+                placeholder={match.winner?.username.charAt(0)}
+              />
             </div>
           </div>
         ) : (
@@ -107,17 +100,13 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
       >
         {/* Immagine del gioco se disponibile */}
         {match.game?.image && (
-          <div className="flex-shrink-0 space-y-2 mx-auto md:mx-0">
-            <Image
-              src={match.game.image}
-              alt={match.game.name}
-              width={small ? 120 : 220}
-              height={small ? 120 : 220}
-              className={`rounded-2xl shadow-lg object-cover border border-muted ${
-                small ? 'size-32' : ''
-              }`}
-            />
-          </div>
+          <FlipCard
+            imageSrc={match.game.image}
+            imageAlt={match.game.name}
+            qrValue={`${PUBLIC_URL}/matches/${match.id}`}
+            size={small ? 128 : 220}
+            enableFlip={!small}
+          />
         )}
         <div>
           <CardHeader className="">
@@ -171,23 +160,12 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                               {player.profile?.id === match.winner?.id && (
                                 <div className="size-20 -right-6 -top-6 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
                               )}
-                              <Avatar
-                                className={` ${
-                                  player.profile?.id === profile?.id
-                                    ? 'border-emerald-500'
-                                    : ''
-                                }`}
-                              >
-                                {player.profile?.image ? (
-                                  <AvatarImage src={player.profile.image} />
-                                ) : (
-                                  <AvatarFallback
-                                    className={`uppercase border-1 text-white bg-indigo-800`}
-                                  >
-                                    {player.profile?.username.charAt(0)}
-                                  </AvatarFallback>
-                                )}
-                              </Avatar>
+                              <MyAvatar
+                                className="size-8"
+                                isOwn={player.profile?.id === profile?.id}
+                                image={player.profile?.image}
+                                placeholder={player.profile?.username.charAt(0)}
+                              />
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>

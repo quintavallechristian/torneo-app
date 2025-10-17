@@ -4,6 +4,7 @@ import React from 'react';
 import { Place } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import Link from 'next/link';
+import MyAvatar from '../MyAvatar/MyAvatar';
 
 interface PlaceListItemProps {
   place: Place;
@@ -77,17 +78,12 @@ export default function PlaceListItem({
       </div>
       {/* --- AVATAR --- */}
       <div>
-        <Avatar className="size-10 rounded-md">
-          {place?.image ? (
-            <AvatarImage src={place.image} />
-          ) : (
-            <AvatarFallback
-              className={`uppercase border-1 text-white bg-indigo-800 rounded`}
-            >
-              {place?.name.charAt(0)}
-            </AvatarFallback>
-          )}
-        </Avatar>
+        <MyAvatar
+          className="size-10"
+          isOwn={false}
+          image={place?.image}
+          placeholder={place?.name.charAt(0)}
+        />
       </div>
       {/* --- USERNAME --- */}
       <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>

@@ -5,6 +5,7 @@ import { Player, Profile } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import StatsExagon from '../StatsExagon/StatsExagon';
 import { BadgeVariant } from '../ui/exagonalBadge';
+import MyAvatar from '../MyAvatar/MyAvatar';
 interface ProfileListItemProps {
   profile: Profile | null;
   player: Player;
@@ -83,21 +84,12 @@ export default function ProfileListItem({
       </div>
       {/* --- AVATAR --- */}
       <div>
-        <Avatar
-          className={`size-10 ${
-            player.profile?.id === profile?.id ? 'border-emerald-500' : ''
-          }`}
-        >
-          {player.profile?.image ? (
-            <AvatarImage src={player.profile.image} />
-          ) : (
-            <AvatarFallback
-              className={`uppercase border-2 text-white bg-indigo-800`}
-            >
-              {player.profile?.username.charAt(0)}
-            </AvatarFallback>
-          )}
-        </Avatar>
+        <MyAvatar
+          className="size-10"
+          isOwn={player.profile?.id === profile?.id}
+          image={player.profile?.image}
+          placeholder={player.profile?.username.charAt(0)}
+        />
       </div>
       {/* --- USERNAME --- */}
       <div className="grid grid-cols-2 gap-2 items-center">
