@@ -32,7 +32,7 @@ export default function ProfileListItem({
 }: ProfileListItemProps) {
   const defaultIntro = (
     <StatsExagon
-      size="md"
+      size="xs"
       variant={
         index === 1
           ? BadgeVariant.gold
@@ -91,15 +91,13 @@ export default function ProfileListItem({
         />
       </div>
       {/* --- USERNAME --- */}
-      <div className="grid grid-cols-2 gap-2 items-center">
+      <div className="w-40 grid grid-cols-2 gap-2 items-center">
         <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>
           <div className="font-semibold">
             {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}
           </div>
         </div>
-        <div className="text-xs font-regular text-slate-200">
-          {renderSlot(DescriptionSlot, defaultDescriptionArea)}
-        </div>
+        <div>{renderSlot(DescriptionSlot, defaultDescriptionArea)}</div>
       </div>
       <div className="ml-auto flex items-center gap-2">
         {renderSlot(StatsSlot, defaultStatsArea)}

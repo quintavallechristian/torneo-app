@@ -1,16 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
-import {
   Check,
-  DicesIcon,
   LockIcon,
   LockOpen,
   TrophyIcon,
@@ -34,6 +25,7 @@ import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import StatsExagon from '@/components/StatsExagon/StatsExagon';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 interface MatchPlayersListProps {
   profile: Profile | null;
   match: Match;
@@ -199,7 +191,7 @@ export default function MatchPlayersList({
                   >
                     <StatsExagon
                       className="cursor-pointer hover:scale-110"
-                      size="lg"
+                      size="sm"
                       stat={<TrophyIcon className="size-5" strokeWidth={1} />}
                       variant={
                         playerObj.profile?.id === match.winner?.id
@@ -259,7 +251,7 @@ export default function MatchPlayersList({
                 !adminControlToggled && (
                   <div className="flex gap-2">
                     <StatsExagon
-                      size="md"
+                      size="xs"
                       stat={
                         profileGames.find(
                           ({ profile_id }) =>
@@ -268,7 +260,7 @@ export default function MatchPlayersList({
                       }
                     />
                     <StatsExagon
-                      size="md"
+                      size="xs"
                       stat={
                         profilePlaces.find(
                           ({ profile_id }) =>
@@ -284,45 +276,41 @@ export default function MatchPlayersList({
           ))}
         </div>
       ) : (
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <DicesIcon />
-            </EmptyMedia>
-          </EmptyHeader>
-          <EmptyTitle>Nessun giocatore</EmptyTitle>
-          <EmptyDescription>Nessun giocatore presente</EmptyDescription>
-          <EmptyContent>
-            <div className="flex items-center gap-4">
-              {!match.players?.find(
-                (player) => player.profile?.id === profile?.id,
-              ) ? (
-                <form
-                  action={subscribeMatch.bind(null, {
-                    match_id: match.id!,
-                  })}
-                >
-                  <Button variant="outline" type="submit" size="sm">
-                    <UserPlus className="size-4" strokeWidth={1} />
-                  </Button>
-                </form>
-              ) : (
-                <form
-                  action={unsubscribeMatch.bind(null, {
-                    match_id: match.id!,
-                  })}
-                >
-                  <Button variant="outline" type="submit" size="sm">
-                    <UserMinus className="size-4" strokeWidth={1} />
-                  </Button>
-                </form>
-              )}
-              {canManagePlaces && adminControlToggled && (
-                <>{match.id && <AddPlayerModal match={match} />}</>
-              )}
-            </div>
-          </EmptyContent>
-        </Empty>
+        <EmptyArea
+          className="w-full"
+          title="Nessun giocatore"
+          message="Ancora nessun giocatore si è unito a questa partita."
+        >
+          <div className="flex items-center gap-4">
+            {!match.players?.find(
+              (player) => player.profile?.id === profile?.id,
+            ) ? (
+              <form
+                action={subscribeMatch.bind(null, {
+                  match_id: match.id!,
+                })}
+              >
+                <Button variant="outline" type="submit" size="sm">
+                  <UserPlus className="size-4" strokeWidth={1} />
+                  Unisciti ora
+                </Button>
+              </form>
+            ) : (
+              <form
+                action={unsubscribeMatch.bind(null, {
+                  match_id: match.id!,
+                })}
+              >
+                <Button variant="outline" type="submit" size="sm">
+                  <UserMinus className="size-4" strokeWidth={1} />
+                </Button>
+              </form>
+            )}
+            {canManagePlaces && adminControlToggled && (
+              <>{match.id && <AddPlayerModal match={match} />}</>
+            )}
+          </div>
+        </EmptyArea>
       )}
     </section>
   );

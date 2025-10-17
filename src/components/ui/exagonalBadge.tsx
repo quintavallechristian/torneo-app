@@ -45,6 +45,7 @@ const badgeVariants = cva('relative flex items-center justify-center', {
         'bg-indigo-50/5 text-indigo-100 [a&]:hover:bg-indigo-50/10 focus-visible:ring-indigo-500/20 dark:focus-visible:ring-indigo-500/40',
     },
     size: {
+      xs: 'size-4 text-xs',
       sm: 'size-6 text-xs',
       md: 'size-8 text-sm',
       lg: 'size-10 text-base',
@@ -124,9 +125,10 @@ function ExagonalBadge({
       data-slot="badge"
       className={cn(
         'relative inline-flex items-center justify-center bg-transparent',
-        size === 'sm' && 'size-6',
-        size === 'md' && 'size-8',
-        size === 'lg' && 'size-10',
+        size === 'xs' && 'size-8',
+        size === 'sm' && 'size-10',
+        size === 'md' && 'size-12',
+        size === 'lg' && 'size-16',
         size === 'xl' && 'size-20',
         size === 'xxl' && 'size-30',
         className,

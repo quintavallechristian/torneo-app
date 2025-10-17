@@ -1,18 +1,11 @@
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
 import React from 'react';
-import { DicesIcon } from 'lucide-react';
 import { getPlaceRanking } from '@/lib/server/place';
 import ProfileListItem from '../ProfileListItem/ProfileListItem';
 import { getGameRanking } from '@/lib/server/game';
 import { Player } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import StatsExagon from '../StatsExagon/StatsExagon';
+import EmptyArea from '../EmptyArea/EmptyArea';
 
 interface RankingProps {
   placeId?: string;
@@ -23,15 +16,10 @@ export default async function Ranking({ placeId, gameId }: RankingProps) {
   const { profile } = await getAuthenticatedUserWithProfile();
   if (!placeId && !gameId) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <DicesIcon />
-          </EmptyMedia>
-        </EmptyHeader>
-        <EmptyTitle>No data</EmptyTitle>
-        <EmptyDescription>No data found</EmptyDescription>
-      </Empty>
+      <EmptyArea
+        title="Nessuno in classifica"
+        message="Gioca per entrare in classifica"
+      />
     );
   }
   let ranking: Player[] = [];
@@ -45,17 +33,13 @@ export default async function Ranking({ placeId, gameId }: RankingProps) {
   return (
     <>
       {ranking.length === 0 && (
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <DicesIcon />
-            </EmptyMedia>
-          </EmptyHeader>
-          <EmptyTitle>Nessun dato</EmptyTitle>
-          <EmptyDescription>
-            Nessun giocatore ha ancora guadagnato punti in questo locale.
-          </EmptyDescription>
-        </Empty>
+        <EmptyArea
+          className="w-full"
+          title="Nessuno in classifica"
+          message={`Nessun giocatore ha ancora guadagnato punti in questo ${
+            placeId ? 'luogo' : 'gioco'
+          }.`}
+        />
       )}
       {ranking.map((player, index) => (
         <ProfileListItem
@@ -63,7 +47,7 @@ export default async function Ranking({ placeId, gameId }: RankingProps) {
           player={player}
           profile={profile}
           index={index + 1}
-          StatsSlot={<StatsExagon size="lg" stat={player.points || 0} />}
+          StatsSlot={<StatsExagon size="sm" stat={player.points || 0} />}
         />
       ))}
     </>

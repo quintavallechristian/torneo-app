@@ -431,13 +431,19 @@ export async function addPlayer({
   }
 }
 
-export async function subscribeMatch({ match_id }: { match_id: string }) {
+export async function subscribeMatch({
+  match_id,
+  autoApprove,
+}: {
+  match_id: string;
+  autoApprove?: boolean;
+}) {
   const { profile } = await getAuthenticatedUserWithProfile();
   if (!profile) throw new Error('User not authenticated');
   const supabase = await createClient();
   const { error } = await supabase
     .from('profiles_matches')
-    .insert([{ profile_id: profile.id, match_id }]);
+    .insert([{ profile_id: profile.id, match_id, confirmed: !!autoApprove }]);
 
   if (error) {
     console.error('Error creating profiles_matches:', error);

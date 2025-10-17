@@ -14,7 +14,7 @@ import Link from 'next/link';
 import MyAvatar from '../MyAvatar/MyAvatar';
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
 import QRCode from 'react-qr-code';
-import ForbiddenArea from '../ForbiddenArea/ForbiddenArea';
+import EmptyArea from '../EmptyArea/EmptyArea';
 
 const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
@@ -63,7 +63,7 @@ export default function PresentationMode({
     );
   }
 
-  const currentMatch = matches[0];
+  const currentMatch = matches[currentIndex];
   const matchStatus = getMatchStatus(currentMatch);
 
   return (
@@ -111,7 +111,7 @@ export default function PresentationMode({
               ) : (
                 <>
                   <Badge
-                    className={`md:block px-2 py-1 rounded-full${
+                    className={`md:block px-2 py-1 rounded-full ${
                       formatMatchStatus(matchStatus).color
                     } `}
                   >
@@ -163,7 +163,7 @@ export default function PresentationMode({
                       : 'Descrizione non disponibile'}
                   </div>
                   <QRCode
-                    value={`${PUBLIC_URL}/matches/${currentMatch.id}`}
+                    value={`${PUBLIC_URL}/matches/join/${currentMatch.id}`}
                     size={150}
                   />
                 </CardContent>
@@ -190,7 +190,7 @@ export default function PresentationMode({
               ))}
             </SpotlightCard>
           ) : (
-            <ForbiddenArea
+            <EmptyArea
               title="Nessun giocatore presente"
               message="Scansiona il codice QR per iscriverti al match"
             />

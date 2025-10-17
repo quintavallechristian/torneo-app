@@ -3,7 +3,7 @@ import ClientPlaceForm from '../../ClientPlaceForm';
 import { createClient } from '@/utils/supabase/server';
 import { Place, UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
-import ForbiddenArea from '@/components/ForbiddenArea/ForbiddenArea';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 
 interface PlaceEditPageProps {
   params: Promise<{ id: string }>;
@@ -28,7 +28,7 @@ export default async function EditPlace({ params }: PlaceEditPageProps) {
   if (!canManagePlaces) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <ForbiddenArea />
+        <EmptyArea />
       </div>
     );
   }

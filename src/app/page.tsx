@@ -85,7 +85,7 @@ export default async function HomePage() {
     <div className="max-w-[90%] mx-auto py-10 px-4">
       <h1 className="flex gap-4 items-center font-bold mb-8 text-indigo-700 dark:text-indigo-400">
         <MyAvatar
-          className="size-14 md:size-20 text-xs"
+          className="size-14 md:size-20 text-3xl"
           isOwn={true}
           image={profile?.image}
           placeholder={profile?.username.charAt(0)}

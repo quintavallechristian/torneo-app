@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import MatchCard from '@/components/MatchCard/MatchCard';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import ForbiddenArea from '@/components/ForbiddenArea/ForbiddenArea';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 
 export default async function matchesPage() {
   const supabase = await createClient();
@@ -42,7 +42,7 @@ export default async function matchesPage() {
           ))}
         </div>
       ) : (
-        <ForbiddenArea
+        <EmptyArea
           title="Nessuna partita"
           message="Non hai ancora giocato partite."
         />
@@ -50,7 +50,7 @@ export default async function matchesPage() {
     </div>
   ) : (
     <div className="min-h-screen flex items-center justify-center">
-      <ForbiddenArea />
+      <EmptyArea />
     </div>
   );
 }

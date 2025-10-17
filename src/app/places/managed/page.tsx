@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { Place, ROLE, UserAction } from '@/types';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
-import ForbiddenArea from '@/components/ForbiddenArea/ForbiddenArea';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -47,10 +47,7 @@ export default async function PlacesPage() {
           ))}
         </div>
       ) : (
-        <ForbiddenArea
-          title="Nessun luogo"
-          message="Non gestisci nessun luogo."
-        />
+        <EmptyArea title="Nessun luogo" message="Non gestisci nessun luogo." />
       )}
       {role === ROLE.PlaceManager && (
         <div className="flex justify-center">
@@ -62,7 +59,7 @@ export default async function PlacesPage() {
     </div>
   ) : (
     <div className="min-h-screen flex items-center justify-center">
-      <ForbiddenArea />
+      <EmptyArea />
     </div>
   );
 }

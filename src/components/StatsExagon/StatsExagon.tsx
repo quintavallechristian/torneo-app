@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { BadgeVariant, ExagonalBadge } from '../ui/exagonalBadge';
 
-export type StatsExagonSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+export type StatsExagonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 
 interface StatsExagonProps {
   size?: StatsExagonSize;
@@ -21,8 +21,13 @@ const sizeConfig: Record<
     label_text: string;
   }
 > = {
-  sm: {
+  xs: {
     stats_text: 'text-[10px]',
+    showLabel: false,
+    label_text: 'text-[10px]',
+  },
+  sm: {
+    stats_text: 'text-[12px]',
     showLabel: false,
     label_text: 'text-[10px]',
   },

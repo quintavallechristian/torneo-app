@@ -5,7 +5,7 @@ import ClientMatchForm from '../../ClientMatchForm';
 import { createClient } from '@/utils/supabase/server';
 import { Match, UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
-import ForbiddenArea from '@/components/ForbiddenArea/ForbiddenArea';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 
 interface MatchEditPageProps {
   params: Promise<{ id: string }>;
@@ -32,7 +32,7 @@ export default async function MatchEditPage({ params }: MatchEditPageProps) {
   if (!canManagePlaces) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <ForbiddenArea />
+        <EmptyArea />
       </div>
     );
   }

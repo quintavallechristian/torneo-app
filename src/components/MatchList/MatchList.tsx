@@ -1,19 +1,11 @@
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
 import { Match } from '@/types';
 import React from 'react';
 import MatchCard from '../MatchCard/MatchCard';
-import { DicesIcon, PlusIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
+import EmptyArea from '../EmptyArea/EmptyArea';
 
 interface MatchListProps {
   matches: Match[] | undefined;
@@ -50,30 +42,25 @@ export default async function MatchList({
           </div>
         </div>
       ) : (
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <DicesIcon />
-            </EmptyMedia>
-          </EmptyHeader>
-          <EmptyTitle>Nessuna partita</EmptyTitle>
-          <EmptyDescription>Nessuna partita giocata</EmptyDescription>
-          <EmptyContent>
-            <div className="flex items-center gap-4">
-              {canManagePlaces && (
-                <Link
-                  href={`/matches/new?place_id=${
-                    placeId ? placeId : ''
-                  }&game_id=${gameId ? gameId : ''}`}
-                >
-                  <Button variant="outline" size="sm" data-testid="Add match">
-                    <PlusIcon className="inline h-6 w-6" />
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </EmptyContent>
-        </Empty>
+        <EmptyArea
+          title="Nessuna partita"
+          message="Nessuna partita giocata"
+          className="w-full"
+        >
+          <div className="flex items-center gap-4">
+            {canManagePlaces && (
+              <Link
+                href={`/matches/new?place_id=${
+                  placeId ? placeId : ''
+                }&game_id=${gameId ? gameId : ''}`}
+              >
+                <Button variant="outline" size="sm" data-testid="Add match">
+                  <PlusIcon className="inline h-6 w-6" />
+                </Button>
+              </Link>
+            )}
+          </div>
+        </EmptyArea>
       )}
     </>
   );

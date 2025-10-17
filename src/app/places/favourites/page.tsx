@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { Place } from '@/types';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
-import ForbiddenArea from '@/components/ForbiddenArea/ForbiddenArea';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 
 export default async function PlacesPage() {
   const supabase = await createClient();
@@ -48,7 +48,7 @@ export default async function PlacesPage() {
           ))}
         </div>
       ) : (
-        <ForbiddenArea
+        <EmptyArea
           title="Nessun luogo"
           message="Non hai ancora aggiunto luoghi ai preferiti."
         />
@@ -56,7 +56,7 @@ export default async function PlacesPage() {
     </div>
   ) : (
     <div className="min-h-screen flex items-center justify-center">
-      <ForbiddenArea />
+      <EmptyArea />
     </div>
   );
 }
