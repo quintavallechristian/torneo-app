@@ -2,12 +2,11 @@
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { Player, Profile } from '@/types';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import StatsExagon from '../StatsExagon/StatsExagon';
 import { BadgeVariant } from '../ui/exagonalBadge';
 import MyAvatar from '../MyAvatar/MyAvatar';
 interface ProfileListItemProps {
-  profile: Profile | null;
+  profile?: Profile | null;
   player: Player;
   relevant?: boolean;
   isWinner?: boolean;

@@ -129,10 +129,19 @@ export default async function PlaceCard({
       )}
       {!small && canManagePlaces && (
         <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
-          <Button className="cursor-pointer" variant="secondary">
-            <PencilIcon className="inline mr-2 h-4 w-4" />
-            <Link href={`/places/${place.id}/edit`}>Modifica</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button className="cursor-pointer" variant="secondary" asChild>
+              <Link href={`/places/${place.id}/edit`}>
+                <PencilIcon className="inline mr-2 h-4 w-4" />
+                Modifica
+              </Link>
+            </Button>
+            <Button className="cursor-pointer" variant="default" asChild>
+              <Link href={`/places/${place.id}/presentation`}>
+                🎬 Modalità Presentazione
+              </Link>
+            </Button>
+          </div>
           {place.id && <DeleteMatchButton id={place.id} />}
         </CardFooter>
       )}

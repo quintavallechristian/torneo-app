@@ -30,7 +30,7 @@ const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
 interface MatchCardProps {
   match: Match;
-  small: boolean;
+  small?: boolean;
 }
 
 export default async function MatchCard({ match, small }: MatchCardProps) {

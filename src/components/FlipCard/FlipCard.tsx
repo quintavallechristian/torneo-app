@@ -8,7 +8,7 @@ import { QrCode } from 'lucide-react';
 interface FlipCardProps {
   imageSrc: string;
   imageAlt: string;
-  qrValue: string;
+  qrValue?: string;
   size: number;
   enableFlip?: boolean;
 }
@@ -66,16 +66,23 @@ export default function FlipCard({
         </div>
 
         {/* Retro - QR Code */}
-        <div
-          className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-muted p-4"
-          style={{
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-          }}
-        >
-          <QRCode value={qrValue} size={size - 32} className="w-full h-full" />
-        </div>
+
+        {qrValue && (
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-muted p-4"
+            style={{
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+            }}
+          >
+            <QRCode
+              value={qrValue}
+              size={size - 32}
+              className="w-full h-full"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

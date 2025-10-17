@@ -125,6 +125,7 @@ export type Place = z.infer<typeof PlaceSchema> & {
 };
 export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;
+  status?: MATCHSTATUS;
   game?: Game;
   place?: Place;
   players?: Player[];
