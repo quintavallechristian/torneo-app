@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
 import EmptyArea from '../EmptyArea/EmptyArea';
+import { PlusIcon } from 'lucide-react';
 
 interface MatchListProps {
   matches: Match[] | undefined;
