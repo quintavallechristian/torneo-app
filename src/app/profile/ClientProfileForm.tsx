@@ -15,18 +15,9 @@ export default function ClientProfileForm({ profile }: { profile: Profile }) {
   const [isLoading, setIsLoading] = useState(false);
 
   async function action(formData: FormData) {
-    console.log('cioa');
-
-    // Aggiungi il file immagine al FormData se presente
     if (selectedImage) {
       formData.set('image', selectedImage);
     }
-
-    const firstname = formData.get('firstname') as string;
-    const lastname = formData.get('lastname') as string;
-    const username = formData.get('username') as string;
-    console.log(username, firstname, lastname);
-
     let res;
     if (profile && profile.id) {
       res = await editProfile(formData, profile.id);

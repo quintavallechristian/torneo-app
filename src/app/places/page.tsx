@@ -1,29 +1,22 @@
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/server';
 import { Button } from '@/components/ui/button';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { Place, ROLE } from '@/types';
 import { UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
+import { getPlaces } from '@/lib/server/place';
 
 export default async function PlacesPage() {
-  const supabase = await createClient();
   const { profile, role } = await getAuthenticatedUserWithProfile();
   let placeData: Place[] = [];
   if (!profile) {
-    const { data } = await supabase.from('places').select('*').limit(10);
-    placeData = data ?? [];
+    placeData = (await getPlaces(true)).data ?? [];
   } else {
-    const { data } = await supabase
-      .from('places')
-      .select(
-        '*, placeStats:profiles_places(profile_id, favourite), matches(*)',
-      )
-      .eq('placeStats.profile_id', profile.id)
-      .limit(100);
-    placeData = data?.sort((a, b) => b.matches.length - a.matches.length) || [];
+    placeData = (await getPlaces(true, true)).data ?? [];
   }
+  placeData =
+    placeData?.sort((a, b) => b.matches!.length - a.matches!.length) || [];
 
   const canUpdatePlacesMap: Record<string, boolean> = {};
   if (profile) {

@@ -75,8 +75,6 @@ export async function updateGameElo(
         1 / (1 + Math.pow(10, (B.currentElo - A.currentElo) / 400));
       const expectedB = 1 - expectedA;
 
-      console.log('Expected', expectedA, expectedB);
-
       // punteggi reali in base al position
       let scoreA = 0.5;
       let scoreB = 0.5;

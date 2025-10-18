@@ -37,7 +37,6 @@ export async function editProfile(
   const lastname = formData.get('lastname') as string;
   const username = formData.get('username') as string;
   const imageFile = formData.get('image') as File | null;
-  console.log(username, firstname, lastname);
 
   // Gestione dell'immagine
   let imageUrl: string | null = existingProfile?.image ?? null;

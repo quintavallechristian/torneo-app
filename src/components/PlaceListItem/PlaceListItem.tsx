@@ -2,7 +2,6 @@
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { Place } from '@/types';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import Link from 'next/link';
 import MyAvatar from '../MyAvatar/MyAvatar';
 

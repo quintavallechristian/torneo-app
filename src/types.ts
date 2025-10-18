@@ -165,3 +165,8 @@ export type PlaceStats = PlayerStats & {
   place_id: string;
   favourite: boolean;
 };
+
+export type PlaceGame = {
+  place_id: string;
+  game: Pick<Game, 'id' | 'name' | 'min_players' | 'max_players'>[];
+};

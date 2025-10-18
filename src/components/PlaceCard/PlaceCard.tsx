@@ -136,11 +136,13 @@ export default async function PlaceCard({
                 Modifica
               </Link>
             </Button>
-            <Button className="cursor-pointer" variant="default" asChild>
-              <Link href={`/places/${place.id}/presentation`}>
-                🎬 Modalità Presentazione
-              </Link>
-            </Button>
+            {(place.matches || []).length > 0 && (
+              <Button className="cursor-pointer" variant="default" asChild>
+                <Link href={`/places/${place.id}/presentation`}>
+                  Modalità Presentazione
+                </Link>
+              </Button>
+            )}
           </div>
           {place.id && <DeleteMatchButton id={place.id} />}
         </CardFooter>

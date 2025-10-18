@@ -7,7 +7,6 @@ import PlaceCard from '@/components/PlaceCard/PlaceCard';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { Game, GameStats, Match, Place, PlaceStats } from '@/types';
 import {
-  TrophyIcon,
   CalendarIcon,
   StarIcon,
   MapPinIcon,

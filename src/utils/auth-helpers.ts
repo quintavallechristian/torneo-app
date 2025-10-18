@@ -129,6 +129,12 @@ export async function getPlaceStatsPerProfile(
   profileId: string,
   placeId: number,
 ): Promise<PlaceStats> {
+  console.log(
+    'Getting place stats for profile:',
+    profileId,
+    'and place:',
+    placeId,
+  );
   const supabase = await createClient();
   let { data: placeStats } = await supabase
     .from('profiles_places')

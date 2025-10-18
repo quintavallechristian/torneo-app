@@ -1,12 +1,12 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
-import { MATCHSTATUS, Place } from '@/types';
+import { MATCHSTATUS } from '@/types';
 import { canUser } from '@/lib/permissions';
 import { UserAction } from '@/types';
 import { redirect } from 'next/navigation';
 import PresentationMode from '@/components/PresentationMode/PresentationMode';
 import { getMatchStatus } from '@/lib/client/match';
+import { getPlaceDetails } from '@/lib/server/place';
 
 interface PresentationPageProps {
   params: Promise<{ id: string }>;
@@ -26,26 +26,9 @@ export default async function PresentationPage({
     redirect(`/places/${id}`);
   }
 
-  const supabase = await createClient();
-
-  // Recupera il place con i match attivi
-  const { data: place, error } = await supabase
-    .from('places')
-    .select(
-      `*, 
-      matches:matches(
-        *,
-        players:profiles_matches(
-          *,
-          profile:profiles(*)
-        ),
-        game:games(name, image, id), 
-        place:places(name, id), 
-        winner:profiles(id, username)
-      )`,
-    )
-    .eq('id', id)
-    .single<Place>();
+  const result = await getPlaceDetails('id', id, true);
+  const place = result.data;
+  const error = result.error;
 
   if (error || !place) {
     redirect(`/places/${id}`);

@@ -1,9 +1,9 @@
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import ClientPlaceForm from '../../ClientPlaceForm';
-import { createClient } from '@/utils/supabase/server';
-import { Place, UserAction } from '@/types';
+import { UserAction } from '@/types';
 import { canUser } from '@/lib/permissions';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
+import { getPlaceDetails } from '@/lib/server/place';
 
 interface PlaceEditPageProps {
   params: Promise<{ id: string }>;
@@ -11,12 +11,9 @@ interface PlaceEditPageProps {
 
 export default async function EditPlace({ params }: PlaceEditPageProps) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: place, error } = await supabase
-    .from('places')
-    .select('*')
-    .eq('id', id)
-    .single<Place>();
+  const result = await getPlaceDetails('id', id, true, true);
+  const place = result.data;
+  const error = result.error;
 
   if (error) {
     console.error('Errore nel recupero del partita:', error);

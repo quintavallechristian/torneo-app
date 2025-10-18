@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/popover';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-import { Game } from '@/types';
+import { Game, PlaceGame } from '@/types';
 
 export type SearchBarItem = {
   value: string;
@@ -31,11 +31,18 @@ export type SearchBarItem = {
 };
 
 type GameSearchPopoverProps = {
-  game: SearchBarItem | null;
+  placeId?: string | null;
+  game?: SearchBarItem | null;
   onSelect?: (game: SearchBarItem | null) => void;
+  disabled?: boolean;
 };
 
-export function GameSearchPopover({ onSelect, game }: GameSearchPopoverProps) {
+export function GameSearchPopover({
+  onSelect,
+  placeId,
+  game,
+  disabled = false,
+}: GameSearchPopoverProps) {
   const [open, setOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState(game);
   const [items, setItems] = useState<SearchBarItem[]>([]);
@@ -49,17 +56,17 @@ export function GameSearchPopover({ onSelect, game }: GameSearchPopoverProps) {
       }
       let active = true;
       async function fetchItems() {
-        const { data, error } = await supabase
-          .from('games')
-          .select('id, name, max_players, min_players')
-          .ilike('name', `%${search}%`);
-        if (!active) return;
-        if (error) {
-          console.error('Errore fetch items:', error);
-          setItems([]);
-          return;
-        }
-        if (data) {
+        if (!placeId) {
+          const { data, error } = await supabase
+            .from('games')
+            .select('id, name, max_players, min_players')
+            .ilike('name', `%${search}%`)
+            .order('bgg_rank', { ascending: true });
+          if (error || !data) {
+            console.error('Errore fetch items:', error);
+            setItems([]);
+            return;
+          }
           setItems(
             data.map(
               (
@@ -72,6 +79,54 @@ export function GameSearchPopover({ onSelect, game }: GameSearchPopoverProps) {
               }),
             ),
           );
+        } else {
+          const { data, error } = await supabase
+            .from('places_games')
+            .select('place_id, game:games(id, name, max_players, min_players)')
+            .eq('place_id', placeId)
+            .ilike('game.name', `%${search}%`);
+          if (!active) return;
+          if (error) {
+            console.error('Errore fetch items:', error);
+            setItems([]);
+            return;
+          }
+          const placeGame = data as PlaceGame[] | null;
+          if (placeGame) {
+            // Estrai i giochi unici dalla relazione places_games
+            const uniqueGames = new Map<
+              string,
+              Pick<Game, 'id' | 'name' | 'max_players' | 'min_players'>
+            >();
+
+            placeGame.forEach((pg: PlaceGame) => {
+              if (pg.game) {
+                // games potrebbe essere un array o un singolo oggetto
+                const games = Array.isArray(pg.game) ? pg.game : [pg.game];
+                games.forEach(
+                  (
+                    game: Pick<
+                      Game,
+                      'id' | 'name' | 'max_players' | 'min_players'
+                    >,
+                  ) => {
+                    if (game) {
+                      uniqueGames.set(game.id, game);
+                    }
+                  },
+                );
+              }
+            });
+
+            setItems(
+              Array.from(uniqueGames.values()).map((game) => ({
+                value: game.id,
+                label: game.name,
+                max_players: game.max_players,
+                min_players: game.min_players,
+              })),
+            );
+          }
         }
       }
       fetchItems();
@@ -80,7 +135,7 @@ export function GameSearchPopover({ onSelect, game }: GameSearchPopoverProps) {
       };
     }, 400);
     return () => clearTimeout(handler);
-  }, [search]);
+  }, [search, placeId]);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -89,6 +144,7 @@ export function GameSearchPopover({ onSelect, game }: GameSearchPopoverProps) {
           role="combobox"
           aria-expanded={open}
           className="justify-between w-full"
+          disabled={disabled}
         >
           {selectedGame ? selectedGame.label : 'Seleziona gioco...'}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -100,6 +156,7 @@ export function GameSearchPopover({ onSelect, game }: GameSearchPopoverProps) {
             placeholder="Cerca gioco..."
             value={search}
             onValueChange={setSearch}
+            disabled={disabled}
           />
           <CommandList>
             {items.length === 0 ? (

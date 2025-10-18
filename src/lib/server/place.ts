@@ -8,6 +8,119 @@ import { uploadImage, replaceImage } from './storage';
 
 import * as z from 'zod';
 import { redirect } from 'next/navigation';
+import { PostgrestError } from '@supabase/supabase-js';
+
+export async function getPlaces(
+  withMatches: boolean = false,
+  withProfileStats: boolean = false,
+  withCollection: boolean = false,
+  limit: number = 100,
+): Promise<{ data: Place[] | null; error: PostgrestError | null }> {
+  const supabase = await createClient();
+
+  const selectFields = [
+    'id',
+    'name',
+    'address',
+    'description',
+    'image',
+
+    ...(withMatches
+      ? [
+          `
+          matches:matches(
+            *,
+            players:profiles_matches(
+              *,
+              profile:profiles(*)
+            ),
+            game:games(id, name, image),
+            place:places(id, name),
+            winner:profiles(id, username)
+          )
+          `,
+        ]
+      : []),
+
+    ...(withProfileStats
+      ? ['placeStats:profiles_places(profile_id, favourite)']
+      : []),
+    ...(withCollection ? ['places_games(id)'] : []),
+  ].join(', ');
+
+  // Creazione query
+  const query = supabase.from('places').select(selectFields).limit(limit);
+
+  // Esecuzione query
+  const { data, error } = await query;
+  const placeData = data as Place[] | null;
+
+  if (error) {
+    console.error('Errore nel recupero dei luoghi:', error);
+    return { data: null, error };
+  }
+
+  return { data: placeData, error: null };
+}
+
+export async function getPlaceDetails(
+  searchBy: 'id' | 'name',
+  placeId: string,
+  withMatches: boolean = false,
+  withProfileStats: boolean = false,
+  withCollection: boolean = false,
+): Promise<{ data: Place | null; error: Error | null }> {
+  const supabase = await createClient();
+
+  const selectFields = [
+    'id',
+    'name',
+    'address',
+    'description',
+    'image',
+    ...(withMatches
+      ? [
+          `matches:matches(
+          *,
+          players:profiles_matches(
+            *,
+            profile:profiles(*)
+          ),
+          game:games(name, image, id), 
+          place:places(name, id), 
+          winner:profiles(id, username)
+        )`,
+        ]
+      : []),
+    ...(withProfileStats
+      ? ['placeStats:profiles_places(profile_id, favourite)']
+      : []),
+    ...(withCollection ? ['places_games(id, games(name, image, id))'] : []),
+  ].join(', ');
+
+  let query = supabase
+    .from('places')
+    .select(selectFields)
+    .eq(searchBy, placeId);
+
+  if (withProfileStats) {
+    const { profile } = await getAuthenticatedUserWithProfile();
+    if (!profile) {
+      return { data: null, error: new Error('Utente non autenticato') };
+    }
+    query = query.eq('placeStats.profile_id', profile.id);
+  }
+
+  // Esegui la query
+  const { data, error } = await query.single<Place>();
+
+  if (error) {
+    console.error('Errore nel recupero del luogo:', error);
+    return { data: null, error: error };
+  }
+
+  return { data, error: null };
+}
 
 export async function getPlaceRanking(placeId?: string) {
   const supabase = await createClient();
@@ -220,4 +333,39 @@ export async function editPlace(
   } else {
     redirect(`/places/${placeId}`);
   }
+}
+
+export async function addGameToCollection({
+  placeId,
+  gameId,
+}: {
+  placeId: string;
+  gameId: string;
+}): Promise<{ success: boolean; message: string }> {
+  const canManagePlaces = !!(await canUser(UserAction.ManagePlaces, {
+    placeId,
+  }));
+  if (!canManagePlaces) {
+    return {
+      success: false,
+      message:
+        'Non hai i permessi per modificare la collezione di questo luogo',
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase.from('places_games').insert([
+    {
+      place_id: placeId,
+      game_id: gameId,
+    },
+  ]);
+
+  if (error) {
+    console.error('Error adding game to collection:', error);
+    return { success: false, message: "Errore durante l'aggiunta del gioco" };
+  }
+
+  return { success: true, message: 'Gioco aggiunto con successo' };
 }

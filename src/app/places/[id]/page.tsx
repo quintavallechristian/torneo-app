@@ -2,7 +2,6 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/server';
 import { Place, PlaceStats } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
@@ -13,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MatchList from '@/components/MatchList/MatchList';
 import Ranking from '@/components/Ranking/Ranking';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
+import { getPlaceDetails } from '@/lib/server/place';
+import GameList from '@/components/GameList/GameList';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -47,36 +48,14 @@ export default async function PlaceDetailsPage({
     positionInPlace = getPositionInPlace(profile.id, gameRanking);
   }
 
-  const supabase = await createClient();
-
-  let place, error;
+  let place: Place | null;
+  let error;
   if (!isNaN(Number(id))) {
-    const result = await supabase
-      .from('places')
-      .select(
-        `*, 
-        matches:matches(
-          *,
-          players:profiles_matches(
-            *,
-            profile:profiles(*)
-          ),
-          game:games(name, image, id), 
-          place:places(name, id), 
-          winner:profiles(id, username)),
-          placeStats:profiles_places(profile_id, favourite)`,
-      )
-      .eq('id', id)
-      .eq('profiles_places.profile_id', profile?.id)
-      .single<Place>();
+    const result = await getPlaceDetails('id', id, true, true, true);
     place = result.data;
     error = result.error;
   } else {
-    const result = await supabase
-      .from('places')
-      .select('*')
-      .eq('name', id)
-      .single<Place>();
+    const result = await getPlaceDetails('name', id, true, true, true);
     place = result.data;
     error = result.error;
   }
@@ -111,12 +90,16 @@ export default async function PlaceDetailsPage({
           <TabsList>
             <TabsTrigger value="matches">Partite collegate</TabsTrigger>
             <TabsTrigger value="ranking">Classifica</TabsTrigger>
+            <TabsTrigger value="collection">Collezione</TabsTrigger>
           </TabsList>
           <TabsContent value="matches" className="w-full">
             <MatchList matches={place.matches} placeId={place.id} />
           </TabsContent>
           <TabsContent value="ranking">
             <Ranking placeId={place.id} />
+          </TabsContent>
+          <TabsContent value="collection">
+            <GameList placeId={place.id} />
           </TabsContent>
         </Tabs>
       </section>

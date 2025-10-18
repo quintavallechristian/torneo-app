@@ -18,9 +18,9 @@ export default function ClientMatchForm({
   game,
   place,
 }: {
-  match?: Match;
-  game?: Game;
-  place?: Place;
+  match?: Match | null;
+  game?: Game | null;
+  place?: Place | null;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [errors, setErrors] = useState<any>(null);
@@ -82,8 +82,6 @@ export default function ClientMatchForm({
         selectedPlace?.value,
       );
     } else {
-      const place = formData.get('place');
-      console.log('Place', place);
       res = await createMatch(
         formData,
         selectedGame?.min_players ?? 1,
@@ -96,7 +94,6 @@ export default function ClientMatchForm({
         toast.error(res.errors.general);
       } else {
         toast.error('Ci sono degli errori nel form, controlla i campi.');
-        console.log(res.errors);
         setErrors(res.errors);
       }
     } else {
@@ -141,25 +138,6 @@ export default function ClientMatchForm({
       <div>
         <label
           htmlFor="name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          Gioco
-        </label>
-        <GameSearchPopover
-          game={
-            selectedGame
-              ? {
-                  value: selectedGame.value ?? '',
-                  label: selectedGame.label ?? '',
-                  min_players: selectedGame.min_players ?? null,
-                  max_players: selectedGame.max_players ?? null,
-                }
-              : null
-          }
-          onSelect={setSelectedGame}
-        />
-        <label
-          htmlFor="name"
           className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 mt-4"
         >
           Luogo
@@ -202,6 +180,27 @@ export default function ClientMatchForm({
             {errors && <ZodErrors error={errors.game_id} />}
           </>
         )}
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 mt-2"
+        >
+          Gioco
+        </label>
+        <GameSearchPopover
+          disabled={!selectedPlace}
+          game={
+            selectedGame
+              ? {
+                  value: selectedGame.value ?? '',
+                  label: selectedGame.label ?? '',
+                  min_players: selectedGame.min_players ?? null,
+                  max_players: selectedGame.max_players ?? null,
+                }
+              : null
+          }
+          placeId={selectedPlace?.value || ''}
+          onSelect={setSelectedGame}
+        />
       </div>
       <div>
         <label />

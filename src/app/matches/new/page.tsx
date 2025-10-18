@@ -2,9 +2,11 @@ import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import ClientMatchForm from '../ClientMatchForm';
 import { createClient } from '@/utils/supabase/server';
 import { Game, Place } from '@/types';
+import { getPlaceDetails } from '@/lib/server/place';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function NewMatch({ searchParams }: any) {
+  const supabase = await createClient();
   const { game_id, place_id } = await searchParams;
 
   const gameId =
@@ -23,7 +25,6 @@ export default async function NewMatch({ searchParams }: any) {
 
   let game: Game | undefined = undefined;
   if (gameId) {
-    const supabase = await createClient();
     const { data: gameData, error } = await supabase
       .from('games')
       .select('id, name, min_players, max_players')
@@ -37,20 +38,12 @@ export default async function NewMatch({ searchParams }: any) {
     game = gameData;
   }
 
-  let place: Place | undefined = undefined;
+  let place: Place | null = null;
   if (placeId) {
-    const supabase = await createClient();
-    const { data: placeData, error } = await supabase
-      .from('places')
-      .select('id, name, address')
-      .eq('id', placeId)
-      .single<Place>();
-
-    if (error || !placeData) {
-      console.error('Errore nel recupero del luogo:', error);
+    place = (await getPlaceDetails('id', placeId)).data;
+    if (!place) {
       return <p>Errore nel recupero del luogo</p>;
     }
-    place = placeData;
   }
 
   return (
