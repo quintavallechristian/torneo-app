@@ -40,7 +40,7 @@ export default async function EditPlace({ params }: PlaceEditPageProps) {
             Compila i dettagli per modificare il tuo locale!
           </p>
         </div>
-        <ClientPlaceForm place={place} />
+        {place && <ClientPlaceForm place={place} />}
       </SpotlightCard>
     </div>
   );

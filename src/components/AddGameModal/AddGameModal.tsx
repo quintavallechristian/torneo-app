@@ -15,7 +15,6 @@ import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addGameToCollection } from '@/lib/server/place';
-import { Place } from '@/types';
 import {
   GameSearchPopover,
   SearchBarItem,
