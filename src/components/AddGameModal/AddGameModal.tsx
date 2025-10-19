@@ -57,7 +57,7 @@ export function AddGameModal({ placeId }: AddGameModalProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <div>
-          <Button variant="outline" size="sm" data-testid="Add Game">
+          <Button variant="outline" size="lg" data-testid="Add Game">
             <PlusIcon className="inline h-6 w-6" />
           </Button>
         </div>

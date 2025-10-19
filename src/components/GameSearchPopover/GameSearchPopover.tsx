@@ -60,6 +60,7 @@ export function GameSearchPopover({
           const { data, error } = await supabase
             .from('games')
             .select('id, name, max_players, min_players')
+            .gt('bgg_rank', 0)
             .ilike('name', `%${search}%`)
             .order('bgg_rank', { ascending: true });
           if (error || !data) {
@@ -84,6 +85,7 @@ export function GameSearchPopover({
             .from('places_games')
             .select('place_id, game:games(id, name, max_players, min_players)')
             .eq('place_id', placeId)
+            .or('bgg_rank.neq.-1,bgg_rank.is.null')
             .ilike('game.name', `%${search}%`);
           if (!active) return;
           if (error) {
