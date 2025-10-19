@@ -104,11 +104,13 @@ export default async function PlaceCard({
                 </form>
               </div>
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardDescription
+              className={`text-muted-foreground ${small ? 'line-clamp-1' : ''}`}
+            >
               {place.address}
             </CardDescription>
             <CardDescription className="text-muted-foreground">
-              {place.matches?.length} partite giocate
+              <div>{place.matches?.length || 0} partite giocate</div>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 w-full">

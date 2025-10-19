@@ -146,11 +146,12 @@ export async function getGame(gameId: string) {
         `
             *, 
             matches:matches(*, 
-              game:games(name, image, id), 
-              place:places(name, id),
-              winner:profiles(*), players:profiles_matches(*, profile:profiles(*))
+            game:games(name, image, id), 
+            place:places(name, id),
+            winner:profiles(*), players:profiles_matches(*, profile:profiles(*))
             ),
-            gameStats:profiles_games(profile_id, favourite, in_collection, in_wishlist, rating)
+            gameStats:profiles_games(profile_id, favourite, in_collection, in_wishlist, rating),
+            gamePlaces:places_games(game_id, place:places(name, id))
             `,
       )
       .eq('id', gameId)
@@ -160,12 +161,13 @@ export async function getGame(gameId: string) {
   } else {
     const result = await supabase
       .from('games')
-      .select('*')
+      .select('*, gamePlaces:places_games(game_id, place:places(name, id))')
       .eq('name', gameId)
       .single<Game>();
     game = result.data;
     error = result.error;
   }
+  console.log('fetched', game);
   return { game, error };
 }
 

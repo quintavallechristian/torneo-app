@@ -118,10 +118,12 @@ export type Game = {
   thumbnail: string | null;
   matches?: Match[];
   gameStats?: GameStats[];
+  gamePlaces?: PlaceGame[];
 };
 export type Place = z.infer<typeof PlaceSchema> & {
   matches?: Match[];
   placeStats?: PlaceStats[];
+  placeGames?: PlaceGame[];
 };
 export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   id?: string;
@@ -167,6 +169,8 @@ export type PlaceStats = PlayerStats & {
 };
 
 export type PlaceGame = {
-  place_id: string;
-  game: Pick<Game, 'id' | 'name' | 'min_players' | 'max_players'>[];
+  place_id?: string;
+  game_id?: string;
+  game?: Pick<Game, 'id' | 'name' | 'min_players' | 'max_players'>[];
+  place?: Pick<Place, 'id' | 'name'>[];
 };

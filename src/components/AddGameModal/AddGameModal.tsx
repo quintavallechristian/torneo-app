@@ -55,8 +55,8 @@ export function AddGameModal({ placeId }: AddGameModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <div>
+      <DialogTrigger asChild className="w-full rounded-full m-0">
+        <div className="bg-amber-300 h-20 m-0">
           <Button variant="outline" size="sm" data-testid="Add Game">
             <PlusIcon className="inline h-6 w-6" />
           </Button>
@@ -65,9 +65,9 @@ export function AddGameModal({ placeId }: AddGameModalProps) {
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Aggiungi giocatore</DialogTitle>
+          <DialogTitle>Aggiungi gioco alla collezione</DialogTitle>
           <DialogDescription>
-            Aggiungi un nuovo giocatore al torneo.
+            Aggiungi un nuovo gioco alla collezione.
           </DialogDescription>
         </DialogHeader>
 

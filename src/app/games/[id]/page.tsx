@@ -15,6 +15,8 @@ import MatchList from '@/components/MatchList/MatchList';
 import Ranking from '@/components/Ranking/Ranking';
 import { getGame } from '@/lib/server/game';
 import GameCard from '@/components/GameCard/GameCard';
+import PlacesList from '@/components/PlacesList/PlacesList';
+import { Badge } from '@/components/ui/badge';
 
 interface GameDetaisPageProps {
   params: Promise<{ id: string }>;
@@ -73,14 +75,24 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
       <section className="mt-8">
         <Tabs defaultValue="matches">
           <TabsList>
-            <TabsTrigger value="matches">Partite collegate</TabsTrigger>
-            <TabsTrigger value="ranking">Classifica</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="matches">
+              Partite collegate
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="ranking">
+              Classifica
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="places">
+              Locali <Badge>{(game.gamePlaces || []).length}</Badge>
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="matches" className="w-full">
             <MatchList matches={game.matches} gameId={game.id} />
           </TabsContent>
           <TabsContent value="ranking">
             <Ranking gameId={game.id} />
+          </TabsContent>
+          <TabsContent value="places">
+            <PlacesList gameId={game.id} />
           </TabsContent>
         </Tabs>
       </section>

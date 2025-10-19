@@ -14,6 +14,7 @@ import Ranking from '@/components/Ranking/Ranking';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
 import { getPlaceDetails } from '@/lib/server/place';
 import GameList from '@/components/GameList/GameList';
+import { Badge } from '@/components/ui/badge';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -87,10 +88,16 @@ export default async function PlaceDetailsPage({
       />
       <section className="mt-8">
         <Tabs defaultValue="matches">
-          <TabsList>
-            <TabsTrigger value="matches">Partite collegate</TabsTrigger>
-            <TabsTrigger value="ranking">Classifica</TabsTrigger>
-            <TabsTrigger value="collection">Collezione</TabsTrigger>
+          <TabsList className="cursor-pointer">
+            <TabsTrigger className="cursor-pointer" value="matches">
+              Partite collegate
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="ranking">
+              Classifica
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="collection">
+              Collezione <Badge>{(place.placeGames || []).length}</Badge>
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="matches" className="w-full">
             <MatchList matches={place.matches} placeId={place.id} />

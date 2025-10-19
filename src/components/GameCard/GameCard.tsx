@@ -182,7 +182,7 @@ export default async function GameCard({
         </div>
       </div>
       {gameStats && !small && (
-        <div className="px-4 md:mt-8 mb-4">
+        <div className="px-4 md:mt-12 mb-4">
           <StatsCard stats={gameStats} position={positionInGame!} />
         </div>
       )}

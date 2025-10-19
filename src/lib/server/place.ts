@@ -99,7 +99,9 @@ export async function getPlaceDetails(
     ...(withProfileStats
       ? ['placeStats:profiles_places(profile_id, favourite)']
       : []),
-    ...(withCollection ? ['places_games(id, games(name, image, id))'] : []),
+    ...(withCollection
+      ? ['placeGames:places_games(place_id, game:games(name, image, id))']
+      : []),
   ].join(', ');
 
   let query = supabase
