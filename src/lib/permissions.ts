@@ -8,13 +8,13 @@ export async function canUser(
     gameId?: string;
   },
   forceTrue: boolean = false,
-) {
+): Promise<boolean> {
   const { role, permissions } = await getAuthenticatedUserWithProfile();
   if (role === ROLE.Admin || forceTrue) return true;
   if (role === ROLE.PlaceManager) {
     return (
-      context?.placeId &&
-      permissions?.some(
+      !!context?.placeId &&
+      !!permissions?.some(
         (p) =>
           String(p.placeId) === String(context?.placeId) && p.action === action,
       )
@@ -22,8 +22,8 @@ export async function canUser(
   }
   if (role === ROLE.GameManager) {
     return (
-      context?.gameId &&
-      permissions?.some(
+      !!context?.gameId &&
+      !!permissions?.some(
         (p) => p.gameId === context?.gameId && p.action === action,
       )
     );

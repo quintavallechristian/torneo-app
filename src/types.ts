@@ -171,6 +171,6 @@ export type PlaceStats = PlayerStats & {
 export type PlaceGame = {
   place_id?: string;
   game_id?: string;
-  game?: Pick<Game, 'id' | 'name' | 'min_players' | 'max_players'>[];
-  place?: Pick<Place, 'id' | 'name'>[];
+  game?: Game[];
+  place?: Place[];
 };
