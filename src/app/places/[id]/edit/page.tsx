@@ -12,6 +12,7 @@ interface PlaceEditPageProps {
 export default async function EditPlace({ params }: PlaceEditPageProps) {
   const { id } = await params;
   const result = await getPlaceDetails('id', id, true, true);
+  console.log(result);
   const place = result.data;
   const error = result.error;
 

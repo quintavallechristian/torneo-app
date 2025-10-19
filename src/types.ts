@@ -68,6 +68,8 @@ export const PlaceSchema = z.object({
   image: z.string().nullable(),
   description: z.string().min(3).max(2000).nullable(),
   address: z.string().min(3).max(2000),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
 });
 
 export const ProfileSchema = z.object({
@@ -118,8 +120,6 @@ export type Game = {
   gameStats?: GameStats[];
 };
 export type Place = z.infer<typeof PlaceSchema> & {
-  latitude?: number;
-  longitude?: number;
   matches?: Match[];
   placeStats?: PlaceStats[];
 };

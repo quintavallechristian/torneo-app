@@ -8,12 +8,22 @@ import { ZodErrors } from '@/components/ZodErrors';
 import { Place } from '@/types';
 import { toast } from 'sonner';
 import ImageDropArea from '@/components/ImageDropArea/ImageDropArea';
+import AddressPicker from '@/components/AddressPicker/AddressPicker';
 
 export default function ClientPlaceForm({ place }: { place?: Place }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [errors, setErrors] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [address, setAddress] = useState<{
+    address: string;
+    lat: number;
+    lng: number;
+  } | null>({
+    address: place?.address || '',
+    lat: place?.latitude || 0,
+    lng: place?.longitude || 0,
+  });
 
   async function action(formData: FormData) {
     setIsLoading(true);
@@ -109,15 +119,28 @@ export default function ClientPlaceForm({ place }: { place?: Place }) {
             >
               Indirizzo
             </label>
-            <Input
-              type="text"
-              id="address"
-              name="address"
-              required
-              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-              defaultValue={place?.address || ''}
+            <AddressPicker
+              address={
+                place
+                  ? {
+                      address: place.address,
+                      lat: place.latitude || 0,
+                      lng: place.longitude || 0,
+                    }
+                  : null
+              }
+              onSelect={setAddress}
             />
+            <input
+              type="hidden"
+              name="address"
+              value={address?.address || ''}
+            />
+            <input type="hidden" name="latitude" value={address?.lat || 0} />
+            <input type="hidden" name="longitude" value={address?.lng || 0} />
             {errors && <ZodErrors error={errors.address} />}
+            {errors && <ZodErrors error={errors.latitude} />}
+            {errors && <ZodErrors error={errors.longitude} />}
           </div>
         </div>
       </div>

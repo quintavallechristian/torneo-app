@@ -22,6 +22,8 @@ export async function getPlaces(
     'id',
     'name',
     'address',
+    'latitude',
+    'longitude',
     'description',
     'image',
 
@@ -76,6 +78,8 @@ export async function getPlaceDetails(
     'id',
     'name',
     'address',
+    'latitude',
+    'longitude',
     'description',
     'image',
     ...(withMatches
@@ -178,6 +182,8 @@ export async function createPlace(formData: FormData): Promise<{
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
   const address = formData.get('address') as string;
+  const latitude = Number(formData.get('latitude'));
+  const longitude = Number(formData.get('longitude'));
   const imageFile = formData.get('image') as File | null;
 
   // Upload dell'immagine se presente
@@ -207,6 +213,8 @@ export async function createPlace(formData: FormData): Promise<{
     name,
     description,
     address,
+    latitude,
+    longitude,
     image: imageUrl,
   };
 
@@ -278,6 +286,8 @@ export async function editPlace(
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
   const address = formData.get('address') as string;
+  const latitude = formData.get('latitude') as string;
+  const longitude = formData.get('longitude') as string;
   const imageFile = formData.get('image') as File | null;
 
   // Gestione dell'immagine
@@ -310,6 +320,8 @@ export async function editPlace(
     name,
     description,
     address,
+    latitude: Number(latitude),
+    longitude: Number(longitude),
     image: imageUrl,
   };
 
