@@ -36,6 +36,7 @@ export async function editProfile(
   const firstname = formData.get('firstname') as string;
   const lastname = formData.get('lastname') as string;
   const username = formData.get('username') as string;
+  const bgg_username = formData.get('bgg_username') as string;
   const imageFile = formData.get('image') as File | null;
 
   // Gestione dell'immagine
@@ -68,6 +69,7 @@ export async function editProfile(
     firstname,
     lastname,
     username,
+    bgg_username,
     image: imageUrl,
   };
 
