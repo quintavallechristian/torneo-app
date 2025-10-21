@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   images: {
@@ -11,6 +12,9 @@ const nextConfig: NextConfig = {
       "c.tile.openstreetmap.org",
       "unpkg.com",
     ],
+  },
+  turbopack: {
+    root: path.resolve(__dirname),
   },
 };
 
