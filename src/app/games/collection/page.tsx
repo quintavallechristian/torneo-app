@@ -4,7 +4,6 @@ import { SearchInput } from '@/components/SearchInput/SearchInput';
 import GameCard from '@/components/GameCard/GameCard';
 import { getBggUsername } from './actions';
 import { BggSyncButton } from '@/components/BggSyncButton/BggSyncButton';
-import { Empty } from '@/components/ui/empty';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
 
 export default async function GamesPage({

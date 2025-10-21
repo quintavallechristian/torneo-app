@@ -16,7 +16,6 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
 import MyAvatar from '@/components/MyAvatar/MyAvatar';
-import PlacesList from '@/components/PlacesList/PlacesList';
 
 export default async function HomePage() {
   const { profile } = await getAuthenticatedUserWithProfile();

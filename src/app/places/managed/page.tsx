@@ -1,7 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { Place, ROLE, SearchParams, UserAction } from '@/types';
-import PlaceCard from '@/components/PlaceCard/PlaceCard';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

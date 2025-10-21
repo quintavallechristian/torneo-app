@@ -43,7 +43,7 @@ export default function AddressPickerInner({ onSelect, address }: Props) {
     const map = useMap();
     useEffect(() => {
       if (selected) map.setView([selected.lat, selected.lng], 15);
-    }, [selected, map]);
+    }, [map]);
     return null;
   };
 

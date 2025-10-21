@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 
 interface GameDetailsPageProps {
   params: Promise<{ id: string }>;
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }
 
 function getPositionInGame(profileId: string, gameRanking: GameStats[]) {

@@ -62,14 +62,8 @@ export default function ClientMatchForm({
   const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
     match ? new Date(match.startAt) : undefined,
   );
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
-    match ? new Date(match.endAt) : undefined,
-  );
   const [startTime, setStartTime] = useState<string>(
     match ? new Date(match.startAt).toTimeString().slice(0, 8) : '20:00:00',
-  );
-  const [endTime, setEndTime] = useState<string>(
-    match ? new Date(match.endAt).toTimeString().slice(0, 8) : '23:00:00',
   );
 
   const [minMaxParticipants, setMinMaxParticipants] = useState([

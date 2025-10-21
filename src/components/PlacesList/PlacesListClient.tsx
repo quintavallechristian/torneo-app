@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Place } from '@/types';
 import EmptyArea from '../EmptyArea/EmptyArea';
-import PlaceCardClient from '../PlaceCard/PlaceCardClient';
 import PlaceCard from '../PlaceCard/PlaceCard';
 
 function haversineDistance(

@@ -52,7 +52,5 @@ export default async function PresentationPage({
     );
   });
 
-  return (
-    <PresentationMode matches={activeMatchesToday!} placeName={place.name} />
-  );
+  return <PresentationMode matches={activeMatchesToday!} />;
 }

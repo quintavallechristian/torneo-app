@@ -22,13 +22,9 @@ const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
 interface PresentationModeProps {
   matches: Match[];
-  placeName: string;
 }
 
-export default function PresentationMode({
-  matches,
-  placeName,
-}: PresentationModeProps) {
+export default function PresentationMode({ matches }: PresentationModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 

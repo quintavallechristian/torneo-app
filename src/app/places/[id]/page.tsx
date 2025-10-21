@@ -19,7 +19,7 @@ import { canUser } from '@/lib/permissions';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }
 
 function getPositionInPlace(profileId: string, placeRanking: PlaceStats[]) {
