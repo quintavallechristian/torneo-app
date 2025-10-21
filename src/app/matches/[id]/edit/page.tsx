@@ -37,7 +37,7 @@ export default async function MatchEditPage({ params }: MatchEditPageProps) {
     );
   }
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8">
+    <div className="min-h-screen flex items-center justify-center mt-4">
       <SpotlightCard
         className=" border-2  bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
         spotlightColor="rgba(0, 229, 255, 0.2)"

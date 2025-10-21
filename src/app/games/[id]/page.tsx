@@ -18,8 +18,9 @@ import GameCard from '@/components/GameCard/GameCard';
 import PlacesList from '@/components/PlacesList/PlacesList';
 import { Badge } from '@/components/ui/badge';
 
-interface GameDetaisPageProps {
+interface GameDetailsPageProps {
   params: Promise<{ id: string }>;
+  searchParams: { q?: string };
 }
 
 function getPositionInGame(profileId: string, gameRanking: GameStats[]) {
@@ -33,8 +34,12 @@ function getPositionInGame(profileId: string, gameRanking: GameStats[]) {
   return positionInGame;
 }
 
-export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
+export default async function GameDetailsPage({
+  params,
+  searchParams,
+}: GameDetailsPageProps) {
   const { id } = await params;
+  const { q } = await searchParams;
   const { profile } = await getAuthenticatedUserWithProfile();
 
   // Get game stats for this user and game
@@ -48,8 +53,8 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
   const { game, error } = await getGame(id);
 
   if (error || !game) {
-    console.error('Errore nel recupero del partita:', error);
-    return <p>Errore nel recupero del partita</p>;
+    console.error('Errore nel recupero del gioco:', error);
+    return <p>Errore nel recupero del gioco</p>;
   }
 
   return (
@@ -82,17 +87,21 @@ export default async function GameDetailsPage({ params }: GameDetaisPageProps) {
               Classifica
             </TabsTrigger>
             <TabsTrigger className="cursor-pointer" value="places">
-              Locali <Badge>{(game.gamePlaces || []).length}</Badge>
+              Dove giocarlo <Badge>{(game.gamePlaces || []).length}</Badge>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="matches" className="w-full">
-            <MatchList matches={game.matches} gameId={game.id} />
+            <MatchList
+              matches={game.matches}
+              gameId={game.id}
+              searchQuery={q}
+            />
           </TabsContent>
           <TabsContent value="ranking">
             <Ranking gameId={game.id} />
           </TabsContent>
           <TabsContent value="places">
-            <PlacesList gameId={game.id} />
+            <PlacesList gameId={game.id} searchQuery={q} useGeolocation />
           </TabsContent>
         </Tabs>
       </section>

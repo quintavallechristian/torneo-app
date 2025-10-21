@@ -1,7 +1,8 @@
 import { Game, GAME_STATS_STATE, SearchParams } from '@/types';
 import { getGames } from '@/lib/server/game';
-import { GameSearchInput } from '@/components/GameSearchInput/GameSearchInput';
+import { SearchInput } from '@/components/SearchInput/SearchInput';
 import GameCard from '@/components/GameCard/GameCard';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 
 export default async function GamesPage({
   searchParams,
@@ -18,7 +19,7 @@ export default async function GamesPage({
         <h1 className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 text-center">
           La tua wishlist
         </h1>
-        <GameSearchInput defaultValue={query} />
+        {games && games.length > 0 && <SearchInput defaultValue={query} />}
       </div>
 
       {games && games.length > 0 ? (
@@ -34,9 +35,10 @@ export default async function GamesPage({
           ))}
         </div>
       ) : (
-        <p className="italic text-muted-foreground text-center">
-          Nessun gioco disponibile.
-        </p>
+        <EmptyArea
+          title="Nessun gioco nella lista desideri"
+          message="Aggiungi giochi alla tua lista desideri per vederli qui."
+        />
       )}
     </div>
   );

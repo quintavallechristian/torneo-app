@@ -1,65 +1,50 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { Place, ROLE } from '@/types';
-import { UserAction } from '@/types';
-import { canUser } from '@/lib/permissions';
-import PlaceCard from '@/components/PlaceCard/PlaceCard';
+import { ROLE, SearchParams } from '@/types';
 import { getPlaces } from '@/lib/server/place';
+import PlacesList from '@/components/PlacesList/PlacesList';
+import { PlusIcon } from 'lucide-react';
+import { SearchInput } from '@/components/SearchInput/SearchInput';
 
-export default async function PlacesPage() {
+export default async function PlacesPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const { q } = await searchParams;
+  const query = q || '';
   const { profile, role } = await getAuthenticatedUserWithProfile();
-  let placeData: Place[] = [];
+  let placeData = [];
   if (!profile) {
     placeData = (await getPlaces(true)).data ?? [];
   } else {
     placeData = (await getPlaces(true, true)).data ?? [];
   }
-  placeData =
-    placeData?.sort((a, b) => b.matches!.length - a.matches!.length) || [];
-
-  const canUpdatePlacesMap: Record<string, boolean> = {};
-  if (profile) {
-    await Promise.all(
-      placeData.map(async (place) => {
-        if (place.id) {
-          canUpdatePlacesMap[place.id] =
-            (await canUser(UserAction.ManagePlaces, {
-              placeId: place.id,
-            })) || false;
-        }
-      }),
-    );
-  }
 
   return (
     <div className="max-w-[90%] mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
-        Luoghi
-      </h1>
-      {placeData && placeData.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {placeData.map((place) => (
-            <PlaceCard
-              key={place.id}
-              place={place}
-              placeStats={place.placeStats?.[0]}
-              small={true}
-            />
-          ))}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 text-center">
+          Tutti i luoghi
+        </h1>
+        <div className="flex gap-2 items-center">
+          <SearchInput defaultValue={query} placeholder="Cerca un luogo..." />
+          {(role === ROLE.PlaceManager || role === ROLE.Admin) && (
+            <Button variant="outline" size="lg" data-testid="Add Match">
+              <Link href="/places/new">
+                <PlusIcon className="h-6 w-6" />
+              </Link>
+            </Button>
+          )}
         </div>
-      ) : (
-        <p className="italic text-muted-foreground text-center">
-          Nessun luogo disponibile.
-        </p>
-      )}
-      {(role === ROLE.PlaceManager || role === ROLE.Admin) && (
-        <div className="flex justify-center">
-          <Button className="mt-4" asChild>
-            <Link href="/places/new">Crea nuovo luogo</Link>
-          </Button>
-        </div>
-      )}
+      </div>
+      <PlacesList
+        places={placeData}
+        useGeolocation={true}
+        gridCols="md:grid-cols-3"
+        searchQuery={query}
+      />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { Place, PlaceStats } from '@/types';
+import { Place, PlaceStats, UserAction } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
   getPlaceRanking,
@@ -15,9 +15,11 @@ import PlaceCard from '@/components/PlaceCard/PlaceCard';
 import { getPlaceDetails } from '@/lib/server/place';
 import GameList from '@/components/GameList/GameList';
 import { Badge } from '@/components/ui/badge';
+import { canUser } from '@/lib/permissions';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
+  searchParams: { q?: string };
 }
 
 function getPositionInPlace(profileId: string, placeRanking: PlaceStats[]) {
@@ -35,8 +37,10 @@ function getPositionInPlace(profileId: string, placeRanking: PlaceStats[]) {
 
 export default async function PlaceDetailsPage({
   params,
+  searchParams,
 }: PlaceDetailsPageProps) {
   const { id } = await params;
+  const { q } = await searchParams;
   const { profile } = await getAuthenticatedUserWithProfile();
 
   const placeStats = await getPlaceStatsPerProfile(
@@ -65,6 +69,9 @@ export default async function PlaceDetailsPage({
     console.error('Errore nel recupero del partita:', error);
     return <p>Errore nel recupero del partita</p>;
   }
+  const canManagePlaces = await canUser(UserAction.ManagePlaces, {
+    placeId: place.id,
+  });
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -85,6 +92,7 @@ export default async function PlaceDetailsPage({
         small={false}
         placeStats={placeStats}
         positionInPlace={positionInPlace}
+        canManagePlaces={canManagePlaces}
       />
       <section className="mt-8">
         <Tabs defaultValue="matches">
@@ -100,13 +108,17 @@ export default async function PlaceDetailsPage({
             </TabsTrigger>
           </TabsList>
           <TabsContent value="matches" className="w-full">
-            <MatchList matches={place.matches} placeId={place.id} />
+            <MatchList
+              matches={place.matches}
+              placeId={place.id}
+              searchQuery={q}
+            />
           </TabsContent>
           <TabsContent value="ranking">
             <Ranking placeId={place.id} />
           </TabsContent>
           <TabsContent value="collection">
-            <GameList placeId={place.id} />
+            <GameList placeId={place.id} searchQuery={q} />
           </TabsContent>
         </Tabs>
       </section>
