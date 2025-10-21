@@ -490,8 +490,10 @@ export async function createMatch(
     };
   }
   const description = formData.get('description') as string;
-  const startAt = formData.get('startAt') as string;
-  const endAt = formData.get('endAt') as string;
+  const startAtStr = formData.get('startAt') as string;
+  const endAtStr = formData.get('endAt') as string;
+  const startAt = new Date(startAtStr);
+  const endAt = new Date(endAtStr);
   const min_players = Number(formData.get('min_players') ?? 0);
   const max_players = Number(formData.get('max_players') ?? 0);
 
@@ -555,8 +557,10 @@ export async function editMatch(
   const name = formData.get('name') as string;
   const game_id = formData.get('game') as string;
   const description = formData.get('description') as string;
-  const startAt = formData.get('startAt') as string;
-  const endAt = formData.get('endAt') as string;
+  const startAtStr = formData.get('startAt') as string;
+  const endAtStr = formData.get('endAt') as string;
+  const startAt = new Date(startAtStr);
+  const endAt = new Date(endAtStr);
   const min_players = Number(formData.get('min_players') ?? 0);
   const max_players = Number(formData.get('max_players') ?? 0);
 
