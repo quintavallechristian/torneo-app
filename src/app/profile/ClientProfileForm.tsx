@@ -113,6 +113,22 @@ export default function ClientProfileForm({ profile }: { profile: Profile }) {
             />
             {errors && <ZodErrors error={errors.username} />}
           </div>
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              BGG Username
+            </label>
+            <Input
+              type="text"
+              id="bgg_username"
+              name="bgg_username"
+              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              defaultValue={profile.bgg_username || ''}
+            />
+            {errors && <ZodErrors error={errors.bgg_username} />}
+          </div>
         </div>
       </div>
       {/* Bottone Submit */}
