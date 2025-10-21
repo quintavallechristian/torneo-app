@@ -15,6 +15,8 @@ import MyAvatar from '../MyAvatar/MyAvatar';
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
 import QRCode from 'react-qr-code';
 import EmptyArea from '../EmptyArea/EmptyArea';
+import { format } from 'date-fns';
+import { it } from 'date-fns/locale';
 
 const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
@@ -46,18 +48,18 @@ export default function PresentationMode({
 
   if (matches.length === 0) {
     return (
-      <div>
-        <div className="text-center text-white">
-          <h1 className="text-6xl font-bold mb-4">{placeName}</h1>
-          <p className="text-3xl">Nessun match attivo al momento</p>
-        </div>
+      <div className="p-8">
+        <EmptyArea
+          className="w-full h-[70vh]"
+          title="Nessun match disponibile"
+          message={`Non ci sono match disponibili oggi. Torna a trovarci un altro giorno!`}
+        />
         <Button
           onClick={handleExit}
-          variant="ghost"
           size="icon"
-          className="absolute top-4 right-4 text-white hover:bg-white/20"
+          className="absolute top-20 right-4 hover:bg-white/20 z-50 rounded-full"
         >
-          <XIcon className="h-8 w-8" />
+          <XIcon className="size-8" />
         </Button>
       </div>
     );
@@ -71,15 +73,14 @@ export default function PresentationMode({
       {/* Pulsante di uscita */}
       <Button
         onClick={handleExit}
-        variant="ghost"
         size="icon"
-        className="absolute top-20 right-4 text-white hover:bg-white/20 z-50"
+        className="absolute top-20 right-4 hover:bg-white/20 z-50 rounded-full"
       >
-        <XIcon className="h-8 w-8" />
+        <XIcon className="size-8" />
       </Button>
 
       {/* Contenuto principale con SpotlightCard */}
-      <div className="max-w-7xl w-full mt-10 z-30">
+      <div className="w-full z-30">
         <div className="grid grid-cols-3 gap-4">
           <SpotlightCard className="flex-1 px-0 py-0 col-span-2">
             <div className="flex justify-between items-center p-4 gap-2">
@@ -128,12 +129,12 @@ export default function PresentationMode({
                 <FlipCard
                   imageSrc={currentMatch.game.image}
                   imageAlt={currentMatch.game.name}
-                  size={300}
+                  size={450}
                   enableFlip={false}
                 />
               )}
-              <div>
-                <CardHeader className="">
+              <div className="flex-1 w-full">
+                <CardHeader>
                   <CardTitle
                     className={
                       'text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex items-center gap-2'
@@ -152,7 +153,9 @@ export default function PresentationMode({
                     <div className="flex items-center gap-1">
                       <CalendarIcon className="size-4 text-slate-500 shrink-0" />
                       <span className="text-xs text-slate-600 dark:text-slate-400 hover:underline">
-                        Dal {currentMatch.startAt} al {currentMatch.endAt}
+                        {format(currentMatch.startAt, 'dd MMMM yyyy HH:mm', {
+                          locale: it,
+                        })}
                       </span>
                     </div>
                   </div>
@@ -164,7 +167,7 @@ export default function PresentationMode({
                   </div>
                   <QRCode
                     value={`${PUBLIC_URL}/matches/join/${currentMatch.id}`}
-                    size={150}
+                    size={250}
                   />
                 </CardContent>
               </div>

@@ -17,7 +17,6 @@ export const getAuthenticatedUserWithProfile = cache(
     role: ROLE | null;
     permissions?: UserPermission[];
   }> => {
-    console.log('called');
     const supabase = await createClient();
 
     const { data: userData, error: userError } = await supabase.auth.getUser();

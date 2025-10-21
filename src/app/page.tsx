@@ -16,6 +16,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
 import MyAvatar from '@/components/MyAvatar/MyAvatar';
+import PlacesList from '@/components/PlacesList/PlacesList';
 
 export default async function HomePage() {
   const { profile } = await getAuthenticatedUserWithProfile();
@@ -193,7 +194,7 @@ export default async function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold text-indigo-500 dark:text-indigo-200 flex items-center gap-2">
               <MapPinIcon className="h-5 w-5" />
-              Luoghi
+              Luoghi preferiti
             </h3>
             <Button variant="ghost" size="sm" asChild>
               <Link

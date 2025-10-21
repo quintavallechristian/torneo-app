@@ -244,7 +244,7 @@ export async function createPlace(formData: FormData): Promise<{
   const { error } = await supabase.from('users_permissions').insert([
     {
       user_id: user.id,
-      user_action_id: 4,
+      user_action_id: 2,
       place_id: newPlace[0].id,
     },
   ]);

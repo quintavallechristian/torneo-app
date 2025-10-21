@@ -33,8 +33,8 @@ export default async function StatsShowcase({
   const highestGameElo =
     allProfileGames?.find(
       (game) =>
-        game.points === Math.max(...allProfileGames.map((g) => g.points || 0)),
-    ).points || 0;
+        game.points === Math.max(...allProfileGames.map((g) => g?.points || 0)),
+    )?.points || 0;
   const totalWins =
     allProfileGames?.reduce((sum, game) => sum + (game.win || 0), 0) || 0;
   return (

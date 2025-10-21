@@ -41,5 +41,18 @@ export default async function PresentationPage({
     ),
   );
 
-  return <PresentationMode matches={activeMatches!} placeName={place.name} />;
+  //filtre solo i match attivi oggi (startAt oggi)
+  const today = new Date();
+  const activeMatchesToday = activeMatches?.filter((match) => {
+    const startAt = new Date(match.startAt);
+    return (
+      startAt.getDate() === today.getDate() &&
+      startAt.getMonth() === today.getMonth() &&
+      startAt.getFullYear() === today.getFullYear()
+    );
+  });
+
+  return (
+    <PresentationMode matches={activeMatchesToday!} placeName={place.name} />
+  );
 }

@@ -43,7 +43,7 @@ export default async function ProfileCard({
             width={small ? 120 : 220}
             height={small ? 120 : 220}
             className={`rounded-2xl shadow-lg object-cover border border-muted dark:bg-indigo-800/20 bg-indigo-500 ${
-              small ? 'size-24' : ''
+              small ? 'size-24' : 'size-60'
             }`}
             priority
           />
@@ -65,7 +65,7 @@ export default async function ProfileCard({
           </CardHeader>
           <CardContent className="space-y-4 w-full">
             {!small && profile.username && (
-              <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700 space-y-2">
+              <div className="overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700 space-y-2">
                 <div className="flex flex-col gap-1">
                   <span className="font-semibold">Nome:</span>
                   <span className="text-indigo-700 dark:text-indigo-900">
@@ -73,10 +73,19 @@ export default async function ProfileCard({
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="font-semibold">Email:</span>
+                  <span className="font-semibold">Username:</span>
                   <span className="text-indigo-700 dark:text-indigo-900">
                     {profile.username}
                   </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold">BGG Username:</span>
+                  <Link
+                    href={`https://boardgamegeek.com/profile/${profile.bgg_username}`}
+                    className="text-indigo-700 dark:text-indigo-900"
+                  >
+                    {profile.bgg_username}
+                  </Link>
                 </div>
               </div>
             )}

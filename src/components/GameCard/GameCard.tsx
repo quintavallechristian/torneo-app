@@ -63,17 +63,17 @@ export default async function GameCard({
         <div
           className={`flex-shrink-0 relative ${small ? 'size-24' : 'size-60'}`}
         >
-          {updatedGame.bgg_rank && (
-            <StatsExagon
-              className={`text-sm absolute left-1/2 -translate-x-1/2 ${
-                small ? '-bottom-4' : '-bottom-7'
-              }`}
-              size={small ? 'sm' : 'lg'}
-              stat={updatedGame.bgg_rank}
-              label="POS"
-              variant={BadgeVariant.amber}
-            />
-          )}
+          <StatsExagon
+            className={`text-sm absolute left-1/2 -translate-x-1/2 ${
+              small ? '-bottom-4' : '-bottom-7'
+            }`}
+            size={small ? 'sm' : 'lg'}
+            stat={
+              (updatedGame.bgg_rank || 0) > 0 ? updatedGame.bgg_rank : 'N/A'
+            }
+            label="RANK"
+            variant={BadgeVariant.amber}
+          />
           <Image
             src={avatarUrl}
             alt={updatedGame?.name || 'Game image'}
@@ -85,22 +85,19 @@ export default async function GameCard({
           />
           {!small && (
             <div className="space-x-8 md:space-x-4 space-y-2 flex gap-2 mt-2 justify-center">
-              {updatedGame.bgg_rating && (
-                <StatsExagon
-                  size="lg"
-                  stat={updatedGame.bgg_rating}
-                  label="POS"
-                  variant={BadgeVariant.red}
-                />
-              )}
-              {updatedGame.bgg_weight && (
-                <StatsExagon
-                  size="lg"
-                  stat={updatedGame.bgg_weight}
-                  label="PESO"
-                  variant={BadgeVariant.blue}
-                />
-              )}
+              <StatsExagon
+                size="lg"
+                stat={updatedGame.bgg_rating || 'N/A'}
+                label="VOTO"
+                variant={BadgeVariant.red}
+              />
+
+              <StatsExagon
+                size="lg"
+                stat={updatedGame.bgg_weight || 'N/A'}
+                label="PESO"
+                variant={BadgeVariant.blue}
+              />
             </div>
           )}
         </div>
@@ -136,8 +133,8 @@ export default async function GameCard({
               </CardDescription>
             )}
           </CardHeader>
-          <CardContent className="space-y-4">
-            {!small && (
+          {!small && (
+            <CardContent className="space-y-4 min-h-60">
               <>
                 <div className="space-x-4 space-y-2">
                   {updatedGame.min_players === updatedGame.max_players ? (
@@ -170,15 +167,14 @@ export default async function GameCard({
                   )}
                 </div>
               </>
-            )}
-            {!small && (
+
               <div className="max-h-40 overflow-y-auto bg-blue-200 rounded-lg p-3 border border-muted text-sm text-gray-700">
                 {updatedGame.description
                   ? updatedGame.description
                   : 'Descrizione non disponibile'}
               </div>
-            )}
-          </CardContent>
+            </CardContent>
+          )}
         </div>
       </div>
       {gameStats && !small && (

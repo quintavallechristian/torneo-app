@@ -33,6 +33,7 @@ export async function getGames(
     const { data } = await supabase
       .from('games')
       .select('*')
+      .or('bgg_rank.neq.-1,bgg_rank.is.null')
       .order('bgg_rank')
       .limit(100);
     return data ?? [];
@@ -42,6 +43,7 @@ export async function getGames(
       .select(
         '*, gameStats:profiles_games!inner(profile_id, favourite, in_collection, in_wishlist, rating)',
       )
+      .or('bgg_rank.neq.-1,bgg_rank.is.null')
       .eq('gameStats.profile_id', profile.id)
       .eq(`gameStats.${filterBy}`, true)
       .ilike('name', `%${query}%`)
@@ -72,6 +74,7 @@ export async function setFavouriteGame({
   gameId: string;
   status: boolean;
 }) {
+  console.log('clicket');
   const { profile } = await getAuthenticatedUserWithProfile();
   const supabase = await createClient();
   const { error } = await supabase.from('profiles_games').upsert(

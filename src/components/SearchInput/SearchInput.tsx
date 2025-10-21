@@ -6,17 +6,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '../ui/input';
 
-export type SearchBarItem = {
-  value: string;
-  label: string;
-  max_players: number | null;
-  min_players: number | null;
-};
-
-export function GameSearchInput({
+export function SearchInput({
   defaultValue = '',
+  placeholder = 'Cerca...',
 }: {
   defaultValue?: string;
+  placeholder?: string;
 }) {
   const [search, setSearch] = useState(defaultValue);
   const router = useRouter();
@@ -27,15 +22,15 @@ export function GameSearchInput({
       const params = new URLSearchParams();
       if (search) params.set('q', search);
       const currentPath = window.location.pathname;
-      router.push(`${currentPath}?${params.toString()}`);
+      router.replace(`${currentPath}?${params.toString()}`, { scroll: false });
     }, 400);
     return () => clearTimeout(handler);
   }, [search, router]);
   return (
     <Input
       type="text"
-      className="max-w-xs"
-      placeholder="Cerca un gioco..."
+      className="max-w-xs bg-gradient-to-br from-white to-slate-200 dark:from-gray-900 dark:to-gray-800"
+      placeholder={placeholder}
       value={search}
       onChange={(e) => setSearch(e.target.value)}
     />

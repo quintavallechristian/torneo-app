@@ -143,11 +143,6 @@ export default function SignupPage() {
                 Data di nascita
               </label>
               <DatePicker onSelect={setSelectedStartDate} />
-              {selectedStartDate && (
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {selectedStartDate.toLocaleDateString()}
-                </p>
-              )}
               <input
                 type="hidden"
                 name="birthday"

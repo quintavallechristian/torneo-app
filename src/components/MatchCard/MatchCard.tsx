@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
 import { Match } from '@/types';
+import { format } from 'date-fns';
+import { it } from 'date-fns/locale';
 import {
   CalendarIcon,
   CrownIcon,
@@ -117,7 +119,10 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                   : 'text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex items-center gap-2'
               }
             >
-              <Link href={`/matches/${match.id}`} className="hover:underline">
+              <Link
+                href={`/matches/${match.id}`}
+                className="hover:underline line-clamp-2 max-h-14 md:line-clamp-none "
+              >
                 {match.name}
               </Link>
             </CardTitle>
@@ -127,7 +132,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
               <div className="flex items-center gap-1">
                 <CalendarIcon className="size-4 text-slate-500 shrink-0" />
                 <span className="text-xs text-slate-600 dark:text-slate-400 hover:underline">
-                  Dal {match.startAt} al {match.endAt}
+                  {format(match.startAt, 'dd MMMM yyyy HH:mm', { locale: it })}
                 </span>
               </div>
               <div className="flex items-center gap-1">

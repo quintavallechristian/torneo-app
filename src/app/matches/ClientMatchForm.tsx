@@ -65,11 +65,28 @@ export default function ClientMatchForm({
   const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
     match ? new Date(match.endAt) : undefined,
   );
+  const [startTime, setStartTime] = useState<string>(
+    match ? new Date(match.startAt).toTimeString().slice(0, 8) : '20:00:00',
+  );
+  const [endTime, setEndTime] = useState<string>(
+    match ? new Date(match.endAt).toTimeString().slice(0, 8) : '23:00:00',
+  );
 
   const [minMaxParticipants, setMinMaxParticipants] = useState([
     selectedGame?.min_players ?? 1,
     selectedGame?.max_players ?? 10,
   ]);
+
+  // Funzione per combinare data e orario in un'unica datetime
+  const combineDateTime = (date: Date | undefined, time: string): string => {
+    if (!date) return '';
+    const [hours, minutes, seconds] = time.split(':');
+    const combined = new Date(date);
+    combined.setHours(parseInt(hours, 10));
+    combined.setMinutes(parseInt(minutes, 10));
+    combined.setSeconds(parseInt(seconds, 10));
+    return combined.toISOString();
+  };
 
   async function action(formData: FormData) {
     let res;
@@ -117,7 +134,7 @@ export default function ClientMatchForm({
   }, [selectedGame]);
 
   return (
-    <form action={action} className="space-y-4">
+    <form action={action} className="space-y-4 max-w-lg">
       <div>
         <label
           htmlFor="name"
@@ -236,7 +253,7 @@ export default function ClientMatchForm({
         {selectedGame?.min_players &&
         selectedGame?.max_players &&
         selectedGame?.min_players < selectedGame?.max_players ? (
-          <div className="flex gap-2 text-sm mt-8">
+          <div className="flex gap-2 text-sm mt-2 pt-12 px-4 pb-4 rounded-md border-input border bg-white dark:bg-input/30">
             <span>Da</span>
             <DualRangeSlider
               label={(value) => <span>{value}</span>}
@@ -258,49 +275,63 @@ export default function ClientMatchForm({
         {errors && <ZodErrors error={errors.min_players} />}
         {errors && <ZodErrors error={errors.max_players} />}
       </div>
-      <div className="flex gap-4">
-        <div className="w-1/2">
+      <div className="space-y-4">
+        <div className="grid grid-cols-4 items-center gap-4">
           <label
             htmlFor="startAt"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Data inizio
+            Inizio
           </label>
-          <DatePicker
-            defaultDate={match ? new Date(match.startAt) : undefined}
-            onSelect={setSelectedStartDate}
+          <div className="col-span-2">
+            <DatePicker
+              defaultDate={match ? new Date(match.startAt) : undefined}
+              onSelect={setSelectedStartDate}
+            />
+          </div>
+          <Input
+            type="time"
+            id="time-picker"
+            step="1"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
-          <input
+          <Input
             type="hidden"
             name="startAt"
-            value={
-              selectedStartDate
-                ? selectedStartDate.toISOString().slice(0, 10)
-                : ''
-            }
+            value={combineDateTime(selectedStartDate, startTime)}
           />
           {errors && <ZodErrors error={errors.startAt} />}
         </div>
-        <div className="w-1/2">
+        {/* <div className="grid grid-cols-4 items-center gap-4">
           <label
             htmlFor="endAt"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Data fine
+            Fine
           </label>
-          <DatePicker
-            defaultDate={match ? new Date(match?.endAt) : undefined}
-            onSelect={setSelectedEndDate}
+          <div className="col-span-2">
+            <DatePicker
+              defaultDate={match ? new Date(match.endAt) : undefined}
+              onSelect={setSelectedEndDate}
+            />
+          </div>
+          <Input
+            type="time"
+            id="time-picker"
+            step="1"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
-          <input
+          <Input
             type="hidden"
             name="endAt"
-            value={
-              selectedEndDate ? selectedEndDate.toISOString().slice(0, 10) : ''
-            }
+            value={combineDateTime(selectedEndDate, endTime)}
           />
           {errors && <ZodErrors error={errors.endAt} />}
-        </div>
+        </div> */}
       </div>
       <div className="flex items-center justify-center mt-6">
         <Button

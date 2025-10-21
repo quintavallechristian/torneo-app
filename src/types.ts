@@ -52,8 +52,14 @@ export const createMatchSchema = (minPlayers: number, maxPlayers: number) =>
     game_id: z.string().min(1, 'Devi selezionare un gioco'),
     place_id: z.string().min(1, 'Devi selezionare un luogo'),
     description: z.string().max(500, 'Descrizione troppo lunga').optional(),
-    startAt: z.string().min(1, 'Devi selezionare una data di inizio'),
-    endAt: z.string().min(1, 'Devi selezionare una data di fine'),
+    startAt: z.union([z.string(), z.date()]).refine((val) => {
+      const date = typeof val === 'string' ? new Date(val) : val;
+      return !isNaN(date.getTime());
+    }, 'Devi selezionare una data di inizio valida'),
+    endAt: z.union([z.string(), z.date()]).refine((val) => {
+      const date = typeof val === 'string' ? new Date(val) : val;
+      return !isNaN(date.getTime());
+    }, 'Devi selezionare una data di fine valida'),
     min_players: z
       .number()
       .min(minPlayers, `Numero minimo di giocatori è ${minPlayers}`),
@@ -74,6 +80,7 @@ export const PlaceSchema = z.object({
 
 export const ProfileSchema = z.object({
   username: z.string().min(3).max(30),
+  bgg_username: z.string().nullable(),
   image: z.string().url().nullable(),
   firstname: z.string().min(1).max(50).nullable(),
   lastname: z.string().min(1).max(50).nullable(),

@@ -1,3 +1,4 @@
+'use client';
 import {
   CardHeader,
   CardTitle,
@@ -6,38 +7,129 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Place, PlaceStats } from '@/types';
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import { PencilIcon, StarIcon } from 'lucide-react';
+import { FootprintsIcon, PencilIcon, StarIcon } from 'lucide-react';
 import { setFavouritePlace } from '@/lib/server/place';
-import { UserAction } from '@/types';
-import { canUser } from '@/lib/permissions';
 import Link from 'next/link';
 import DeleteMatchButton from '../DeleteMatchButton/DeleteMatchButton';
 import StatsCard from '../StatsCard/StatsCard';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
+function haversineDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const R = 6371; // km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // distanza in km
+}
+
 interface PlaceCardProps {
   place: Place;
   small: boolean;
+  distance?: number | null;
   placeStats?: PlaceStats;
   positionInPlace?: number;
+  canManagePlaces?: boolean;
 }
 
-export default async function PlaceCard({
+export default function PlaceCard({
   place,
   placeStats,
+  distance,
   small,
   positionInPlace,
+  canManagePlaces,
 }: PlaceCardProps) {
   const avatarUrl = place?.image || '/placeholder.png';
-  const canManagePlaces = await canUser(UserAction.ManagePlaces, {
-    placeId: place.id,
-  });
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!distance && typeof window !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          console.error('Errore geolocalizzazione:', error);
+          // In caso di errore, usa i luoghi senza ordinamento per distanza
+        },
+      );
+    }
+  }, [distance]);
+
+  if (!distance && userLocation) {
+    distance = haversineDistance(
+      userLocation.lat,
+      userLocation.lng,
+      place.latitude || 0,
+      place.longitude || 0,
+    );
+  }
   return (
     <SpotlightCard className="px-0 py-0">
+      <div className="flex justify-between items-center pl-6 pr-2 pt-1 gap-2">
+        <div className="text-sm text-muted-foreground">
+          <FootprintsIcon className="size-4 inline-block mr-1" />
+          {distance && (
+            <span className="text-sm">
+              {distance < 1
+                ? `${Math.round(distance * 1000)} m`
+                : `${distance.toFixed(1)} km`}
+            </span>
+          )}
+        </div>
+        <div className="ml-auto flex gap-2 items-center">
+          <form
+            action={setFavouritePlace.bind(null, {
+              placeId: place.id!,
+              status: !placeStats?.favourite,
+            })}
+          >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="link"
+                  className="hover:scale-110"
+                  type="submit"
+                >
+                  <StarIcon
+                    className={`size-6  ${
+                      placeStats?.favourite
+                        ? 'text-amber-300 hover:text-gray-600'
+                        : 'text-gray-400'
+                    }`}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {placeStats?.favourite
+                    ? 'Rimuovi dai preferiti'
+                    : 'Aggiungi ai preferiti'}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </form>
+        </div>
+      </div>
       <div
         className={`flex p-4 ${
           small
@@ -68,41 +160,7 @@ export default async function PlaceCard({
             >
               <Link href={`/places/${place.id}`} className="hover:underline">
                 {place.name}
-              </Link>
-
-              <div className="ml-auto flex gap-2 items-center">
-                <form
-                  action={setFavouritePlace.bind(null, {
-                    placeId: place.id!,
-                    status: !placeStats?.favourite,
-                  })}
-                >
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="link"
-                        className="hover:scale-110"
-                        type="submit"
-                      >
-                        <StarIcon
-                          className={`size-6  ${
-                            placeStats?.favourite
-                              ? 'text-amber-300 hover:text-gray-600'
-                              : 'text-gray-400'
-                          }`}
-                        />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        {placeStats?.favourite
-                          ? 'Rimuovi dai preferiti'
-                          : 'Aggiungi ai preferiti'}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </form>
-              </div>
+              </Link>{' '}
             </CardTitle>
             <CardDescription
               className={`text-muted-foreground ${small ? 'line-clamp-1' : ''}`}
