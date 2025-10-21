@@ -2,33 +2,12 @@ import { createClient } from '@/utils/supabase/server';
 import MatchCard from '@/components/MatchCard/MatchCard';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
+import { getMatches } from '@/lib/server/match';
 
 export default async function matchesPage() {
   const supabase = await createClient();
   const { profile } = await getAuthenticatedUserWithProfile();
-
-  const { data: playerMatches } = await supabase
-    .from('profiles_matches')
-    .select('match_id')
-    .eq('profile_id', profile?.id);
-
-  const matchIds = playerMatches?.map((p) => p.match_id) ?? [];
-
-  const { data } = await supabase
-    .from('matches')
-    .select(
-      `
-    *,
-    game:games(*),
-    place:places(*),
-    winner:profiles(*),
-    players:profiles_matches(
-      *,
-      profile:profiles(*)
-    )
-  `,
-    )
-    .in('id', matchIds);
+  const data = await getMatches({ mine: true });
 
   return profile ? (
     <div className="max-w-[90%] mx-auto py-10 px-4">

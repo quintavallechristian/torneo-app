@@ -600,3 +600,42 @@ export async function editMatch(
     redirect(`/matches/${matchId}`);
   }
 }
+
+export async function getMatches({
+  mine = false,
+  limit,
+}: { mine?: boolean; limit?: number } = {}) {
+  const supabase = await createClient();
+  const { profile } = await getAuthenticatedUserWithProfile();
+  if (mine) {
+    const { data: playerMatches } = await supabase
+      .from('profiles_matches')
+      .select('match_id')
+      .eq('profile_id', profile?.id);
+
+    const matchIds = playerMatches?.map((p) => p.match_id) ?? [];
+
+    const { data } = await supabase
+      .from('matches')
+      .select(
+        `
+      *,
+      game:games(*),
+      place:places(*),
+      winner:profiles(*),
+      players:profiles_matches(
+        *,
+        profile:profiles(*)
+      )
+    `,
+      )
+      .in('id', matchIds);
+    return data;
+  }
+  const { data } = await supabase
+    .from('matches')
+    .select(
+      '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
+    )
+    .order('startAt', { ascending: false });
+}

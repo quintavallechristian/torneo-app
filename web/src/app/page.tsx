@@ -16,6 +16,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
 import MyAvatar from '@/components/MyAvatar/MyAvatar';
+import { getMatches } from '@/lib/server/match';
 
 export default async function HomePage() {
   const { profile } = await getAuthenticatedUserWithProfile();
@@ -42,15 +43,10 @@ export default async function HomePage() {
     );
   }
 
-  // Fetch user's matches (upcoming and recent)
-  const { data: myMatches } = await supabase
-    .from('matches')
-    .select(
-      '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
-    )
-    .eq('players.profile_id', profile.id)
-    .order('startAt', { ascending: false })
-    .limit(3);
+  const myMatches = await getMatches({
+    mine: true,
+    limit: 3,
+  });
 
   // Fetch favourite games
   const { data: favouriteGamesData } = await supabase
