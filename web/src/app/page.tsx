@@ -107,7 +107,7 @@ export default async function HomePage() {
             <CalendarIcon className="h-6 w-6" />
             Le mie partite
           </h2>
-          <Button variant="outline" asChild>
+          <Button variant="ghost" asChild>
             <Link href="/matches/mine" className="flex items-center gap-2">
               Vedi tutte
               <ArrowRightIcon className="h-4 w-4" />

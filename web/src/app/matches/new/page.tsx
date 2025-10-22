@@ -47,9 +47,9 @@ export default async function NewMatch({ searchParams }: any) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex md:items-center justify-center p-4">
       <SpotlightCard
-        className=" border-2  bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
+        className="px-4 md:px-8 w-full md:w-lg"
         spotlightColor="rgba(0, 229, 255, 0.2)"
       >
         <div className="mb-6 text-center">
@@ -57,7 +57,7 @@ export default async function NewMatch({ searchParams }: any) {
             Crea un nuovo partita
           </h1>
           <p className="text-gray-500 dark:text-gray-300">
-            Compila i dettagli per organizzare una nuova competizione!
+            Compila i dettagli per organizzare una nuova partita!
           </p>
         </div>
         <ClientMatchForm game={game} place={place} />

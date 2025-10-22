@@ -270,14 +270,14 @@ export default function ClientMatchForm({
         {errors && <ZodErrors error={errors.max_players} />}
       </div>
       <div className="space-y-4">
-        <div className="grid grid-cols-4 items-center gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
           <label
             htmlFor="startAt"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
             Inizio
           </label>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <DatePicker
               defaultDate={match ? new Date(match.startAt) : undefined}
               onSelect={setSelectedStartDate}
@@ -298,34 +298,6 @@ export default function ClientMatchForm({
           />
           {errors && <ZodErrors error={errors.startAt} />}
         </div>
-        {/* <div className="grid grid-cols-4 items-center gap-4">
-          <label
-            htmlFor="endAt"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Fine
-          </label>
-          <div className="col-span-2">
-            <DatePicker
-              defaultDate={match ? new Date(match.endAt) : undefined}
-              onSelect={setSelectedEndDate}
-            />
-          </div>
-          <Input
-            type="time"
-            id="time-picker"
-            step="1"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-            className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-          />
-          <Input
-            type="hidden"
-            name="endAt"
-            value={combineDateTime(selectedEndDate, endTime)}
-          />
-          {errors && <ZodErrors error={errors.endAt} />}
-        </div> */}
       </div>
       <div className="flex items-center justify-center mt-6">
         <Button

@@ -74,7 +74,7 @@ export default function ClientProfileForm({ profile }: { profile: Profile }) {
               id="firstname"
               name="firstname"
               required
-              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               defaultValue={profile.firstname || ''}
             />
             {errors && <ZodErrors error={errors.name} />}
@@ -91,7 +91,7 @@ export default function ClientProfileForm({ profile }: { profile: Profile }) {
               id="lastname"
               name="lastname"
               required
-              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               defaultValue={profile.lastname || ''}
             />
             {errors && <ZodErrors error={errors.lastname} />}
@@ -108,7 +108,7 @@ export default function ClientProfileForm({ profile }: { profile: Profile }) {
               id="username"
               name="username"
               required
-              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               defaultValue={profile.username || ''}
             />
             {errors && <ZodErrors error={errors.username} />}
@@ -124,7 +124,7 @@ export default function ClientProfileForm({ profile }: { profile: Profile }) {
               type="text"
               id="bgg_username"
               name="bgg_username"
-              className="focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+              className="focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               defaultValue={profile.bgg_username || ''}
             />
             {errors && <ZodErrors error={errors.bgg_username} />}
@@ -136,7 +136,7 @@ export default function ClientProfileForm({ profile }: { profile: Profile }) {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-800 text-white font-semibold py-2 rounded-lg transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white font-semibold py-2 rounded-lg transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Caricamento...' : 'Aggiorna profilo'}
         </Button>

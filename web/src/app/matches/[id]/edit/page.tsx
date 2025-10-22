@@ -37,18 +37,18 @@ export default async function MatchEditPage({ params }: MatchEditPageProps) {
     );
   }
   return (
-    <div className="min-h-screen flex items-center justify-center mt-4">
+    <div className="flex md:items-center justify-center p-4">
       <SpotlightCard
-        className=" border-2  bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800"
+        className=" border-2  bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 px-4 md:px-8 w-full md:w-lg"
         spotlightColor="rgba(0, 229, 255, 0.2)"
       >
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-extrabold text-indigo-700 dark:text-indigo-400 mb-2">
             Modifica partita
           </h1>
-          <p className="text-gray-500 dark:text-gray-300">
+          {/* <p className="text-gray-500 dark:text-gray-300">
             Compila i dettagli per organizzare una nuova competizione!
-          </p>
+          </p> */}
         </div>
         <ClientMatchForm match={match} />
       </SpotlightCard>

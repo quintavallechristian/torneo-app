@@ -153,7 +153,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
               </div>
             )}
 
-            {match.players && (
+            {match.players && !small && (
               <div className="flex">
                 {match.players.map(
                   (player) =>

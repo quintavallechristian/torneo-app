@@ -44,6 +44,37 @@ export default async function GameCard({
   const avatarUrl = updatedGame?.image || '/placeholder.png';
   return (
     <SpotlightCard className="px-0 pt-0 pb-0 md:pb-2">
+      <div className="flex justify-between items-center pl-6 pr-2 pt-2 gap-2">
+        <div className="text-sm text-muted-foreground">
+          {!small && (
+            <>
+              <CardDescription className="text-muted-foreground block md:hidden line-clamp-1">
+                {updatedGame.designer}
+              </CardDescription>
+              <CardDescription className="text-muted-foreground line-clamp-2 hidden md:block">
+                {updatedGame.year_published
+                  ? `Anno: ${updatedGame.year_published}`
+                  : null}{' '}
+                | {updatedGame.designer}
+              </CardDescription>
+            </>
+          )}
+          {small && (
+            <StatsExagon
+              className="mt-1"
+              size="xs"
+              stat={
+                (updatedGame.bgg_rank || 0) > 0 ? updatedGame.bgg_rank : 'N/A'
+              }
+              label="RANK"
+              variant={BadgeVariant.amber}
+            />
+          )}
+        </div>
+        <div className="ml-auto flex gap-2 items-center">
+          <ActionButtons game={game} gameStats={gameStats} context={context} />
+        </div>
+      </div>
       <div className="relative">
         <div
           className={`
@@ -60,20 +91,18 @@ export default async function GameCard({
             : 'text-base flex-col md:flex-row gap-4 items-center'
         }`}
       >
-        <div
-          className={`flex-shrink-0 relative ${small ? 'size-24' : 'size-60'}`}
-        >
-          <StatsExagon
-            className={`text-sm absolute left-1/2 -translate-x-1/2 ${
-              small ? '-bottom-4' : '-bottom-7'
-            }`}
-            size={small ? 'sm' : 'lg'}
-            stat={
-              (updatedGame.bgg_rank || 0) > 0 ? updatedGame.bgg_rank : 'N/A'
-            }
-            label="RANK"
-            variant={BadgeVariant.amber}
-          />
+        <div className={`shrink-0 relative ${small ? 'size-24' : 'size-60'}`}>
+          {!small && (
+            <StatsExagon
+              className={`text-sm absolute left-1/2 -translate-x-1/2 -bottom-7`}
+              size="lg"
+              stat={
+                (updatedGame.bgg_rank || 0) > 0 ? updatedGame.bgg_rank : 'N/A'
+              }
+              label="RANK"
+              variant={BadgeVariant.amber}
+            />
+          )}
           <Image
             src={avatarUrl}
             alt={updatedGame?.name || 'Game image'}
@@ -112,26 +141,13 @@ export default async function GameCard({
             >
               <Link
                 href={`/games/${updatedGame.id}`}
-                className="hover:underline line-clamp-2 max-h-14 md:line-clamp-none "
+                className={`hover:underline max-h-14 ${
+                  small ? 'line-clamp-1' : ''
+                }`}
               >
                 {updatedGame.name}
               </Link>
-              <div className="-ml-2 z-10">
-                <ActionButtons
-                  game={game}
-                  gameStats={gameStats}
-                  context={context}
-                />
-              </div>
             </CardTitle>
-            {!small && (
-              <CardDescription className="text-muted-foreground line-clamp-2">
-                {updatedGame.year_published
-                  ? `Anno: ${updatedGame.year_published}`
-                  : null}{' '}
-                | {updatedGame.designer}
-              </CardDescription>
-            )}
           </CardHeader>
           {!small && (
             <CardContent className="space-y-4 min-h-60">
@@ -174,6 +190,14 @@ export default async function GameCard({
                   : 'Descrizione non disponibile'}
               </div>
             </CardContent>
+          )}
+          {small && (
+            <CardDescription className="text-muted-foreground pl-6">
+              <div>Anno: {updatedGame.year_published}</div>
+              <div className={`${small ? 'line-clamp-1' : ''}`}>
+                Designer: {updatedGame.designer}
+              </div>
+            </CardDescription>
           )}
         </div>
       </div>
