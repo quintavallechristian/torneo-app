@@ -29,7 +29,7 @@ export default function EmptyArea({
           <DicesIcon />
         </EmptyMedia>
         <EmptyTitle className="text-2xl">{title || 'Zona vietata'}</EmptyTitle>
-        <EmptyDescription className="text-lg">
+        <EmptyDescription className="text-lg px-8">
           {message || 'Non hai i permessi per visualizzare questa pagina.'}
         </EmptyDescription>
       </EmptyHeader>

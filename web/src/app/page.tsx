@@ -5,7 +5,14 @@ import MatchCard from '@/components/MatchCard/MatchCard';
 import GameCard from '@/components/GameCard/GameCard';
 import PlaceCard from '@/components/PlaceCard/PlaceCard';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { Game, GameStats, Match, Place, PlaceStats } from '@/types';
+import {
+  Game,
+  GameStats,
+  Match,
+  MATCHSTATUS,
+  Place,
+  PlaceStats,
+} from '@/types';
 import {
   CalendarIcon,
   StarIcon,
@@ -17,6 +24,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
 import MyAvatar from '@/components/MyAvatar/MyAvatar';
 import { getMatches } from '@/lib/server/match';
+import { getMatchStatus } from '@/lib/client/match';
 
 export default async function HomePage() {
   const { profile } = await getAuthenticatedUserWithProfile();
@@ -46,6 +54,11 @@ export default async function HomePage() {
   const myMatches = await getMatches({
     mine: true,
     limit: 3,
+  });
+
+  const matchesWithStatus = myMatches?.map((match) => {
+    const status = getMatchStatus(match);
+    return { ...match, status };
   });
 
   // Fetch favourite games
@@ -114,11 +127,31 @@ export default async function HomePage() {
             </Link>
           </Button>
         </div>
-        {myMatches && myMatches.length > 0 ? (
+        {matchesWithStatus?.filter(
+          (match) => match.status === MATCHSTATUS.Ongoing,
+        ) &&
+        matchesWithStatus?.filter(
+          (match) => match.status === MATCHSTATUS.Ongoing,
+        ).length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {myMatches.map((match) => (
-              <MatchCard key={match.id} match={match as Match} small={true} />
-            ))}
+            {matchesWithStatus
+              ?.filter((match) => match.status === MATCHSTATUS.Ongoing)
+              .map((match) => (
+                <MatchCard key={match.id} match={match as Match} small={true} />
+              ))}
+          </div>
+        ) : matchesWithStatus?.filter(
+            (match) => match.status === MATCHSTATUS.Scheduled,
+          ) &&
+          matchesWithStatus?.filter(
+            (match) => match.status === MATCHSTATUS.Scheduled,
+          ).length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {matchesWithStatus
+              ?.filter((match) => match.status === MATCHSTATUS.Scheduled)
+              .map((match) => (
+                <MatchCard key={match.id} match={match as Match} small={true} />
+              ))}
           </div>
         ) : (
           <Card>

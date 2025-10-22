@@ -60,6 +60,18 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
             {match.game?.name ?? match.game_id}
           </Link>
         </div>
+
+        {match.players?.find((player) => player.profile?.id === profile?.id) &&
+        !match.players?.find((player) => player.profile?.id === profile?.id)
+          ?.confirmed ? (
+          <div className="relative ml-auto">
+            <div className="size-96 -right-52 -top-52 from-red-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
+            <div className="text-sm text-red-300 truncate">Da confermare</div>
+          </div>
+        ) : (
+          ''
+        )}
+
         {match.winner?.id ? (
           <div className="relative">
             <div className="size-96 -right-52 -top-52 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
