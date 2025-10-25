@@ -1,4 +1,4 @@
-import { Match } from '@/types';
+import { Match, MATCHSTATUS } from '@/types';
 import React from 'react';
 import MatchCard from '../MatchCard/MatchCard';
 import { Button } from '../ui/button';
@@ -8,12 +8,15 @@ import { canUser } from '@/lib/permissions';
 import EmptyArea from '../EmptyArea/EmptyArea';
 import { PlusIcon } from 'lucide-react';
 import { SearchInput } from '../SearchInput/SearchInput';
+import { MatchStatusFilter } from '../MatchStatusFilter';
+import { getMatchStatus } from '@/lib/client/match';
 
 interface MatchListProps {
   matches: Match[] | undefined;
   placeId?: string;
   gameId?: string;
   searchQuery?: string;
+  statusFilter?: string;
 }
 
 export default async function MatchList({
@@ -21,12 +24,15 @@ export default async function MatchList({
   placeId,
   gameId,
   searchQuery,
+  statusFilter,
 }: MatchListProps) {
   const canManagePlaces = await canUser(UserAction.ManagePlaces, {
     placeId,
     gameId,
   });
-  const filteredMatches = searchQuery
+
+  // Apply search filter
+  let filteredMatches = searchQuery
     ? matches?.filter(
         (match) =>
           match.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -36,21 +42,34 @@ export default async function MatchList({
           match.game?.name.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : matches;
+
+  // Apply status filter
+  if (statusFilter && filteredMatches) {
+    filteredMatches = filteredMatches.filter(
+      (match) => getMatchStatus(match) === statusFilter,
+    );
+  }
+
   return (
     <>
-      <div className="mt-4 flex gap-2 justify-between">
-        <SearchInput defaultValue={searchQuery} />
-        {canManagePlaces && placeId && (
-          <Link
-            href={`/matches/new?place_id=${placeId ? placeId : ''}&game_id=${
-              gameId ? gameId : ''
-            }`}
-          >
-            <Button variant="outline" size="lg" data-testid="Add Game">
-              <PlusIcon className="inline h-6 w-6" />
-            </Button>
-          </Link>
-        )}
+      <div className="sticky top-0 z-10  backdrop-blur supports-backdrop-filter:bg-background/60 pt-4 pb-4 -mx-4 px-4 border-b border-t">
+        <div className="flex gap-2 justify-between">
+          <SearchInput defaultValue={searchQuery} />
+          <div className="flex gap-2">
+            <MatchStatusFilter />
+            {canManagePlaces && placeId && (
+              <Link
+                href={`/matches/new?place_id=${
+                  placeId ? placeId : ''
+                }&game_id=${gameId ? gameId : ''}`}
+              >
+                <Button variant="outline" size="lg" data-testid="Add Game">
+                  <PlusIcon className="inline h-6 w-6" />
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
       {filteredMatches && filteredMatches.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">

@@ -19,7 +19,7 @@ import { canUser } from '@/lib/permissions';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; status?: string }>;
 }
 
 function getPositionInPlace(profileId: string, placeRanking: PlaceStats[]) {
@@ -40,7 +40,7 @@ export default async function PlaceDetailsPage({
   searchParams,
 }: PlaceDetailsPageProps) {
   const { id } = await params;
-  const { q } = await searchParams;
+  const { q, status } = await searchParams;
   const { profile } = await getAuthenticatedUserWithProfile();
 
   const placeStats = await getPlaceStatsPerProfile(
@@ -112,6 +112,7 @@ export default async function PlaceDetailsPage({
               matches={place.matches}
               placeId={place.id}
               searchQuery={q}
+              statusFilter={status}
             />
           </TabsContent>
           <TabsContent value="ranking">

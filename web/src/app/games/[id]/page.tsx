@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 
 interface GameDetailsPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; status?: string }>;
 }
 
 function getPositionInGame(profileId: string, gameRanking: GameStats[]) {
@@ -39,7 +39,7 @@ export default async function GameDetailsPage({
   searchParams,
 }: GameDetailsPageProps) {
   const { id } = await params;
-  const { q } = await searchParams;
+  const { q, status } = await searchParams;
   const { profile } = await getAuthenticatedUserWithProfile();
 
   // Get game stats for this user and game
@@ -95,6 +95,7 @@ export default async function GameDetailsPage({
               matches={game.matches}
               gameId={game.id}
               searchQuery={q}
+              statusFilter={status}
             />
           </TabsContent>
           <TabsContent value="ranking">
