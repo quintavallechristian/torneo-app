@@ -7,7 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "seed": "tsx scripts/seed-test-data.ts",
+    "seed:places": "tsx scripts/seed-places.ts",
+    "seed:matches": "tsx scripts/seed-matches.ts",
+    "seed:users": "tsx scripts/seed-users.ts",
+    "seed:players": "tsx scripts/seed-match-players.ts",
+    "seed:all": "tsx scripts/seed-all.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -66,6 +72,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/xml2js": "^0.4.14",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
     "jest": "^30.1.3",
@@ -73,6 +80,7 @@
     "supabase": "^2.48.3",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "tw-animate-css": "^1.3.8",
     "typescript": "^5"
   }
