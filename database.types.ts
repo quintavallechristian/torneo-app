@@ -166,6 +166,7 @@ export type Database = {
           address: string | null
           created_at: string
           description: string | null
+          geom: unknown
           id: number
           image: string | null
           latitude: number | null
@@ -176,6 +177,7 @@ export type Database = {
           address?: string | null
           created_at?: string
           description?: string | null
+          geom?: unknown
           id?: number
           image?: string | null
           latitude?: number | null
@@ -186,6 +188,7 @@ export type Database = {
           address?: string | null
           created_at?: string
           description?: string | null
+          geom?: unknown
           id?: number
           image?: string | null
           latitude?: number | null
@@ -193,6 +196,48 @@ export type Database = {
           name?: string | null
         }
         Relationships: []
+      }
+      places_games: {
+        Row: {
+          copies: number | null
+          created_at: string
+          game_id: number | null
+          id: number
+          place_id: number | null
+          rented: number | null
+        }
+        Insert: {
+          copies?: number | null
+          created_at?: string
+          game_id?: number | null
+          id?: number
+          place_id?: number | null
+          rented?: number | null
+        }
+        Update: {
+          copies?: number | null
+          created_at?: string
+          game_id?: number | null
+          id?: number
+          place_id?: number | null
+          rented?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "places_games_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "places_games_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -530,7 +575,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_places_by_distance: {
+        Args: { user_lat: number; user_lon: number }
+        Returns: {
+          address: string
+          distance: number
+          id: number
+          name: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

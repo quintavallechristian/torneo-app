@@ -11,6 +11,16 @@
     "start": "npm run start --workspace=web",
     "lint": "npm run lint --workspace=web",
     "test": "npm run test --workspace=web",
-    "db:types": "npx supabase gen types --lang=typescript --local > database.types.ts"
+    "db:types": "npx supabase gen types --lang=typescript --local > database.types.ts",
+    "seed": "npm run seed --workspace=web",
+    "seed:places": "npm run seed:places --workspace=web",
+    "seed:matches": "npm run seed:matches --workspace=web",
+    "seed:users": "npm run seed:users --workspace=web",
+    "seed:players": "npm run seed:players --workspace=web",
+    "seed:all": "npm run seed:all --workspace=web"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "tsx": "^4.20.6"
   }
 }
