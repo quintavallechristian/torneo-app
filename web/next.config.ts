@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   images: {
     domains: [
       "cf.geekdo-images.com",
       "127.0.0.1",
+      "supabase.test",
+      "app.partitaapp.test",
       "tile.openstreetmap.org",
       "a.tile.openstreetmap.org",
       "b.tile.openstreetmap.org",
@@ -13,9 +14,7 @@ const nextConfig: NextConfig = {
       "unpkg.com",
     ],
   },
-  turbopack: {
-    root: path.resolve(__dirname),
-  },
+  allowedDevOrigins: ["app.partitaapp.test"],
 };
 
 export default nextConfig;
