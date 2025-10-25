@@ -27,7 +27,7 @@ export default async function MatchesPage({
     <div className="max-w-[90%] mx-auto py-10 px-4">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 text-center">
-          Tutti i giochi
+          Tutte le partite
         </h1>
         <div className="flex gap-2 items-center">
           <SearchInput

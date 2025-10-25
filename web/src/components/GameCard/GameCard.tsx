@@ -81,7 +81,7 @@ export default async function GameCard({
             ${context === 'favourites' ? 'from-amber-300' : ''} 
             ${context === 'in_wishlist' ? 'from-sky-300' : ''} 
             ${context === 'in_collection' ? 'from-emerald-300' : ''} 
-          size-96 -right-52 -top-52 opacity-20 bg-radial via-transparent to-transparent absolute`}
+          z-0 size-96 -right-52 -top-52 opacity-20 bg-radial via-transparent to-transparent absolute pointer-events-none`}
         ></div>
       </div>
       <div
@@ -141,7 +141,7 @@ export default async function GameCard({
             >
               <Link
                 href={`/games/${updatedGame.id}`}
-                className={`hover:underline max-h-14 ${
+                className={`hover:underline max-h-14 z-10 ${
                   small ? 'line-clamp-1' : ''
                 }`}
               >

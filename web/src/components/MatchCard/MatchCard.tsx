@@ -65,7 +65,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
         !match.players?.find((player) => player.profile?.id === profile?.id)
           ?.confirmed ? (
           <div className="relative ml-auto">
-            <div className="size-96 -right-52 -top-52 from-red-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
+            <div className="z-0 size-96 -right-52 -top-52 from-red-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
             <div className="text-sm text-red-300 truncate">Da confermare</div>
           </div>
         ) : (
@@ -74,7 +74,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
 
         {match.winner?.id ? (
           <div className="relative">
-            <div className="size-96 -right-52 -top-52 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute"></div>
+            <div className="size-96 -right-52 -top-52 from-amber-200 opacity-20 bg-radial via-transparent to-transparent absolute pointer-events-none"></div>
             <div className="flex items-center gap-1">
               <CrownIcon className="h-4 w-4 text-amber-500 -rotate-30 shrink-0" />
               <span className="text-sm text-amber-500 truncate">
@@ -133,7 +133,9 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
             >
               <Link
                 href={`/matches/${match.id}`}
-                className="hover:underline line-clamp-2 max-h-14 md:line-clamp-none "
+                className={`hover:underline max-h-14 z-10 ${
+                  small ? 'line-clamp-1' : ''
+                }`}
               >
                 {match.name}
               </Link>

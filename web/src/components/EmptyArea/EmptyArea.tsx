@@ -12,11 +12,13 @@ export default function EmptyArea({
   title,
   message,
   className,
+  icon,
 }: {
   children?: React.ReactNode;
   title?: string;
   message?: string;
   className?: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <Empty
@@ -25,9 +27,7 @@ export default function EmptyArea({
       }`}
     >
       <EmptyHeader className="max-w-2xl">
-        <EmptyMedia variant="icon">
-          <DicesIcon />
-        </EmptyMedia>
+        <EmptyMedia variant="icon">{icon || <DicesIcon />}</EmptyMedia>
         <EmptyTitle className="text-2xl">{title || 'Zona vietata'}</EmptyTitle>
         <EmptyDescription className="text-lg px-8">
           {message || 'Non hai i permessi per visualizzare questa pagina.'}

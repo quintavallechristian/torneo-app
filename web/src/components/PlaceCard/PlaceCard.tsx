@@ -158,7 +158,12 @@ export default function PlaceCard({
                   : 'text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-1 flex gap-2'
               }
             >
-              <Link href={`/places/${place.id}`} className="hover:underline">
+              <Link
+                href={`/places/${place.id}`}
+                className={`hover:underline max-h-14 z-10 ${
+                  small ? 'line-clamp-1' : ''
+                }`}
+              >
                 {place.name}
               </Link>{' '}
             </CardTitle>

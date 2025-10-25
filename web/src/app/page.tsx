@@ -25,6 +25,7 @@ import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
 import MyAvatar from '@/components/MyAvatar/MyAvatar';
 import { getMatches } from '@/lib/server/match';
 import { getMatchStatus } from '@/lib/client/match';
+import EmptyArea from '@/components/EmptyArea/EmptyArea';
 
 export default async function HomePage() {
   const { profile } = await getAuthenticatedUserWithProfile();
@@ -154,17 +155,16 @@ export default async function HomePage() {
               ))}
           </div>
         ) : (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <CalendarIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground mb-4">
-                Non hai ancora partecipato a nessuna partita
-              </p>
-              <Button asChild>
-                <Link href="/matches">Esplora le partite</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyArea
+            icon={<CalendarIcon className="h-12 w-12 text-muted-foreground" />}
+            className="w-full"
+            title="Non hai ancora partecipato a nessuna partita"
+            message=" "
+          >
+            <Button asChild>
+              <Link href="/matches">Esplora le partite</Link>
+            </Button>
+          </EmptyArea>
         )}
       </section>
 
@@ -206,14 +206,15 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <Card>
-              <CardContent className="py-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Nessun gioco preferito. Aggiungi i tuoi giochi preferiti dalle
-                  pagine dei giochi!
-                </p>
-              </CardContent>
-            </Card>
+            <EmptyArea
+              className="w-full"
+              title="Nessun gioco preferito."
+              message=""
+            >
+              <Button asChild>
+                <Link href="/games">Esplora i giochi</Link>
+              </Button>
+            </EmptyArea>
           )}
         </div>
 
@@ -246,14 +247,16 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <Card>
-              <CardContent className="py-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Nessun luogo preferito. Aggiungi i tuoi luoghi preferiti dalle
-                  pagine dei luoghi!
-                </p>
-              </CardContent>
-            </Card>
+            <EmptyArea
+              icon={<MapPinIcon className="h-12 w-12 text-muted-foreground" />}
+              className="w-full"
+              title="Nessun luogo preferito."
+              message=" "
+            >
+              <Button asChild>
+                <Link href="/places">Trova il locale più vicino</Link>
+              </Button>
+            </EmptyArea>
           )}
         </div>
       </section>
