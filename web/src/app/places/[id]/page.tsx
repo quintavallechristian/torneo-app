@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { Place, PlaceStats, UserAction } from '@/types';
+import { Place, PlaceStats as PlaceStatsType, UserAction } from '@/types';
 import {
   getAuthenticatedUserWithProfile,
   getPlaceRanking,
@@ -16,13 +16,15 @@ import { getPlaceDetails } from '@/lib/server/place';
 import GameList from '@/components/GameList/GameList';
 import { Badge } from '@/components/ui/badge';
 import { canUser } from '@/lib/permissions';
+import PlaceStats from '@/components/PlaceStats/PlaceStats';
+import StickyTabsWrapper from '@/components/StickyTabsWrapper/StickyTabsWrapper';
 
 interface PlaceDetailsPageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ q?: string; status?: string }>;
 }
 
-function getPositionInPlace(profileId: string, placeRanking: PlaceStats[]) {
+function getPositionInPlace(profileId: string, placeRanking: PlaceStatsType[]) {
   let positionInPlace = -1;
   if (placeRanking.length !== 0) {
     const position = placeRanking.findIndex(
@@ -94,19 +96,26 @@ export default async function PlaceDetailsPage({
         positionInPlace={positionInPlace}
         canManagePlaces={canManagePlaces}
       />
-      <section className="mt-8">
-        <Tabs defaultValue="matches">
-          <TabsList className="cursor-pointer">
-            <TabsTrigger className="cursor-pointer" value="matches">
-              Partite collegate
-            </TabsTrigger>
-            <TabsTrigger className="cursor-pointer" value="ranking">
-              Classifica
-            </TabsTrigger>
-            <TabsTrigger className="cursor-pointer" value="collection">
-              Collezione <Badge>{(place.placeGames || []).length}</Badge>
-            </TabsTrigger>
-          </TabsList>
+      <section className="mt-4">
+        <Tabs defaultValue="matches" className="mb-0 pb-0">
+          <StickyTabsWrapper>
+            <TabsList className="cursor-pointer mb-0">
+              <TabsTrigger className="cursor-pointer" value="matches">
+                Partite collegate
+              </TabsTrigger>
+              <TabsTrigger className="cursor-pointer" value="ranking">
+                Classifica
+              </TabsTrigger>
+              <TabsTrigger className="cursor-pointer" value="collection">
+                Collezione <Badge>{(place.placeGames || []).length}</Badge>
+              </TabsTrigger>
+              {canManagePlaces && (
+                <TabsTrigger className="cursor-pointer" value="stats">
+                  Statistiche
+                </TabsTrigger>
+              )}
+            </TabsList>
+          </StickyTabsWrapper>
           <TabsContent value="matches" className="w-full">
             <MatchList
               matches={place.matches}
@@ -120,6 +129,9 @@ export default async function PlaceDetailsPage({
           </TabsContent>
           <TabsContent value="collection">
             <GameList placeId={place.id} searchQuery={q} />
+          </TabsContent>
+          <TabsContent value="stats">
+            <PlaceStats placeId={Number(place.id)} />
           </TabsContent>
         </Tabs>
       </section>

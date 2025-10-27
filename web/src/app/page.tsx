@@ -26,6 +26,15 @@ import MyAvatar from '@/components/MyAvatar/MyAvatar';
 import { getMatches } from '@/lib/server/match';
 import { getMatchStatus } from '@/lib/client/match';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
+import HeroSection from '@/components/HeroSection/HeroSection';
+import FeaturesSection from '@/components/FeaturesSection/FeaturesSection';
+import StatsPreview from '@/components/StatsPreview/StatsPreview';
+import HowItWorksSection from '@/components/HowItWorksSection/HowItWorksSection';
+import TestimonialsSection from '@/components/TestimonialsSection/TestimonialsSection';
+import PricingPreview from '@/components/PricingPreview/PricingPreview';
+import FAQSection from '@/components/FAQSection/FAQSection';
+import CTASection from '@/components/CTASection/CTASection';
+import Footer from '@/components/Footer/Footer';
 
 export default async function HomePage() {
   const { profile } = await getAuthenticatedUserWithProfile();
@@ -33,21 +42,16 @@ export default async function HomePage() {
 
   if (!profile) {
     return (
-      <div className="max-w-4xl mx-auto py-16 px-4 text-center">
-        <h1 className="text-4xl font-bold mb-4 text-indigo-700 dark:text-indigo-400">
-          Benvenuto nella tua app per partite!
-        </h1>
-        <p className="text-lg text-muted-foreground mb-8">
-          Accedi per visualizzare le tue statistiche, partite e preferiti
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Button asChild>
-            <Link href="/login">Accedi</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/signup">Registrati</Link>
-          </Button>
-        </div>
+      <div className="min-h-screen">
+        <HeroSection />
+        <StatsPreview />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <TestimonialsSection />
+        <PricingPreview />
+        <FAQSection />
+        <CTASection />
+        <Footer />
       </div>
     );
   }

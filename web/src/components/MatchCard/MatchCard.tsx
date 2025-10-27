@@ -8,7 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
-import { Match } from '@/types';
+import { Match, MATCHSTATUS } from '@/types';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {
@@ -91,17 +91,14 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
         ) : (
           <>
             <Badge
-              className={`hidden md:block ${
-                formatMatchStatus(matchStatus).color
-              } ${small ? 'rounded-full px-2 py-2' : 'px-2 py-1 rounded-full'}`}
-            >
-              {small ? '' : formatMatchStatus(matchStatus).label}
-            </Badge>
-            <Badge
-              className={`rounded-full px-2 py-2 md:hidden ${
-                formatMatchStatus(matchStatus).color
+              className={` ${formatMatchStatus(matchStatus).color} ${
+                small
+                  ? 'rounded-full px-2 py-px text-xs'
+                  : 'px-2 py-1 rounded-full'
               }`}
-            ></Badge>
+            >
+              {formatMatchStatus(matchStatus).label}
+            </Badge>
           </>
         )}
       </div>
@@ -118,7 +115,7 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
             imageSrc={match.game.image}
             imageAlt={match.game.name}
             qrValue={`${PUBLIC_URL}/matches/${match.id}`}
-            size={small ? 128 : 220}
+            size={small ? 100 : 220}
             enableFlip={!small}
           />
         )}

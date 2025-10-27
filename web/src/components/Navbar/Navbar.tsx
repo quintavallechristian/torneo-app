@@ -12,9 +12,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
-import { MyNavigationMenu, MobileMenuButton } from './MyNavigationMenu';
 import { ROLE } from '@/types';
 import { Button } from '../ui/button';
+import { DicesIcon } from 'lucide-react';
+import {
+  GuestNavigationMenu,
+  MobileGuestMenuButton,
+} from './GuestNavigationMenu';
+import {
+  LoggedNavigationMenu,
+  MobileLoggedMenuButton,
+} from './LoggedNavigationMenu';
 
 async function handleLogout() {
   'use server';
@@ -29,10 +37,21 @@ export default async function Navbar() {
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-4">
-        <MobileMenuButton profile={profile} role={role} />
-        <Link href="/">Logo</Link>
+        {profile ? (
+          <MobileLoggedMenuButton profile={profile} role={role} />
+        ) : (
+          <MobileGuestMenuButton />
+        )}
+        <Link href="/" className="flex items-center gap-2">
+          <DicesIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+          <span className="text-xl font-bold">PartitApp</span>
+        </Link>
       </div>
-      <MyNavigationMenu profile={profile} role={role} />
+      {profile ? (
+        <LoggedNavigationMenu profile={profile} role={role} />
+      ) : (
+        <GuestNavigationMenu />
+      )}
       <div className="flex items-center gap-4">
         {profile ? (
           <div>

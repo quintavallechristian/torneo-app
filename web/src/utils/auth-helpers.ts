@@ -127,7 +127,7 @@ export async function getGameRanking(gameId: number): Promise<GameStats[]> {
 export async function getPlaceStatsPerProfile(
   profileId: string,
   placeId: number,
-): Promise<PlaceStats> {
+): Promise<PlaceStats | null> {
   console.log(
     'Getting place stats for profile:',
     profileId,
@@ -135,13 +135,15 @@ export async function getPlaceStatsPerProfile(
     placeId,
   );
   const supabase = await createClient();
-  let { data: placeStats } = await supabase
+  let placeStats: PlaceStats | null = null;
+  let { data } = await supabase
     .from('profiles_places')
     .select('*')
     .eq('profile_id', profileId)
     .eq('place_id', placeId)
     .maybeSingle();
-  if (!placeStats) {
+  placeStats = data as PlaceStats;
+  if (!data) {
     const { data, error } = await supabase
       .from('profiles_places')
       .insert({
@@ -151,7 +153,7 @@ export async function getPlaceStatsPerProfile(
       .select()
       .single();
     console.log(error);
-    placeStats = data;
+    placeStats = data as PlaceStats;
   }
 
   return placeStats;

@@ -10,6 +10,7 @@ import { PlusIcon } from 'lucide-react';
 import { SearchInput } from '../SearchInput/SearchInput';
 import { MatchStatusFilter } from '../MatchStatusFilter';
 import { getMatchStatus } from '@/lib/client/match';
+import StickyTabsWrapper from '../StickyTabsWrapper/StickyTabsWrapper';
 
 interface MatchListProps {
   matches: Match[] | undefined;
@@ -49,10 +50,9 @@ export default async function MatchList({
       (match) => getMatchStatus(match) === statusFilter,
     );
   }
-
   return (
     <>
-      <div className="sticky top-0 z-10  backdrop-blur supports-backdrop-filter:bg-background/60 pt-4 pb-4 -mx-4 px-4 border-b border-t">
+      <StickyTabsWrapper topOffset="top-[68px]">
         <div className="flex gap-2 justify-between">
           <SearchInput defaultValue={searchQuery} />
           <div className="flex gap-2">
@@ -70,7 +70,7 @@ export default async function MatchList({
             )}
           </div>
         </div>
-      </div>
+      </StickyTabsWrapper>
       {filteredMatches && filteredMatches.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {filteredMatches.map((match) => (

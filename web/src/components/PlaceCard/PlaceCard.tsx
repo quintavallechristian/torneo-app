@@ -41,7 +41,7 @@ interface PlaceCardProps {
   place: Place;
   small: boolean;
   distance?: number | null;
-  placeStats?: PlaceStats;
+  placeStats?: PlaceStats | null;
   positionInPlace?: number;
   canManagePlaces?: boolean;
 }
@@ -204,10 +204,15 @@ export default function PlaceCard({
             {(place.matches || []).length > 0 && (
               <Button className="cursor-pointer" variant="default" asChild>
                 <Link href={`/places/${place.id}/presentation`}>
-                  Modalità Presentazione
+                  Presentazione Partite
                 </Link>
               </Button>
             )}
+            <Button className="cursor-pointer" variant="default" asChild>
+              <Link href={`/places/${place.id}/presentation/ranking`}>
+                Presentazione Classifica
+              </Link>
+            </Button>
           </div>
           {place.id && <DeleteMatchButton id={place.id} />}
         </CardFooter>

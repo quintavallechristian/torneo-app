@@ -1,4 +1,5 @@
 import { Match, MATCHSTATUS } from '@/types';
+import { isToday, startOfDay } from 'date-fns';
 
 export function formatMatchStatus(status: MATCHSTATUS): {
   label: string;
@@ -42,14 +43,14 @@ export function getMatchStatus(match: Match) {
   const now = new Date();
   const startAt = new Date(match.startAt);
   const endAt = new Date(match.endAt);
-  if (match.winner) {
+  if (match.winner_id || match.winner) {
     return MATCHSTATUS.Completed;
-  }
-  if (now < startAt) {
-    return MATCHSTATUS.Scheduled;
-  } else if (now >= startAt && now <= endAt) {
+  } else if (isToday(startAt)) {
+    console.log('oggi');
     return MATCHSTATUS.Ongoing;
-  } else if (now > endAt) {
+  } else if (now < startAt) {
+    return MATCHSTATUS.Scheduled;
+  } else if (now > startAt) {
     return MATCHSTATUS.WaitingForResults;
   }
   return MATCHSTATUS.Canceled;
