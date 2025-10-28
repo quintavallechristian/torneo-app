@@ -2,7 +2,7 @@
 
 import { PlaceStats } from '@/types';
 import { useEffect, useState } from 'react';
-import { XIcon, TrophyIcon, MedalIcon } from 'lucide-react';
+import { XIcon, TrophyIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';

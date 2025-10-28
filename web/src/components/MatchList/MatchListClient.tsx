@@ -1,42 +1,87 @@
+'use client';
 import { Match } from '@/types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MatchCard from '../MatchCard/MatchCard';
 import { Button } from '../ui/button';
 import Link from 'next/link';
-import { UserAction } from '@/types';
-import { canUser } from '@/lib/permissions';
 import EmptyArea from '../EmptyArea/EmptyArea';
 import { PlusIcon } from 'lucide-react';
 import { SearchInput } from '../SearchInput/SearchInput';
 import { MatchStatusFilter } from '../MatchStatusFilter';
 import { getMatchStatus } from '@/lib/client/match';
 import StickyTabsWrapper from '../StickyTabsWrapper/StickyTabsWrapper';
+import { haversineDistance } from '@/lib/client/place';
 
 interface MatchListProps {
   matches: Match[] | undefined;
-  placeId?: string;
-  gameId?: string;
-  searchQuery?: string;
-  statusFilter?: string;
-  withDistances?: boolean;
+  placeId?: string | null;
+  gameId?: string | null;
+  searchQuery?: string | null;
+  statusFilter?: string | null;
+  canManagePlaces?: boolean | null;
+  withDistances?: boolean | null;
 }
 
-export default async function MatchList({
+export default function MatchListClient({
   matches,
   placeId,
   gameId,
   searchQuery,
   statusFilter,
+  canManagePlaces = false,
   withDistances = false,
 }: MatchListProps) {
-  const canManagePlaces = await canUser(UserAction.ManagePlaces, {
-    placeId,
-    gameId,
-  });
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
-  // Apply search filter
+  const [sortedMatches, setSortedMatches] = useState<Match[] | undefined>(
+    matches,
+  );
+
+  useEffect(() => {
+    // Ottieni la posizione dell'utente
+    if (
+      withDistances &&
+      typeof window !== 'undefined' &&
+      'geolocation' in navigator
+    ) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          console.error('Errore geolocalizzazione:', error);
+        },
+      );
+    } else {
+    }
+  }, [withDistances]);
+
+  useEffect(() => {
+    if (userLocation && withDistances) {
+      const matchesWithDistance = matches
+        ?.map((match) => ({
+          ...match,
+          distance: haversineDistance(
+            userLocation.lat,
+            userLocation.lng,
+            match.place?.latitude || 0,
+            match.place?.longitude || 0,
+          ),
+        }))
+        .sort((a, b) => a.distance - b.distance);
+
+      setSortedMatches(matchesWithDistance);
+    } else {
+      setSortedMatches(matches);
+    }
+  }, [userLocation, matches, withDistances]);
+
   let filteredMatches = searchQuery
-    ? matches?.filter(
+    ? sortedMatches?.filter(
         (match) =>
           match.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (match.description || '')
@@ -44,7 +89,7 @@ export default async function MatchList({
             .includes(searchQuery.toLowerCase()) ||
           match.game?.name.toLowerCase().includes(searchQuery.toLowerCase()),
       )
-    : matches;
+    : sortedMatches;
 
   // Apply status filter
   if (statusFilter && filteredMatches) {
@@ -53,17 +98,20 @@ export default async function MatchList({
     );
   }
 
-  filteredMatches = filteredMatches?.sort((a, b) => {
-    const aStart = a?.startAt || '';
-    const bStart = b?.startAt || '';
-    return new Date(bStart).getTime() - new Date(aStart).getTime();
-  });
+  // Sort by date only if not sorting by distance
+  if (!withDistances || !userLocation) {
+    filteredMatches = filteredMatches?.sort((a, b) => {
+      const aStart = a?.startAt || '';
+      const bStart = b?.startAt || '';
+      return new Date(bStart).getTime() - new Date(aStart).getTime();
+    });
+  }
 
   return (
     <>
       <StickyTabsWrapper topOffset="top-[68px]">
         <div className="flex gap-2 justify-between">
-          <SearchInput defaultValue={searchQuery} />
+          <SearchInput defaultValue={searchQuery || undefined} />
           <div className="flex gap-2">
             <MatchStatusFilter />
             {canManagePlaces && placeId && (

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import SpotlightCard from '../SpotlightCard/SpotlightCard';
 

@@ -1,5 +1,5 @@
 import { Match, MATCHSTATUS } from '@/types';
-import { isToday, startOfDay } from 'date-fns';
+import { isToday } from 'date-fns';
 
 export function formatMatchStatus(status: MATCHSTATUS): {
   label: string;
@@ -42,7 +42,6 @@ export function formatMatchStatus(status: MATCHSTATUS): {
 export function getMatchStatus(match: Match) {
   const now = new Date();
   const startAt = new Date(match.startAt);
-  const endAt = new Date(match.endAt);
   if (match.winner_id || match.winner) {
     return MATCHSTATUS.Completed;
   } else if (isToday(startAt)) {

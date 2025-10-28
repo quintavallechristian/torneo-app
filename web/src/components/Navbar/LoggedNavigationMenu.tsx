@@ -136,13 +136,12 @@ export function LoggedNavigationMenu({
     {
       title: 'Partite',
       href: '/matches',
-      description: 'Lista di tutte le partite presenti nel database di Torneo.',
+      description: 'Lista di tutte le tue partite.',
     },
     profile && {
-      title: 'Mie partite',
-      href: '/matches/mine',
-      description:
-        'Lista di tutte le partite a cui partecipi o hai partecipato',
+      title: 'Archivio',
+      href: '/matches/archive',
+      description: 'Lista di tutte le partite a cui hai partecipato',
     },
   ].filter(Boolean) as { title: string; href: string; description: string }[];
 

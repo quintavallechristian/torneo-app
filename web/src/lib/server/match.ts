@@ -7,6 +7,7 @@ import {
   Place,
   PlaceStats,
   Player,
+  PlayerStats,
 } from '@/types';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
@@ -25,6 +26,97 @@ const K = 32;
  * @param players array di giocatori con id, rating e rank (1 = migliore)
  * @returns array con i nuovi rating
  */
+export async function updateElo(
+  players: Pick<Player, 'profile_id' | 'points'>[],
+) {
+  const supabase = await createClient();
+  const playersWithAllNeeded: {
+    [id: string]: {
+      currentElo: number;
+      points: number;
+      position: number;
+      result: number;
+    };
+  } = {};
+
+  const { data } = await supabase
+    .from('profiles_stats')
+    .select<'profile_id, points', PlayerStats>('profile_id, points')
+    .in(
+      'profile_id',
+      players.map((p) => p.profile_id),
+    );
+
+  players.forEach(
+    (p, index) =>
+      (playersWithAllNeeded[p.profile_id] = {
+        currentElo:
+          data?.find((d) => d.profile_id === p.profile_id)?.points || 0,
+        points: p.points || 0,
+        position: index + 1,
+        result: 0,
+      }),
+  );
+
+  // confronta ogni coppia di giocatori
+  const playerIds = Object.keys(playersWithAllNeeded);
+  const results: { [id: string]: number } = {};
+  playerIds.forEach((id) => (results[id] = 0));
+
+  for (let i = 0; i < playerIds.length; i++) {
+    for (let j = i + 1; j < playerIds.length; j++) {
+      const A = playersWithAllNeeded[playerIds[i]];
+      const B = playersWithAllNeeded[playerIds[j]];
+
+      // aspettative (probabilità che A vinca contro B)
+      const expectedA =
+        1 / (1 + Math.pow(10, (B.currentElo - A.currentElo) / 400));
+      const expectedB = 1 - expectedA;
+
+      // punteggi reali in base al position
+      let scoreA = 0.5;
+      let scoreB = 0.5;
+
+      if (A.position < B.position) {
+        scoreA = 1;
+        scoreB = 0;
+      } else if (A.position > B.position) {
+        scoreA = 0;
+        scoreB = 1;
+      }
+      // se position uguali → resta scoreA = 0.5 e scoreB = 0.5 (pareggio)
+
+      // aggiorna i risultati accumulati
+      results[playerIds[i]] += K * (scoreA - expectedA);
+      results[playerIds[j]] += K * (scoreB - expectedB);
+    }
+  }
+
+  const rows = playerIds.map((playerId) => {
+    const eloChange =
+      playersWithAllNeeded[playerId].currentElo <= 100
+        ? Math.max(Math.round(results[playerId]), 0)
+        : Math.round(results[playerId]);
+    const newElo =
+      playersWithAllNeeded[playerId].currentElo <= 100
+        ? Math.max(0, playersWithAllNeeded[playerId].currentElo + eloChange)
+        : Math.max(100, playersWithAllNeeded[playerId].currentElo + eloChange);
+
+    return {
+      profile_id: playerId,
+      points: newElo,
+    };
+  });
+  console.log('Final ELO changes', rows);
+
+  const { error } = await supabase.from('profiles_stats').upsert(rows, {
+    onConflict: 'profile_id',
+  });
+
+  if (error) {
+    console.error('Error updating ELOs', error);
+  }
+}
 export async function updateGameElo(
   players: Pick<Player, 'profile_id' | 'points'>[],
   game: Game,
@@ -256,6 +348,7 @@ export async function setWinner({
       message: 'Non hai i permessi per aggiornare le statistiche',
     };
   }
+  updateElo(players);
   updateGameElo(players, game);
   updatePlaceElo(players, place);
   revalidatePath(`/matches/${match.id}`);
@@ -604,9 +697,12 @@ export async function editMatch(
 export async function getMatches({
   mine = false,
   limit,
-}: { mine?: boolean; limit?: number } = {}) {
+  withPlaceDistance = false,
+}: { mine?: boolean; limit?: number; withPlaceDistance?: boolean } = {}) {
+  console.log('TODO, handle limit:', limit);
   const supabase = await createClient();
   const { profile } = await getAuthenticatedUserWithProfile();
+  let matchesList: Match[] = [];
   if (mine) {
     const { data: playerMatches } = await supabase
       .from('profiles_matches')
@@ -630,12 +726,17 @@ export async function getMatches({
     `,
       )
       .in('id', matchIds);
-    return data;
+    matchesList = data as Match[];
+  } else {
+    const { data } = await supabase
+      .from('matches')
+      .select(
+        '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
+      )
+      .order('startAt', { ascending: false });
+    matchesList = data as Match[];
   }
-  const { data } = await supabase
-    .from('matches')
-    .select(
-      '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
-    )
-    .order('startAt', { ascending: false });
+  if (withPlaceDistance) {
+  }
+  return matchesList;
 }

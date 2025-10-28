@@ -1,60 +1,82 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { createClient } from '@/utils/supabase/server';
-import MatchCard from '@/components/MatchCard/MatchCard';
-import { canUser } from '@/lib/permissions';
-import { SearchParams, UserAction } from '@/types';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
-import { SearchInput } from '@/components/SearchInput/SearchInput';
-import { PlusIcon } from 'lucide-react';
+import { getMatches } from '@/lib/server/match';
+import { getMatchStatus } from '@/lib/client/match';
+import { MATCHSTATUS } from '@/types';
+import MatchListClient from '@/components/MatchList/MatchListClient';
 
-export default async function MatchesPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const { q } = await searchParams;
-  const query = q || '';
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('matches')
-    .select(
-      '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
-    )
-    .ilike('name', `%${query}%`);
-  const canManagePlatform = await canUser(UserAction.ManagePlatform);
-  return (
+export default async function matchesPage() {
+  const { profile } = await getAuthenticatedUserWithProfile();
+  const data = await getMatches({ mine: true });
+  const otherMatches = await getMatches();
+
+  const matchesWithStatus = data?.map((match) => {
+    const status = getMatchStatus(match);
+    return { ...match, status };
+  });
+
+  const otherMatchesWithStatus = otherMatches?.map((match) => {
+    const status = getMatchStatus(match);
+    return { ...match, status };
+  });
+
+  const scheduledOtherMatches = otherMatchesWithStatus?.filter(
+    (match) => match.status === MATCHSTATUS.Scheduled,
+  );
+
+  const scheduledMatches = matchesWithStatus?.filter(
+    (match) => match.status === MATCHSTATUS.Scheduled,
+  );
+
+  const ongoingMatches = matchesWithStatus?.filter(
+    (match) => match.status === MATCHSTATUS.Ongoing,
+  );
+
+  return profile ? (
     <div className="max-w-[90%] mx-auto py-10 px-4">
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 text-center">
-          Tutte le partite
-        </h1>
-        <div className="flex gap-2 items-center">
-          <SearchInput
-            defaultValue={query}
-            placeholder="Cerca una partita..."
-          />
-          {canManagePlatform && (
-            <Button variant="outline" size="lg" data-testid="Add Match">
-              <Link href="/matches/new">
-                <PlusIcon className="h-6 w-6" />
-              </Link>
-            </Button>
-          )}
-        </div>
-      </div>
-      {data && data.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {data.map((match) => (
-            <MatchCard key={match.id} match={match} small={true} />
-          ))}
-        </div>
+      <h1 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
+        Le tue partite
+      </h1>
+      <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400">
+        In corso
+      </h2>
+      {ongoingMatches && ongoingMatches.length > 0 ? (
+        <MatchListClient matches={ongoingMatches} />
       ) : (
         <EmptyArea
-          title="Nessuna partita disponibile."
-          message="Torna qui più tardi per vedere le partite attive"
-        ></EmptyArea>
+          className="w-full mt-4"
+          title="Nessuna partita"
+          message="Non hai partite in corso."
+        />
       )}
+      <h2 className="text-2xl mt-8 font-bold text-indigo-700 dark:text-indigo-400">
+        In arrivo
+      </h2>
+      {scheduledMatches && scheduledMatches.length > 0 ? (
+        <MatchListClient matches={scheduledMatches} />
+      ) : (
+        <EmptyArea
+          className="w-full mt-4"
+          title="Nessuna partita"
+          message="Non hai ancora giocato partite."
+        />
+      )}
+      <h2 className="text-2xl mt-8 font-bold text-indigo-700 dark:text-indigo-400">
+        Trova partite
+      </h2>
+      {scheduledOtherMatches && scheduledOtherMatches.length > 0 ? (
+        <MatchListClient withDistances={true} matches={scheduledOtherMatches} />
+      ) : (
+        <EmptyArea
+          className="w-full mt-4"
+          title="Nessuna partita"
+          message="Non hai ancora giocato partite."
+        />
+      )}
+    </div>
+  ) : (
+    <div className="min-h-screen flex items-center justify-center">
+      <EmptyArea />
     </div>
   );
 }

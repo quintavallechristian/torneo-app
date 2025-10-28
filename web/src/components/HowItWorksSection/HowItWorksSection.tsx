@@ -1,7 +1,7 @@
 'use client';
 
 import { UserPlus, DicesIcon, Trophy, BarChart3 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import SpotlightCard from '../SpotlightCard/SpotlightCard';
 
 export default function HowItWorksSection() {

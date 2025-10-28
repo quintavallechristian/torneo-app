@@ -108,7 +108,7 @@ export default async function MatchDetailsPage({
       </div>
       {match && match.game ? (
         <>
-          <MatchCard match={match} small={false} />
+          <MatchCard match={match} small={false} profile={profile} />
           <MatchPlayersList
             profile={profile}
             match={match}

@@ -11,7 +11,7 @@ import {
   Clock,
   Award,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import SpotlightCard from '../SpotlightCard/SpotlightCard';
 
 export default function FeaturesSection() {

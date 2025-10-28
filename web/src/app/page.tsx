@@ -20,7 +20,6 @@ import {
   DicesIcon,
   ArrowRightIcon,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
 import MyAvatar from '@/components/MyAvatar/MyAvatar';
 import { getMatches } from '@/lib/server/match';
@@ -142,7 +141,12 @@ export default async function HomePage() {
             {matchesWithStatus
               ?.filter((match) => match.status === MATCHSTATUS.Ongoing)
               .map((match) => (
-                <MatchCard key={match.id} match={match as Match} small={true} />
+                <MatchCard
+                  key={match.id}
+                  match={match as Match}
+                  small={true}
+                  profile={profile}
+                />
               ))}
           </div>
         ) : matchesWithStatus?.filter(
@@ -155,7 +159,12 @@ export default async function HomePage() {
             {matchesWithStatus
               ?.filter((match) => match.status === MATCHSTATUS.Scheduled)
               .map((match) => (
-                <MatchCard key={match.id} match={match as Match} small={true} />
+                <MatchCard
+                  key={match.id}
+                  match={match as Match}
+                  small={true}
+                  profile={profile}
+                />
               ))}
           </div>
         ) : (

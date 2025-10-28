@@ -50,7 +50,12 @@ export default async function PrivatePage() {
             {matches && matches.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {matches.map((match) => (
-                  <MatchCard key={match.id} match={match} small />
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    small
+                    profile={profile}
+                  />
                 ))}
               </div>
             ) : (

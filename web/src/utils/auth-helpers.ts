@@ -136,7 +136,7 @@ export async function getPlaceStatsPerProfile(
   );
   const supabase = await createClient();
   let placeStats: PlaceStats | null = null;
-  let { data } = await supabase
+  const { data } = await supabase
     .from('profiles_places')
     .select('*')
     .eq('profile_id', profileId)

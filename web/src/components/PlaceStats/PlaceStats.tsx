@@ -17,8 +17,9 @@ import {
   TrendingUpIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Match, MATCHSTATUS, PlaceStats as PlaceStatsType } from '@/types';
+import { Game, Match, MATCHSTATUS } from '@/types';
 import { getMatchStatus } from '@/lib/client/match';
+import Image from 'next/image';
 
 interface PlaceStatsProps {
   placeId: number;
@@ -53,25 +54,22 @@ export default async function PlaceStats({ placeId }: PlaceStatsProps) {
   const matches = data as Match[] | null;
 
   // Get player statistics
-  const { data: playersStatsData } = await supabase
-    .from('profiles_places')
-    .select(
-      `
-      profile_id,
-      points,
-      win,
-      loss,
-      draw,
-      minutes_played,
-      profile:profiles(id, username, image, bgg_username, image, firstname, lastname)
-    `,
-    )
-    .eq('place_id', placeId)
-    .order('points', { ascending: false })
-    .limit(10);
-
-  const playersStats: PlaceStatsType[] =
-    (playersStatsData as unknown as PlaceStatsType[]) || [];
+  // const { data: playersStatsData } = await supabase
+  //   .from('profiles_places')
+  //   .select(
+  //     `
+  //     profile_id,
+  //     points,
+  //     win,
+  //     loss,
+  //     draw,
+  //     minutes_played,
+  //     profile:profiles(id, username, image, bgg_username, image, firstname, lastname)
+  //   `,
+  //   )
+  //   .eq('place_id', placeId)
+  //   .order('points', { ascending: false })
+  //   .limit(10);
 
   const totalMatches = matches?.length || 0;
   const completedMatches =
@@ -88,7 +86,7 @@ export default async function PlaceStats({ placeId }: PlaceStatsProps) {
   const gamesMap = new Map<string, GameWithStats>();
   matches?.forEach((match) => {
     if (match.game && !Array.isArray(match.game)) {
-      const game = match.game as { id: any; name: any; image: any };
+      const game = match.game as Game;
       const gameId = String(game.id);
       const existing = gamesMap.get(gameId);
       const confirmedPlayers = match.players?.filter((p) => p.confirmed) || [];
@@ -217,9 +215,11 @@ export default async function PlaceStats({ placeId }: PlaceStatsProps) {
                   <CardHeader className="pb-3">
                     <div className="flex items-start gap-3">
                       {game.game_image && (
-                        <img
+                        <Image
                           src={game.game_image}
                           alt={game.game_name}
+                          width={64}
+                          height={64}
                           className="w-16 h-16 rounded-lg object-cover shrink-0"
                         />
                       )}

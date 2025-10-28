@@ -58,7 +58,7 @@ export default function TestimonialsSection() {
                 </div>
 
                 <p className="text-muted-foreground mb-6 italic">
-                  "{testimonial.content}"
+                  {testimonial.content}
                 </p>
 
                 <div className="flex items-center gap-3">

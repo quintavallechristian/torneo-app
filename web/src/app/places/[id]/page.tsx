@@ -101,7 +101,7 @@ export default async function PlaceDetailsPage({
           <StickyTabsWrapper>
             <TabsList className="cursor-pointer mb-0">
               <TabsTrigger className="cursor-pointer" value="matches">
-                Partite collegate
+                Partite
               </TabsTrigger>
               <TabsTrigger className="cursor-pointer" value="ranking">
                 Classifica

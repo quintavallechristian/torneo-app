@@ -19,51 +19,6 @@ export default async function matchesPage() {
       <h1 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
         Le tue partite
       </h1>
-      <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400">
-        In corso
-      </h2>
-      {matchesWithStatus?.filter(
-        (match) => match.status === MATCHSTATUS.Ongoing,
-      ) &&
-      matchesWithStatus?.filter((match) => match.status === MATCHSTATUS.Ongoing)
-        .length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          {matchesWithStatus
-            ?.filter((match) => match.status === MATCHSTATUS.Ongoing)
-            .map((match) => (
-              <MatchCard key={match.id} match={match} small={true} />
-            ))}
-        </div>
-      ) : (
-        <EmptyArea
-          className="w-full mt-4"
-          title="Nessuna partita"
-          message="Non hai in corso."
-        />
-      )}
-      <h2 className="text-2xl mt-8 font-bold text-indigo-700 dark:text-indigo-400">
-        In arrivo
-      </h2>
-      {matchesWithStatus?.filter(
-        (match) => match.status === MATCHSTATUS.Scheduled,
-      ) &&
-      matchesWithStatus?.filter(
-        (match) => match.status === MATCHSTATUS.Scheduled,
-      ).length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          {matchesWithStatus
-            ?.filter((match) => match.status === MATCHSTATUS.Scheduled)
-            .map((match) => (
-              <MatchCard key={match.id} match={match} small={true} />
-            ))}
-        </div>
-      ) : (
-        <EmptyArea
-          className="w-full mt-4"
-          title="Nessuna partita"
-          message="Non hai ancora giocato partite."
-        />
-      )}
       <h2 className="text-2xl font-bold mt-8 text-indigo-700 dark:text-indigo-400">
         In attesa di risultati
       </h2>
@@ -77,7 +32,12 @@ export default async function matchesPage() {
           {matchesWithStatus
             ?.filter((match) => match.status === MATCHSTATUS.WaitingForResults)
             .map((match) => (
-              <MatchCard key={match.id} match={match} small={true} />
+              <MatchCard
+                key={match.id}
+                match={match}
+                small={true}
+                profile={profile}
+              />
             ))}
         </div>
       ) : (
@@ -100,7 +60,12 @@ export default async function matchesPage() {
           {matchesWithStatus
             ?.filter((match) => match.status === MATCHSTATUS.Completed)
             .map((match) => (
-              <MatchCard key={match.id} match={match} small={true} />
+              <MatchCard
+                key={match.id}
+                match={match}
+                small={true}
+                profile={profile}
+              />
             ))}
         </div>
       ) : (

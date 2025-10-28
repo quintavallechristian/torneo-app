@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import {
   CardHeader,
@@ -8,23 +9,21 @@ import {
 import { Badge } from '@/components/ui/badge';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
-import { Match, MATCHSTATUS } from '@/types';
+import { Match, Profile } from '@/types';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {
   CalendarIcon,
   CrownIcon,
   DicesIcon,
+  FootprintsIcon,
   MapPinIcon,
   PencilIcon,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import DeleteMatchButton from '../DeleteMatchButton/DeleteMatchButton';
-import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { formatMatchStatus, getMatchStatus } from '@/lib/client/match';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { UserAction } from '@/types';
-import { canUser } from '@/lib/permissions';
 import MyAvatar from '../MyAvatar/MyAvatar';
 import FlipCard from '../FlipCard/FlipCard';
 
@@ -32,16 +31,20 @@ const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
 interface MatchCardProps {
   match: Match;
-  small?: boolean;
+  small?: boolean | null;
+  profile?: Profile | null;
+  canManagePlaces?: boolean | null;
+  withDistances?: boolean | null;
 }
 
-export default async function MatchCard({ match, small }: MatchCardProps) {
+export default function MatchCard({
+  match,
+  small,
+  profile,
+  canManagePlaces = false,
+  withDistances = false,
+}: MatchCardProps) {
   const matchStatus = getMatchStatus(match);
-  const { profile } = await getAuthenticatedUserWithProfile();
-
-  const canManagePlaces = await canUser(UserAction.ManagePlaces, {
-    placeId: match.place_id,
-  });
   return (
     <SpotlightCard className="px-0 py-0">
       <div className="flex justify-between items-center p-4 gap-2">
@@ -193,6 +196,18 @@ export default async function MatchCard({ match, small }: MatchCardProps) {
                         </Tooltip>
                       </Link>
                     ),
+                )}
+              </div>
+            )}
+            {withDistances && match.distance !== undefined && (
+              <div className="text-sm text-muted-foreground">
+                <FootprintsIcon className="size-4 inline-block mr-1" />
+                {match.distance && (
+                  <span className="text-sm">
+                    {match.distance < 1
+                      ? `${Math.round(match.distance * 1000)} m`
+                      : `${match.distance.toFixed(1)} km`}
+                  </span>
                 )}
               </div>
             )}
