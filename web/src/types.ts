@@ -37,6 +37,7 @@ export enum GAME_STATS_STATE {
 
 export enum MATCHSTATUS {
   Scheduled = 'Scheduled',
+  Starting = 'Starting',
   Ongoing = 'Ongoing',
   Completed = 'Completed',
   Canceled = 'Canceled',

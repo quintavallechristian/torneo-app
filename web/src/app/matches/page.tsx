@@ -20,16 +20,18 @@ export default async function matchesPage() {
     return { ...match, status };
   });
 
-  const scheduledOtherMatches = otherMatchesWithStatus?.filter(
-    (match) => match.status === MATCHSTATUS.Scheduled,
-  );
-
-  const scheduledMatches = matchesWithStatus?.filter(
-    (match) => match.status === MATCHSTATUS.Scheduled,
+  const scheduledMatches = matchesWithStatus?.filter((match) =>
+    [MATCHSTATUS.Scheduled, MATCHSTATUS.Starting].includes(match.status),
   );
 
   const ongoingMatches = matchesWithStatus?.filter(
     (match) => match.status === MATCHSTATUS.Ongoing,
+  );
+
+  const scheduledOtherMatches = otherMatchesWithStatus?.filter(
+    (match) =>
+      match.status === MATCHSTATUS.Scheduled &&
+      !matchesWithStatus?.some((m) => m.id === match.id),
   );
 
   return profile ? (
@@ -41,7 +43,7 @@ export default async function matchesPage() {
         In corso
       </h2>
       {ongoingMatches && ongoingMatches.length > 0 ? (
-        <MatchListClient matches={ongoingMatches} />
+        <MatchListClient matches={ongoingMatches} hideBar />
       ) : (
         <EmptyArea
           className="w-full mt-4"
@@ -50,10 +52,10 @@ export default async function matchesPage() {
         />
       )}
       <h2 className="text-2xl mt-8 font-bold text-indigo-700 dark:text-indigo-400">
-        In arrivo
+        Programmate
       </h2>
       {scheduledMatches && scheduledMatches.length > 0 ? (
-        <MatchListClient matches={scheduledMatches} />
+        <MatchListClient matches={scheduledMatches} hideBar />
       ) : (
         <EmptyArea
           className="w-full mt-4"
@@ -65,7 +67,11 @@ export default async function matchesPage() {
         Trova partite
       </h2>
       {scheduledOtherMatches && scheduledOtherMatches.length > 0 ? (
-        <MatchListClient withDistances={true} matches={scheduledOtherMatches} />
+        <MatchListClient
+          withDistances={true}
+          matches={scheduledOtherMatches}
+          hideBar
+        />
       ) : (
         <EmptyArea
           className="w-full mt-4"

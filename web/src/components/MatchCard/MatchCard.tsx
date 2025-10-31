@@ -167,7 +167,7 @@ export default function MatchCard({
               </div>
             )}
 
-            {match.players && !small && (
+            {match.players && (
               <div className="flex">
                 {match.players.map(
                   (player) =>

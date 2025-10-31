@@ -76,7 +76,7 @@ export default function MyAvatar({
         <AvatarImage src={image} />
       ) : (
         <AvatarFallback
-          className={`uppercase border-1 text-white ${avatarColor}`}
+          className={`uppercase border text-white ${avatarColor}`}
         >
           {placeholder}
         </AvatarFallback>

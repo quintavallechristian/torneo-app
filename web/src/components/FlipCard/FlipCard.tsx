@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import QRCode from 'react-qr-code';
 import { QrCode } from 'lucide-react';
@@ -21,10 +21,15 @@ export default function FlipCard({
   enableFlip = true,
 }: FlipCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div
-      className={`flex-shrink-0 mx-auto md:mx-0 ${
+      className={`shrink-0 mx-auto md:mx-0 ${
         enableFlip ? 'cursor-pointer group' : ''
       }`}
       style={{ perspective: '1000px' }}
@@ -67,7 +72,7 @@ export default function FlipCard({
 
         {/* Retro - QR Code */}
 
-        {qrValue && (
+        {qrValue && isMounted && (
           <div
             className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-muted p-4"
             style={{

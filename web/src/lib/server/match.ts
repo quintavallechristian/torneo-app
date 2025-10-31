@@ -725,15 +725,17 @@ export async function getMatches({
       )
     `,
       )
-      .in('id', matchIds);
+      .in('id', matchIds)
+      .order('startAt', { ascending: true });
     matchesList = data as Match[];
   } else {
+    console.log('heeehherheheherehre');
     const { data } = await supabase
       .from('matches')
       .select(
         '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
       )
-      .order('startAt', { ascending: false });
+      .order('startAt', { ascending: true });
     matchesList = data as Match[];
   }
   if (withPlaceDistance) {

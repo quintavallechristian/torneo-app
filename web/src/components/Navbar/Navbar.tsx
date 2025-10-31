@@ -14,7 +14,13 @@ import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { ROLE } from '@/types';
 import { Button } from '../ui/button';
-import { DicesIcon } from 'lucide-react';
+import {
+  DicesIcon,
+  LogOut,
+  LogOutIcon,
+  SettingsIcon,
+  UserIcon,
+} from 'lucide-react';
 import {
   GuestNavigationMenu,
   MobileGuestMenuButton,
@@ -23,6 +29,7 @@ import {
   LoggedNavigationMenu,
   MobileLoggedMenuButton,
 } from './LoggedNavigationMenu';
+import MyAvatar from '../MyAvatar/MyAvatar';
 
 async function handleLogout() {
   'use server';
@@ -57,33 +64,42 @@ export default async function Navbar() {
           <div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <span
-                  className={`cursor-pointer text-sm font-medium mr-4 ${
-                    role === ROLE.Admin
-                      ? 'text-red-300'
-                      : role === ROLE.User
-                      ? 'text-blue-300'
-                      : 'text-green-300'
-                  }`}
-                >
-                  {profile.username}
-                </span>
+                <div className="flex items-center gap-2  mr-2">
+                  <div
+                    className={`cursor-pointer text-sm font-medium ${
+                      role === ROLE.Admin
+                        ? 'text-red-300'
+                        : role === ROLE.User
+                        ? 'text-blue-300'
+                        : 'text-green-300'
+                    }`}
+                  >
+                    {profile.username}
+                  </div>
+                  <MyAvatar
+                    className="size-8 text-3xl"
+                    isOwn={true}
+                    image={profile?.image}
+                    placeholder={profile?.username.charAt(0)}
+                  />
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="start">
-                <DropdownMenuLabel>
+                <DropdownMenuLabel className="flex gap-2 items-center">
+                  <UserIcon className="size-4" />
                   <Link href="/profile">My Account</Link>
                 </DropdownMenuLabel>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <Link href="/profile/edit">Impostazioni</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
+                <DropdownMenuLabel className="flex gap-2 items-center">
+                  <SettingsIcon className="size-4" />
+                  <Link href="/settings">Impostazioni</Link>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuLabel className="flex gap-2 items-center">
+                  <LogOut className="size-4" />
                   <form action={handleLogout}>
                     <button type="submit">Log out</button>
                   </form>
-                </DropdownMenuItem>
+                </DropdownMenuLabel>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

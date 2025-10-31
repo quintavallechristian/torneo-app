@@ -1,5 +1,5 @@
 import { Match, MATCHSTATUS } from '@/types';
-import { isToday } from 'date-fns';
+import { addHours, isToday } from 'date-fns';
 
 export function formatMatchStatus(status: MATCHSTATUS): {
   label: string;
@@ -10,6 +10,11 @@ export function formatMatchStatus(status: MATCHSTATUS): {
       return {
         label: 'Programmata',
         color: 'bg-yellow-200 text-yellow-900',
+      };
+    case MATCHSTATUS.Starting:
+      return {
+        label: 'In arrivo',
+        color: 'bg-lime-200 text-lime-900',
       };
     case MATCHSTATUS.Ongoing:
       return {
@@ -42,14 +47,17 @@ export function formatMatchStatus(status: MATCHSTATUS): {
 export function getMatchStatus(match: Match) {
   const now = new Date();
   const startAt = new Date(match.startAt);
+  const twoHoursAfterStart = addHours(startAt, 2);
+
   if (match.winner_id || match.winner) {
     return MATCHSTATUS.Completed;
-  } else if (isToday(startAt)) {
-    console.log('oggi');
+  } else if (now >= startAt && now < twoHoursAfterStart) {
     return MATCHSTATUS.Ongoing;
+  } else if (isToday(startAt) && now < startAt) {
+    return MATCHSTATUS.Starting;
   } else if (now < startAt) {
     return MATCHSTATUS.Scheduled;
-  } else if (now > startAt) {
+  } else if (now >= twoHoursAfterStart) {
     return MATCHSTATUS.WaitingForResults;
   }
   return MATCHSTATUS.Canceled;

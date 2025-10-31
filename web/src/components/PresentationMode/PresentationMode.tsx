@@ -26,7 +26,12 @@ interface PresentationModeProps {
 
 export default function PresentationMode({ matches }: PresentationModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (matches.length === 0) return;
@@ -161,10 +166,12 @@ export default function PresentationMode({ matches }: PresentationModeProps) {
                       ? currentMatch.description
                       : 'Descrizione non disponibile'}
                   </div>
-                  <QRCode
-                    value={`${PUBLIC_URL}/matches/join/${currentMatch.id}`}
-                    size={250}
-                  />
+                  {isMounted && (
+                    <QRCode
+                      value={`${PUBLIC_URL}/matches/join/${currentMatch.id}`}
+                      size={250}
+                    />
+                  )}
                 </CardContent>
               </div>
             </div>

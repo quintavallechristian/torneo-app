@@ -20,6 +20,7 @@ interface MatchListProps {
   statusFilter?: string | null;
   canManagePlaces?: boolean | null;
   withDistances?: boolean | null;
+  hideBar?: boolean | null;
 }
 
 export default function MatchListClient({
@@ -30,6 +31,7 @@ export default function MatchListClient({
   statusFilter,
   canManagePlaces = false,
   withDistances = false,
+  hideBar = false,
 }: MatchListProps) {
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -98,36 +100,29 @@ export default function MatchListClient({
     );
   }
 
-  // Sort by date only if not sorting by distance
-  if (!withDistances || !userLocation) {
-    filteredMatches = filteredMatches?.sort((a, b) => {
-      const aStart = a?.startAt || '';
-      const bStart = b?.startAt || '';
-      return new Date(bStart).getTime() - new Date(aStart).getTime();
-    });
-  }
-
   return (
     <>
-      <StickyTabsWrapper topOffset="top-[68px]">
-        <div className="flex gap-2 justify-between">
-          <SearchInput defaultValue={searchQuery || undefined} />
-          <div className="flex gap-2">
-            <MatchStatusFilter />
-            {canManagePlaces && placeId && (
-              <Link
-                href={`/matches/new?place_id=${
-                  placeId ? placeId : ''
-                }&game_id=${gameId ? gameId : ''}`}
-              >
-                <Button variant="outline" size="lg" data-testid="Add Game">
-                  <PlusIcon className="inline h-6 w-6" />
-                </Button>
-              </Link>
-            )}
+      {!hideBar && (
+        <StickyTabsWrapper topOffset="top-[68px]">
+          <div className="flex gap-2 justify-between">
+            <SearchInput defaultValue={searchQuery || undefined} />
+            <div className="flex gap-2">
+              <MatchStatusFilter />
+              {canManagePlaces && placeId && (
+                <Link
+                  href={`/matches/new?place_id=${
+                    placeId ? placeId : ''
+                  }&game_id=${gameId ? gameId : ''}`}
+                >
+                  <Button variant="outline" size="lg" data-testid="Add Game">
+                    <PlusIcon className="inline h-6 w-6" />
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
-      </StickyTabsWrapper>
+        </StickyTabsWrapper>
+      )}
       {filteredMatches && filteredMatches.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {filteredMatches.map((match) => (
