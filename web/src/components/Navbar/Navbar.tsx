@@ -22,6 +22,7 @@ import {
   MobileLoggedMenuButton,
 } from './LoggedNavigationMenu';
 import MyAvatar from '../MyAvatar/MyAvatar';
+import { NotificationBell } from './NotificationBell';
 
 async function handleLogout() {
   'use server';
@@ -32,6 +33,18 @@ async function handleLogout() {
 
 export default async function Navbar() {
   const { profile, role } = await getAuthenticatedUserWithProfile();
+
+  // Conta le notifiche non lette
+  let unreadCount = 0;
+  if (profile) {
+    const supabase = await createClient();
+    const { count } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('profile_id', profile.id)
+      .eq('read', false);
+    unreadCount = count || 0;
+  }
 
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
@@ -53,7 +66,11 @@ export default async function Navbar() {
       )}
       <div className="flex items-center gap-4">
         {profile ? (
-          <div>
+          <div className="flex items-center gap-2">
+            <NotificationBell
+              profileId={profile.id}
+              initialCount={unreadCount}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center gap-2  mr-2">

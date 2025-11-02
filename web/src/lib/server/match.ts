@@ -438,8 +438,8 @@ export async function confirmResult({ match }: { match: Match }) {
     .update([{ pending_confirmation: true }])
     .eq('id', match.id);
 
-  const title = `Risultati confermati per la partita ${match.name}`;
-  const body = `I risultati per la partita ${match.name} sono stati confermati.`;
+  const title = `${profile?.username} ha confermato i risultati`;
+  const body = `I risultati per la partita "${match.name}" sono stati confermati. Non appena la maggioranza dei giocatori avrà confermato, i punteggi saranno aggiornati.`;
   const user_messages = match.players
     ?.filter((p) => p.profile_id !== profile?.id)
     .map((p) => ({ profile_id: p.profile_id, title: title, body: body }));

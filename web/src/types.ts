@@ -80,6 +80,14 @@ export const ProfileSchema = z.object({
   lastname: z.string().min(1).max(50).nullable(),
 });
 
+export type Notification = {
+  profile_id: string;
+  title: string;
+  body: string;
+  read: boolean;
+  created_at?: string | null;
+};
+
 export type UserRowPermission = {
   id: number;
   place_id: string;
