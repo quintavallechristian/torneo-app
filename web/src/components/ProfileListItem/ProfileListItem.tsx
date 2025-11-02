@@ -91,13 +91,15 @@ export default function ProfileListItem({
         />
       </div>
       {/* --- USERNAME --- */}
-      <div className="grid grid-cols-2 gap-2 items-center">
+      <div className="flex items-center gap-2">
         <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>
-          <div className="font-semibold">
+          <div className="font-semibold w-28 truncate">
             {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}
           </div>
         </div>
-        <div>{renderSlot(DescriptionSlot, defaultDescriptionArea)}</div>
+        <div className="w-10">
+          {renderSlot(DescriptionSlot, defaultDescriptionArea)}
+        </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
         {renderSlot(StatsSlot, defaultStatsArea)}

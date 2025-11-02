@@ -46,19 +46,6 @@ export default async function GameCard({
     <SpotlightCard className="px-0 pt-0 pb-0 md:pb-2">
       <div className="flex justify-between items-center pl-6 pr-2 pt-2 gap-2">
         <div className="text-sm text-muted-foreground">
-          {!small && (
-            <>
-              <CardDescription className="text-muted-foreground block md:hidden line-clamp-1">
-                {updatedGame.designer}
-              </CardDescription>
-              <CardDescription className="text-muted-foreground line-clamp-2 hidden md:block">
-                {updatedGame.year_published
-                  ? `Anno: ${updatedGame.year_published}`
-                  : null}{' '}
-                | {updatedGame.designer}
-              </CardDescription>
-            </>
-          )}
           {small && (
             <StatsExagon
               className="mt-1"
@@ -70,8 +57,35 @@ export default async function GameCard({
               variant={BadgeVariant.amber}
             />
           )}
+          {!small && (
+            <div className=" z-10 md:left-14 top-4 space-x-2 space-y-2 flex gap-2 justify-center relative">
+              <StatsExagon
+                size="md"
+                stat={updatedGame.bgg_rating || 'N/A'}
+                label="VOTO"
+                variant={BadgeVariant.red}
+              />
+              <StatsExagon
+                size="md"
+                stat={
+                  (updatedGame.bgg_rank || 0) > 0 ? updatedGame.bgg_rank : 'N/A'
+                }
+                label="RANK"
+                variant={BadgeVariant.amber}
+                className="absolute top-8 left-8"
+              />
+              <StatsExagon
+                size="md"
+                stat={updatedGame.bgg_weight || 'N/A'}
+                label="PESO"
+                variant={BadgeVariant.blue}
+              />
+            </div>
+          )}
         </div>
-        <div className="ml-auto flex gap-2 items-center">
+        <div
+          className={`ml-auto flex gap-2 items-center ${small ? '' : 'mt-4'}`}
+        >
           <ActionButtons game={game} gameStats={gameStats} context={context} />
         </div>
       </div>
@@ -85,24 +99,13 @@ export default async function GameCard({
         ></div>
       </div>
       <div
-        className={`flex flex-col md:flex-row p-4 ${
+        className={`flex flex-col md:flex-row px-4 mt-3 ${
           small
             ? 'text-sm flex-row'
-            : 'text-base flex-col md:flex-row gap-4 items-center'
+            : 'text-base flex-col md:flex-row gap-4 items-center md:-mt-6'
         }`}
       >
         <div className={`shrink-0 relative ${small ? 'size-24' : 'size-60'}`}>
-          {!small && (
-            <StatsExagon
-              className={`text-sm absolute left-1/2 -translate-x-1/2 -bottom-7`}
-              size="lg"
-              stat={
-                (updatedGame.bgg_rank || 0) > 0 ? updatedGame.bgg_rank : 'N/A'
-              }
-              label="RANK"
-              variant={BadgeVariant.amber}
-            />
-          )}
           <Image
             src={avatarUrl}
             alt={updatedGame?.name || 'Game image'}
@@ -112,25 +115,8 @@ export default async function GameCard({
               small ? 'size-24' : 'size-60'
             }`}
           />
-          {!small && (
-            <div className="space-x-8 md:space-x-4 space-y-2 flex gap-2 mt-2 justify-center">
-              <StatsExagon
-                size="lg"
-                stat={updatedGame.bgg_rating || 'N/A'}
-                label="VOTO"
-                variant={BadgeVariant.red}
-              />
-
-              <StatsExagon
-                size="lg"
-                stat={updatedGame.bgg_weight || 'N/A'}
-                label="PESO"
-                variant={BadgeVariant.blue}
-              />
-            </div>
-          )}
         </div>
-        <div className={`flex-1 w-full ${small ? '' : 'pt-16 md:pt-0'}`}>
+        <div className={`flex-1 w-full ${small ? '' : 'md:pt-0'}`}>
           <CardHeader className={`pb-2 pr-0`}>
             <CardTitle
               className={
@@ -152,31 +138,40 @@ export default async function GameCard({
           {!small && (
             <CardContent className="space-y-4 min-h-60">
               <>
+                <CardDescription className="text-muted-foreground block md:hidden line-clamp-1">
+                  {updatedGame.designer}
+                </CardDescription>
+                <CardDescription className="text-muted-foreground line-clamp-2 hidden md:block">
+                  {updatedGame.year_published
+                    ? `Anno: ${updatedGame.year_published}`
+                    : null}{' '}
+                  | {updatedGame.designer}
+                </CardDescription>
                 <div className="space-x-4 space-y-2">
                   {updatedGame.min_players === updatedGame.max_players ? (
-                    <Badge className="bg-green-100 text-green-800">
+                    <Badge className="bg-linear-to-br from-green-100 to-green-300 text-green-800">
                       Giocatori: {updatedGame.min_players}
                     </Badge>
                   ) : (
                     <>
-                      <Badge className="bg-green-100 text-green-800">
+                      <Badge className="bg-linear-to-br from-green-100 to-green-300 text-green-800">
                         Minimo giocatori: {updatedGame.min_players}
                       </Badge>
-                      <Badge className="bg-red-100 text-red-800">
+                      <Badge className="bg-linear-to-br from-red-100 to-red-300 text-red-800">
                         Massimo giocatori: {updatedGame.max_players}
                       </Badge>
                     </>
                   )}
                   {updatedGame.min_playtime === updatedGame.max_playtime ? (
-                    <Badge className="bg-yellow-100 text-yellow-800">
+                    <Badge className="bg-linear-to-br from-yellow-100 to-yellow-300 text-yellow-800">
                       Durata: {updatedGame.min_playtime} min
                     </Badge>
                   ) : (
                     <>
-                      <Badge className="bg-yellow-100 text-yellow-800">
+                      <Badge className="bg-linear-to-br from-yellow-100 to-yellow-300 text-yellow-800">
                         Durata minima: {updatedGame.min_playtime} min
                       </Badge>
-                      <Badge className="bg-yellow-100 text-yellow-800">
+                      <Badge className="bg-linear-to-br from-yellow-100 to-yellow-300 text-yellow-800">
                         Durata massima: {updatedGame.max_playtime} min
                       </Badge>
                     </>

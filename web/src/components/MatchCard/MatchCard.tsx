@@ -19,6 +19,7 @@ import {
   FootprintsIcon,
   MapPinIcon,
   PencilIcon,
+  TrophyIcon,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import DeleteMatchButton from '../DeleteMatchButton/DeleteMatchButton';
@@ -26,6 +27,8 @@ import { formatMatchStatus, getMatchStatus } from '@/lib/client/match';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import MyAvatar from '../MyAvatar/MyAvatar';
 import FlipCard from '../FlipCard/FlipCard';
+import { confirmResult, setWinner } from '@/lib/server/match';
+import { toast } from 'sonner';
 
 const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
@@ -34,6 +37,7 @@ interface MatchCardProps {
   small?: boolean | null;
   profile?: Profile | null;
   canManagePlaces?: boolean | null;
+  canUpdateMatchStats?: boolean | null;
   withDistances?: boolean | null;
 }
 
@@ -42,9 +46,35 @@ export default function MatchCard({
   small,
   profile,
   canManagePlaces = false,
+  canUpdateMatchStats = false,
   withDistances = false,
 }: MatchCardProps) {
   const matchStatus = getMatchStatus(match);
+
+  function setConfirmationAction() {
+    const winnerId = match.players
+      ?.filter((p) => p.confirmed)
+      .sort((a, b) => (b.points || 0) - (a.points || 0))[0].profile_id;
+
+    if (!winnerId) {
+      toast.error('Nessun giocatore confermato per questa partita');
+      return;
+    }
+    confirmResult({
+      match,
+    })
+      .then((data) => {
+        if (data.success) {
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
+      })
+      .catch(() => {
+        toast.error('Errore nel confermare il vincitore');
+      });
+  }
+
   return (
     <SpotlightCard className="px-0 py-0">
       <div className="flex justify-between items-center p-4 gap-2">
@@ -133,8 +163,8 @@ export default function MatchCard({
             >
               <Link
                 href={`/matches/${match.id}`}
-                className={`hover:underline max-h-14 z-10 ${
-                  small ? 'line-clamp-1' : ''
+                className={`hover:underline z-10 ${
+                  small ? 'line-clamp-1 max-h-14' : ''
                 }`}
               >
                 {match.name}
@@ -215,13 +245,27 @@ export default function MatchCard({
         </div>
       </div>
 
-      {!small && canManagePlaces && (
+      {!small && (canManagePlaces || canUpdateMatchStats) && (
         <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
-          <Button className="cursor-pointer" variant="secondary">
-            <PencilIcon className="inline mr-2 h-4 w-4" />
-            <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
-          </Button>
-          {match.id && <DeleteMatchButton id={match.id} />}
+          {canUpdateMatchStats && !match.winner && (
+            <Button
+              className="cursor-pointer"
+              variant="default"
+              onClick={() => setConfirmationAction()}
+            >
+              <TrophyIcon className="inline mr-2 h-4 w-4" />
+              Conferma risultati
+            </Button>
+          )}
+          {canManagePlaces && (
+            <div className="ml-auto flex gap-2">
+              <Button className="cursor-pointer" variant="secondary">
+                <PencilIcon className="inline mr-2 h-4 w-4" />
+                <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
+              </Button>
+              {match.id && <DeleteMatchButton id={match.id} />}
+            </div>
+          )}
         </CardFooter>
       )}
     </SpotlightCard>

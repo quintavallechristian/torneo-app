@@ -9,37 +9,39 @@ export function formatMatchStatus(status: MATCHSTATUS): {
     case MATCHSTATUS.Scheduled:
       return {
         label: 'Programmata',
-        color: 'bg-yellow-200 text-yellow-900',
+        color:
+          'bg-gradient-to-br from-yellow-200 to-yellow-600 text-yellow-900',
       };
     case MATCHSTATUS.Starting:
       return {
         label: 'In arrivo',
-        color: 'bg-lime-200 text-lime-900',
+        color: 'bg-gradient-to-br from-lime-200 to-lime-600 text-lime-900',
       };
     case MATCHSTATUS.Ongoing:
       return {
         label: 'In corso',
-        color: 'bg-green-200 text-green-900',
+        color: 'bg-gradient-to-br from-green-200 to-green-500 text-green-900',
       };
     case MATCHSTATUS.Completed:
       return {
         label: 'Completata',
-        color: 'bg-blue-200 text-blue-900',
+        color: 'bg-gradient-to-br from-blue-200 to-blue-500 text-blue-900',
       };
     case MATCHSTATUS.Canceled:
       return {
         label: 'Annullata',
-        color: 'bg-red-200 text-red-900',
+        color: 'bg-gradient-to-br from-red-200 to-red-500 text-red-900',
       };
     case MATCHSTATUS.WaitingForResults:
       return {
         label: 'In attesa di risultati',
-        color: 'bg-purple-200 text-purple-900',
+        color:
+          'bg-gradient-to-br from-purple-200 to-purple-400 text-purple-900',
       };
     default:
       return {
         label: 'Annullata',
-        color: 'bg-red-200 text-red-900',
+        color: 'bg-gradient-to-br from-red-200 to-red-500 text-red-900',
       };
   }
 }

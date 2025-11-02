@@ -170,7 +170,6 @@ export async function getGame(gameId: string) {
     game = result.data;
     error = result.error;
   }
-  console.log('fetched', game);
   return { game, error };
 }
 
@@ -250,6 +249,7 @@ export async function updateGame(game: Game): Promise<Game> {
 
       gameDescription = decode(gameDescription.replace(/<br\s*\/?>/gi, '\n'));
 
+      console.log(parsedData);
       const { error: updateError } = await supabase
         .from('games')
         .update({
@@ -267,7 +267,7 @@ export async function updateGame(game: Game): Promise<Game> {
           bgg_weight,
           bgg_rank:
             retrieved_bgg_rank === 'Not Ranked' ? -1 : retrieved_bgg_rank,
-          updated_at: new Date(),
+          // updated_at: new Date(),
         })
         .eq('id', game.id);
 

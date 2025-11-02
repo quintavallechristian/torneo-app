@@ -3,13 +3,6 @@ export enum UserAction {
   ManagePlatform = 'manage:platform',
   ManagePlaces = 'manage:places',
   ManageGames = 'manage:games',
-  CreateMatches = 'create:matches',
-  DeleteMatches = 'delete:matches',
-  UpdateMatches = 'update:matches',
-  ReadPlaces = 'read:places',
-  CreatePlaces = 'create:places',
-  DeletePlaces = 'delete:places',
-  UpdatePlaces = 'update:places',
 }
 
 export enum ROLE {
@@ -170,6 +163,11 @@ export type GameStats = PlayerStats & {
 export type PlaceStats = PlayerStats & {
   place_id: string;
   favourite: boolean;
+};
+
+export type GamePlaceStats = PlayerStats & {
+  place_id: string;
+  game_id: string;
 };
 
 export type PlaceGame = {

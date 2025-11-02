@@ -4,8 +4,6 @@ import { createClient } from '@/utils/supabase/server';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -14,13 +12,7 @@ import Link from 'next/link';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { ROLE } from '@/types';
 import { Button } from '../ui/button';
-import {
-  DicesIcon,
-  LogOut,
-  LogOutIcon,
-  SettingsIcon,
-  UserIcon,
-} from 'lucide-react';
+import { DicesIcon, LogOut, SettingsIcon, UserIcon } from 'lucide-react';
 import {
   GuestNavigationMenu,
   MobileGuestMenuButton,
@@ -77,7 +69,7 @@ export default async function Navbar() {
                     {profile.username}
                   </div>
                   <MyAvatar
-                    className="size-8 text-3xl"
+                    className="size-8"
                     isOwn={true}
                     image={profile?.image}
                     placeholder={profile?.username.charAt(0)}

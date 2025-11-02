@@ -10,7 +10,15 @@ import {
   UserRoundCheck,
   UserRoundX,
 } from 'lucide-react';
-import { GameStats, PlaceStats, Match, Player, Profile } from '@/types';
+import {
+  GameStats,
+  PlaceStats,
+  Match,
+  Player,
+  Profile,
+  MATCHSTATUS,
+  GamePlaceStats,
+} from '@/types';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
 import {
   confirmPlayer,
@@ -26,11 +34,11 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import StatsExagon from '@/components/StatsExagon/StatsExagon';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
+import { getMatchStatus } from '@/lib/client/match';
 interface MatchPlayersListProps {
   profile: Profile | null;
   match: Match;
-  profileGames: GameStats[];
-  profilePlaces: PlaceStats[];
+  profileGamesPlaces: GamePlaceStats[];
   canManagePlatform: boolean;
   canUpdateMatchStats: boolean;
   canManagePlaces: boolean;
@@ -38,8 +46,7 @@ interface MatchPlayersListProps {
 export default function MatchPlayersList({
   profile,
   match,
-  profileGames,
-  profilePlaces,
+  profileGamesPlaces,
   canUpdateMatchStats,
   canManagePlaces,
 }: MatchPlayersListProps) {
@@ -85,28 +92,11 @@ export default function MatchPlayersList({
       });
   }
 
-  function setWinnerAction(profileId: string) {
-    setWinner({
-      winnerId: profileId,
-      match: match!,
-      game: match.game!,
-      place: match.place!,
-      players: match.players!.map((p) => ({
-        profile_id: p.profile_id,
-        points: p.points,
-      })),
-    })
-      .then((data) => {
-        if (data.success) {
-          toast.success(data.message);
-        } else {
-          toast.error(data.message);
-        }
-      })
-      .catch(() => {
-        toast.error('Errore nel confermare il vincitore');
-      });
-  }
+  const matchStatus = getMatchStatus(match);
+  const canMatchBeUpdated = [
+    MATCHSTATUS.Ongoing,
+    MATCHSTATUS.WaitingForResults,
+  ].includes(matchStatus);
 
   return (
     <section className="mt-8">
@@ -182,38 +172,30 @@ export default function MatchPlayersList({
               key={`${playerObj.profile?.id}-${index}`}
               player={playerObj}
               relevant={!!playerObj.confirmed}
-              isWinner={playerObj.profile?.id === match.winner?.id}
-              IntroSlot={
-                !adminControlToggled ? (
-                  <button
-                    type="submit"
-                    onClick={() => setWinnerAction(playerObj.profile!.id!)}
-                  >
-                    <StatsExagon
-                      className="cursor-pointer hover:scale-110"
-                      size="sm"
-                      stat={<TrophyIcon className="size-5" strokeWidth={1} />}
-                      variant={
-                        playerObj.profile?.id === match.winner?.id
-                          ? BadgeVariant.gold
-                          : BadgeVariant.opaque
-                      }
-                    />
-                  </button>
-                ) : (
-                  ''
-                )
+              index={index + 1}
+              isWinner={
+                playerObj.profile?.id === match.winner?.id ||
+                (index === 0 && canMatchBeUpdated)
               }
               StatsSlot={
                 !adminControlToggled ? (
-                  match.game && match.place && canUpdateMatchStats ? (
+                  match.game &&
+                  match.place &&
+                  canUpdateMatchStats &&
+                  canMatchBeUpdated ? (
                     <PointsPopover
                       placeId={match.place.id || ''}
                       match={match}
                       playerId={playerObj.profile!.id!}
                       startingPoints={playerObj.points || 0}
                     />
-                  ) : null
+                  ) : (
+                    <button className="cursor-pointer focus:outline-none hover:scale-105">
+                      <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs font-medium">
+                        0 pts
+                      </span>
+                    </button>
+                  )
                 ) : (
                   ''
                 )
@@ -249,25 +231,15 @@ export default function MatchPlayersList({
               }
               DescriptionSlot={
                 !adminControlToggled && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center w-20">
                     <StatsExagon
                       size="xs"
                       stat={
-                        profileGames.find(
+                        profileGamesPlaces.find(
                           ({ profile_id }) =>
                             profile_id === playerObj.profile!.id!,
                         )?.points || 0
                       }
-                    />
-                    <StatsExagon
-                      size="xs"
-                      stat={
-                        profilePlaces.find(
-                          ({ profile_id }) =>
-                            profile_id === playerObj.profile!.id!,
-                        )?.points || 0
-                      }
-                      variant={BadgeVariant.blue}
                     />
                   </div>
                 )

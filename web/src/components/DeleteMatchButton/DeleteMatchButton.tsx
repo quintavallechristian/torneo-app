@@ -31,7 +31,13 @@ export async function deleteMatch(matchId: string) {
   }
 }
 
-export default function DeleteMatchButton({ id }: { id: string }) {
+export default function DeleteMatchButton({
+  id,
+  className,
+}: {
+  id: string;
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   const handleDelete = async () => {
@@ -42,7 +48,7 @@ export default function DeleteMatchButton({ id }: { id: string }) {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" className="cursor-pointer">
+        <Button variant="destructive" className={`cursor-pointer ${className}`}>
           <Trash className="inline mr-2 h-4 w-4" />
           Elimina
         </Button>

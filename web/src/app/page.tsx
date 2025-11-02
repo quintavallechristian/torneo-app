@@ -108,14 +108,14 @@ export default async function HomePage() {
       </h1>
 
       {/* Sezione Statistiche */}
-      <section className="mb-12">
+      {/* <section className="mb-12">
         <div className="hidden md:block">
           <StatsShowcase size="xxl" />
         </div>
         <div className="block md:hidden">
           <StatsShowcase size="xl" />
         </div>
-      </section>
+      </section> */}
 
       {/* Sezione Le Mie Partite */}
       <section className="mb-12">

@@ -6,17 +6,20 @@ import { Toaster } from 'sonner';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { MyAurora } from '@/components/Aurora/MyAurora';
 import 'leaflet/dist/leaflet.css';
+import { NotificationListener } from '@/components/NotificationListener/NotificationListener';
+import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 
 export const metadata: Metadata = {
   title: 'PartitApp',
   description: 'Descrizione di PartitApp',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { profile } = await getAuthenticatedUserWithProfile();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -39,6 +42,7 @@ export default function RootLayout({
           {children}
           <SpeedInsights />
           <Toaster />
+          {profile && <NotificationListener profileId={profile.id} />}
         </ThemeProvider>
       </body>
     </html>

@@ -107,7 +107,6 @@ export async function updateElo(
       points: newElo,
     };
   });
-  console.log('Final ELO changes', rows);
 
   const { error } = await supabase.from('profiles_stats').upsert(rows, {
     onConflict: 'profile_id',
@@ -160,7 +159,6 @@ export async function updateGameElo(
     for (let j = i + 1; j < playerIds.length; j++) {
       const A = playersWithAllNeeded[playerIds[i]];
       const B = playersWithAllNeeded[playerIds[j]];
-      console.log('A vs B', A, B);
 
       // aspettative (probabilità che A vinca contro B)
       const expectedA =
@@ -178,14 +176,12 @@ export async function updateGameElo(
         scoreA = 0;
         scoreB = 1;
       }
-      console.log('Score', scoreA, scoreB);
+
       // se position uguali → resta scoreA = 0.5 e scoreB = 0.5 (pareggio)
 
       // aggiorna i risultati accumulati
       results[playerIds[i]] += K * (scoreA - expectedA);
       results[playerIds[j]] += K * (scoreB - expectedB);
-      console.log('Results so far', results);
-      console.log('---');
     }
   }
 
@@ -205,7 +201,6 @@ export async function updateGameElo(
       points: newElo,
     };
   });
-  console.log('Final ELO changes', rows);
 
   const { error } = await supabase.from('profiles_games').upsert(rows, {
     onConflict: 'game_id,profile_id',
@@ -258,14 +253,11 @@ export async function updatePlaceElo(
     for (let j = i + 1; j < playerIds.length; j++) {
       const A = playersWithAllNeeded[playerIds[i]];
       const B = playersWithAllNeeded[playerIds[j]];
-      console.log('A vs B', A, B);
 
       // aspettative (probabilità che A vinca contro B)
       const expectedA =
         1 / (1 + Math.pow(10, (B.currentElo - A.currentElo) / 400));
       const expectedB = 1 - expectedA;
-
-      console.log('Expected', expectedA, expectedB);
 
       // punteggi reali in base al position
       let scoreA = 0.5;
@@ -278,14 +270,12 @@ export async function updatePlaceElo(
         scoreA = 0;
         scoreB = 1;
       }
-      console.log('Score', scoreA, scoreB);
+
       // se position uguali → resta scoreA = 0.5 e scoreB = 0.5 (pareggio)
 
       // aggiorna i risultati accumulati
       results[playerIds[i]] += K * (scoreA - expectedA);
       results[playerIds[j]] += K * (scoreB - expectedB);
-      console.log('Results so far', results);
-      console.log('---');
     }
   }
 
@@ -305,7 +295,6 @@ export async function updatePlaceElo(
       points: newElo,
     };
   });
-  console.log('Final ELO changes', rows);
 
   const { error } = await supabase.from('profiles_places').upsert(rows, {
     onConflict: 'place_id,profile_id',
@@ -315,6 +304,154 @@ export async function updatePlaceElo(
     console.error('Error updating ELOs', error);
   }
 }
+export async function updateGamePlaceElo(
+  players: Pick<Player, 'profile_id' | 'points'>[],
+  game: Game,
+  place: Place,
+) {
+  console.log('ciao');
+  const supabase = await createClient();
+  const playersWithAllNeeded: {
+    [id: string]: {
+      currentElo: number;
+      points: number;
+      position: number;
+      result: number;
+    };
+  } = {};
+
+  const { data } = await supabase
+    .from('profiles_games_places')
+    .select<'profile_id, points', PlaceStats>('profile_id, points')
+    .eq('place_id', place.id)
+    .eq('game_id', game.id)
+    .in(
+      'profile_id',
+      players.map((p) => p.profile_id),
+    );
+
+  players.forEach(
+    (p, index) =>
+      (playersWithAllNeeded[p.profile_id] = {
+        currentElo:
+          data?.find((d) => d.profile_id === p.profile_id)?.points || 0,
+        points: p.points || 0,
+        position: index + 1,
+        result: 0,
+      }),
+  );
+
+  // confronta ogni coppia di giocatori
+  const playerIds = Object.keys(playersWithAllNeeded);
+  const results: { [id: string]: number } = {};
+  playerIds.forEach((id) => (results[id] = 0));
+
+  for (let i = 0; i < playerIds.length; i++) {
+    for (let j = i + 1; j < playerIds.length; j++) {
+      const A = playersWithAllNeeded[playerIds[i]];
+      const B = playersWithAllNeeded[playerIds[j]];
+
+      // aspettative (probabilità che A vinca contro B)
+      const expectedA =
+        1 / (1 + Math.pow(10, (B.currentElo - A.currentElo) / 400));
+      const expectedB = 1 - expectedA;
+
+      // punteggi reali in base al position
+      let scoreA = 0.5;
+      let scoreB = 0.5;
+
+      if (A.position < B.position) {
+        scoreA = 1;
+        scoreB = 0;
+      } else if (A.position > B.position) {
+        scoreA = 0;
+        scoreB = 1;
+      }
+
+      // se position uguali → resta scoreA = 0.5 e scoreB = 0.5 (pareggio)
+
+      // aggiorna i risultati accumulati
+      results[playerIds[i]] += K * (scoreA - expectedA);
+      results[playerIds[j]] += K * (scoreB - expectedB);
+    }
+  }
+
+  const rows = playerIds.map((playerId) => {
+    const eloChange =
+      playersWithAllNeeded[playerId].currentElo <= 100
+        ? Math.max(Math.round(results[playerId]), 0)
+        : Math.round(results[playerId]);
+    const newElo =
+      playersWithAllNeeded[playerId].currentElo <= 100
+        ? Math.max(0, playersWithAllNeeded[playerId].currentElo + eloChange)
+        : Math.max(100, playersWithAllNeeded[playerId].currentElo + eloChange);
+
+    return {
+      profile_id: playerId,
+      place_id: place.id,
+      game_id: game.id,
+      points: newElo,
+    };
+  });
+
+  const { error } = await supabase.from('profiles_games_places').upsert(rows, {
+    onConflict: 'place_id,game_id,profile_id',
+  });
+
+  if (error) {
+    console.error('Error updating ELOs', error);
+  }
+}
+
+export async function confirmResult({ match }: { match: Match }) {
+  const supabase = await createClient();
+
+  const { profile } = await getAuthenticatedUserWithProfile();
+
+  const canUpdateMatchStats = !!(await canUser(
+    UserAction.ManagePlaces,
+    {
+      placeId: match.place_id,
+    },
+    match.players?.some((p) => p.confirmed && p.profile_id === profile?.id),
+  ));
+  if (!canUpdateMatchStats) {
+    return {
+      success: false,
+      message: 'Non hai i permessi per confermare i risultati',
+    };
+  }
+
+  const { error } = await supabase
+    .from('profiles_matches')
+    .update([{ confirmed_result: true }])
+    .eq('match_id', match.id)
+    .eq('profile_id', profile!.id);
+
+  if (error) {
+    console.error('Error confirming result:', error);
+    throw error;
+  }
+
+  await supabase
+    .from('matches')
+    .update([{ pending_confirmation: true }])
+    .eq('id', match.id);
+
+  const title = `Risultati confermati per la partita ${match.name}`;
+  const body = `I risultati per la partita ${match.name} sono stati confermati.`;
+  const user_messages = match.players
+    ?.filter((p) => p.profile_id !== profile?.id)
+    .map((p) => ({ profile_id: p.profile_id, title: title, body: body }));
+
+  console.log(user_messages);
+  await supabase.from('notifications').insert(user_messages).select();
+
+  revalidatePath(`/matches/${match.id}`);
+
+  return { success: true, message: 'Risultato confermato con successo' };
+}
+
 export async function setWinner({
   match,
   players,
@@ -351,6 +488,7 @@ export async function setWinner({
   updateElo(players);
   updateGameElo(players, game);
   updatePlaceElo(players, place);
+  updateGamePlaceElo(players, game, place);
   revalidatePath(`/matches/${match.id}`);
   return { success: true, message: 'Vincitore aggiornato con successo' };
 }
@@ -699,7 +837,6 @@ export async function getMatches({
   limit,
   withPlaceDistance = false,
 }: { mine?: boolean; limit?: number; withPlaceDistance?: boolean } = {}) {
-  console.log('TODO, handle limit:', limit);
   const supabase = await createClient();
   const { profile } = await getAuthenticatedUserWithProfile();
   let matchesList: Match[] = [];
@@ -729,7 +866,6 @@ export async function getMatches({
       .order('startAt', { ascending: true });
     matchesList = data as Match[];
   } else {
-    console.log('heeehherheheherehre');
     const { data } = await supabase
       .from('matches')
       .select(

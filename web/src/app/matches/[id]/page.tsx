@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import { GameStats, PlaceStats, Match, UserAction } from '@/types';
+import { Match, UserAction, GamePlaceStats } from '@/types';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import MatchCard from '@/components/MatchCard/MatchCard';
 import { canUser } from '@/lib/permissions';
@@ -44,28 +44,12 @@ export default async function MatchDetailsPage({
     return <p>Errore nel recupero del partita</p>;
   }
 
-  let profileGames: GameStats[] = [];
+  let profileGamesPlaces: GamePlaceStats[] = [];
   if (match.players) {
     const { data } = await supabase
-      .from('profiles_games')
-      .select<'profile_id, points', GameStats>('profile_id, points')
+      .from('profiles_games_places')
+      .select<'profile_id, points', GamePlaceStats>('profile_id, points')
       .eq('game_id', match.game_id)
-      .in(
-        'profile_id',
-        match.players.map((p) => p.profile_id),
-      );
-
-    if (error) {
-      console.error('Errore nel recupero delle statistiche di gioco:', error);
-    }
-    profileGames = data || [];
-  }
-
-  let profilePlaces: PlaceStats[] = [];
-  if (match.players) {
-    const { data } = await supabase
-      .from('profiles_places')
-      .select<'profile_id, points', PlaceStats>('profile_id, points')
       .eq('place_id', match.place_id)
       .in(
         'profile_id',
@@ -75,7 +59,7 @@ export default async function MatchDetailsPage({
     if (error) {
       console.error('Errore nel recupero delle statistiche di gioco:', error);
     }
-    profilePlaces = data || [];
+    profileGamesPlaces = data || [];
   }
 
   const canUpdateMatchStats = !!(await canUser(
@@ -108,12 +92,17 @@ export default async function MatchDetailsPage({
       </div>
       {match && match.game ? (
         <>
-          <MatchCard match={match} small={false} profile={profile} />
+          <MatchCard
+            match={match}
+            small={false}
+            profile={profile}
+            canManagePlaces={canManagePlaces}
+            canUpdateMatchStats={canUpdateMatchStats}
+          />
           <MatchPlayersList
             profile={profile}
             match={match}
-            profileGames={profileGames}
-            profilePlaces={profilePlaces}
+            profileGamesPlaces={profileGamesPlaces}
             canManagePlatform={canManagePlatform}
             canUpdateMatchStats={canUpdateMatchStats}
             canManagePlaces={canManagePlaces}
