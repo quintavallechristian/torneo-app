@@ -38,6 +38,12 @@ export function formatMatchStatus(status: MATCHSTATUS): {
         color:
           'bg-gradient-to-br from-purple-200 to-purple-400 text-purple-900',
       };
+    case MATCHSTATUS.PendingConfirmation:
+      return {
+        label: 'In attesa di conferma',
+        color:
+          'bg-gradient-to-br from-purple-200 to-purple-400 text-purple-900',
+      };
     default:
       return {
         label: 'Annullata',
@@ -60,7 +66,9 @@ export function getMatchStatus(match: Match) {
   } else if (now < startAt) {
     return MATCHSTATUS.Scheduled;
   } else if (now >= twoHoursAfterStart) {
-    return MATCHSTATUS.WaitingForResults;
+    return match.pending_confirmation
+      ? MATCHSTATUS.PendingConfirmation
+      : MATCHSTATUS.WaitingForResults;
   }
   return MATCHSTATUS.Canceled;
 }

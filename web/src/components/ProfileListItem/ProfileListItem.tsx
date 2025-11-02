@@ -93,7 +93,7 @@ export default function ProfileListItem({
       {/* --- USERNAME --- */}
       <div className="flex items-center gap-2">
         <div className={`${relevant ? 'opacity-100' : 'opacity-50'}`}>
-          <div className="font-semibold w-28 truncate">
+          <div className="font-semibold w-28 md:w-40 truncate">
             {player.profile?.username ?? player.profile?.firstname ?? 'Anonimo'}
           </div>
         </div>

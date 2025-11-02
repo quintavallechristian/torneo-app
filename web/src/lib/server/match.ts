@@ -415,6 +415,7 @@ export async function confirmResult({ match }: { match: Match }) {
     },
     match.players?.some((p) => p.confirmed && p.profile_id === profile?.id),
   ));
+
   if (!canUpdateMatchStats) {
     return {
       success: false,
@@ -422,6 +423,7 @@ export async function confirmResult({ match }: { match: Match }) {
     };
   }
 
+  // updates the profiles_matches to set confirmed_result = true for the current user
   const { error } = await supabase
     .from('profiles_matches')
     .update([{ confirmed_result: true }])
@@ -433,18 +435,33 @@ export async function confirmResult({ match }: { match: Match }) {
     throw error;
   }
 
+  //count players
+  const playersCount = match.players?.length || 0;
+  const confirmedPlayers =
+    match.players?.filter((p) => p.confirmed_result) || [];
+  const confirmedCount = confirmedPlayers.length;
+
+  let pendingConfirmation = true;
+  let title = `${profile?.username} ha confermato i risultati`;
+  let body = `I risultati per la partita "${match.name}" sono stati confermati. Non appena la maggioranza dei giocatori avrà confermato, i punteggi saranno aggiornati.`;
+  if (confirmedCount / playersCount >= 0.5) {
+    // if more than 50% of players have confirmed, set pending_confirmation = false and update winner_id
+    setWinner({ match });
+    pendingConfirmation = false;
+    title = `Risultati confermati per la partita "${match.name}"`;
+    body = `La maggioranza dei giocatori ha confermato i risultati per la partita "${match.name}". I punteggi sono stati aggiornati.`;
+  }
+  // updates the match to set pending_confirmation = true
   await supabase
     .from('matches')
-    .update([{ pending_confirmation: true }])
+    .update([{ pending_confirmation: pendingConfirmation }])
     .eq('id', match.id);
 
-  const title = `${profile?.username} ha confermato i risultati`;
-  const body = `I risultati per la partita "${match.name}" sono stati confermati. Non appena la maggioranza dei giocatori avrà confermato, i punteggi saranno aggiornati.`;
+  // create notifications for all players except the current user to inform them that the results have been confirmed by this user
   const user_messages = match.players
     ?.filter((p) => p.profile_id !== profile?.id)
     .map((p) => ({ profile_id: p.profile_id, title: title, body: body }));
 
-  console.log(user_messages);
   await supabase.from('notifications').insert(user_messages).select();
 
   revalidatePath(`/matches/${match.id}`);
@@ -452,24 +469,25 @@ export async function confirmResult({ match }: { match: Match }) {
   return { success: true, message: 'Risultato confermato con successo' };
 }
 
-export async function setWinner({
-  match,
-  players,
-  place,
-  game,
-  winnerId,
-}: {
-  match: Match;
-  players: Pick<Player, 'profile_id' | 'points'>[];
-  place: Place;
-  game: Game;
-  winnerId?: string;
-}) {
+export async function setWinner({ match }: { match: Match }) {
+  if (!match.players) {
+    throw new Error('No players in match');
+  }
+  if (!match.game) {
+    throw new Error('No game in match');
+  }
+  if (!match.place) {
+    throw new Error('No place in match');
+  }
   const supabase = await createClient();
   const { profile } = await getAuthenticatedUserWithProfile();
+  const winner = match.players
+    ?.filter((p) => p.confirmed)
+    .sort((a, b) => (b.points || 0) - (a.points || 0))[0];
+
   const { error } = await supabase
     .from('matches')
-    .update({ winner_id: winnerId || players[0].profile_id })
+    .update({ winner_id: winner?.profile_id })
     .eq('id', match.id);
   if (error) throw error;
   const canUpdateMatchStats = !!(await canUser(
@@ -485,10 +503,10 @@ export async function setWinner({
       message: 'Non hai i permessi per aggiornare le statistiche',
     };
   }
-  updateElo(players);
-  updateGameElo(players, game);
-  updatePlaceElo(players, place);
-  updateGamePlaceElo(players, game, place);
+  updateElo(match.players);
+  updateGameElo(match.players, match.game);
+  updatePlaceElo(match.players, match.place);
+  updateGamePlaceElo(match.players, match.game, match.place);
   revalidatePath(`/matches/${match.id}`);
   return { success: true, message: 'Vincitore aggiornato con successo' };
 }

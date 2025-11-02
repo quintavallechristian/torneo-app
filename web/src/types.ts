@@ -35,6 +35,7 @@ export enum MATCHSTATUS {
   Completed = 'Completed',
   Canceled = 'Canceled',
   WaitingForResults = 'WaitingForResults',
+  PendingConfirmation = 'PendingConfirmation',
 }
 
 export const createMatchSchema = (minPlayers: number, maxPlayers: number) =>
@@ -143,6 +144,7 @@ export type Match = z.infer<ReturnType<typeof createMatchSchema>> & {
   winner?: Profile | null;
   winner_id?: string | null;
   distance?: number;
+  pending_confirmation?: boolean | null;
 };
 
 export type Player = {
@@ -152,6 +154,7 @@ export type Player = {
   profile: Profile;
   points: number;
   confirmed?: boolean | null;
+  confirmed_result?: boolean | null;
 };
 
 export type PlayerStats = Player & {

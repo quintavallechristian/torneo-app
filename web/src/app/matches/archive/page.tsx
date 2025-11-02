@@ -16,6 +16,10 @@ export default async function matchesPage() {
     return { ...match, status };
   });
 
+  const pendingConfirmationMatches = matchesWithStatus?.filter(
+    (match) => match.status === MATCHSTATUS.PendingConfirmation,
+  );
+
   const waitingResultMatches = matchesWithStatus?.filter(
     (match) => match.status === MATCHSTATUS.WaitingForResults,
   );
@@ -29,6 +33,18 @@ export default async function matchesPage() {
       <h1 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
         Le tue partite
       </h1>
+      <h2 className="text-2xl font-bold mt-8 text-indigo-700 dark:text-indigo-400">
+        In attesa di conferma
+      </h2>
+      {pendingConfirmationMatches && pendingConfirmationMatches.length > 0 ? (
+        <MatchListClient matches={pendingConfirmationMatches} hideBar />
+      ) : (
+        <EmptyArea
+          className="w-full mt-4"
+          title="Nessuna partita"
+          message="Non hai ancora concluso nessuna partita."
+        />
+      )}
       <h2 className="text-2xl font-bold mt-8 text-indigo-700 dark:text-indigo-400">
         In attesa di risultati
       </h2>

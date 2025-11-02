@@ -27,7 +27,7 @@ import { formatMatchStatus, getMatchStatus } from '@/lib/client/match';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import MyAvatar from '../MyAvatar/MyAvatar';
 import FlipCard from '../FlipCard/FlipCard';
-import { confirmResult, setWinner } from '@/lib/server/match';
+import { confirmResult } from '@/lib/server/match';
 import { toast } from 'sonner';
 
 const PUBLIC_URL = process.env.PUBLIC_URL || '';
@@ -74,6 +74,10 @@ export default function MatchCard({
         toast.error('Errore nel confermare il vincitore');
       });
   }
+
+  const alreadyConfirmedResults =
+    match.winner_id ||
+    match.players?.find((p) => p.profile_id === profile?.id)?.confirmed_result;
 
   return (
     <SpotlightCard className="px-0 py-0">
@@ -245,29 +249,31 @@ export default function MatchCard({
         </div>
       </div>
 
-      {!small && (canManagePlaces || canUpdateMatchStats) && (
-        <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
-          {canUpdateMatchStats && !match.winner && (
-            <Button
-              className="cursor-pointer"
-              variant="default"
-              onClick={() => setConfirmationAction()}
-            >
-              <TrophyIcon className="inline mr-2 h-4 w-4" />
-              Conferma risultati
-            </Button>
-          )}
-          {canManagePlaces && (
-            <div className="ml-auto flex gap-2">
-              <Button className="cursor-pointer" variant="secondary">
-                <PencilIcon className="inline mr-2 h-4 w-4" />
-                <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
+      {!small &&
+        (canManagePlaces || canUpdateMatchStats) &&
+        !alreadyConfirmedResults && (
+          <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
+            {canUpdateMatchStats && !match.winner && (
+              <Button
+                className="cursor-pointer"
+                variant="default"
+                onClick={() => setConfirmationAction()}
+              >
+                <TrophyIcon className="inline mr-2 h-4 w-4" />
+                Conferma risultati
               </Button>
-              {match.id && <DeleteMatchButton id={match.id} />}
-            </div>
-          )}
-        </CardFooter>
-      )}
+            )}
+            {canManagePlaces && (
+              <div className="ml-auto flex gap-2">
+                <Button className="cursor-pointer" variant="secondary">
+                  <PencilIcon className="inline mr-2 h-4 w-4" />
+                  <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
+                </Button>
+                {match.id && <DeleteMatchButton id={match.id} />}
+              </div>
+            )}
+          </CardFooter>
+        )}
     </SpotlightCard>
   );
 }
