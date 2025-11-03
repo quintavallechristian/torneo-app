@@ -34,6 +34,8 @@ export async function updateElo(
     [id: string]: {
       currentElo: number;
       points: number;
+      currentWins: number;
+      currentLosses: number;
       position: number;
       result: number;
     };
@@ -41,7 +43,9 @@ export async function updateElo(
 
   const { data } = await supabase
     .from('profiles_stats')
-    .select<'profile_id, points', PlayerStats>('profile_id, points')
+    .select<'profile_id, points, win, loss', PlayerStats>(
+      'profile_id, points, win, loss',
+    )
     .in(
       'profile_id',
       players.map((p) => p.profile_id),
@@ -52,6 +56,9 @@ export async function updateElo(
       (playersWithAllNeeded[p.profile_id] = {
         currentElo:
           data?.find((d) => d.profile_id === p.profile_id)?.points || 0,
+        currentWins: data?.find((d) => d.profile_id === p.profile_id)?.win || 0,
+        currentLosses:
+          data?.find((d) => d.profile_id === p.profile_id)?.loss || 0,
         points: p.points || 0,
         position: index + 1,
         result: 0,
@@ -105,6 +112,12 @@ export async function updateElo(
     return {
       profile_id: playerId,
       points: newElo,
+      win:
+        playersWithAllNeeded[playerId].currentWins +
+        (playersWithAllNeeded[playerId].position === 1 ? 1 : 0),
+      loss:
+        playersWithAllNeeded[playerId].currentLosses +
+        (playersWithAllNeeded[playerId].position !== 1 ? 1 : 0),
     };
   });
 
@@ -309,7 +322,6 @@ export async function updateGamePlaceElo(
   game: Game,
   place: Place,
 ) {
-  console.log('ciao');
   const supabase = await createClient();
   const playersWithAllNeeded: {
     [id: string]: {
@@ -439,13 +451,19 @@ export async function confirmResult({ match }: { match: Match }) {
   const playersCount = match.players?.length || 0;
   const confirmedPlayers =
     match.players?.filter((p) => p.confirmed_result) || [];
-  const confirmedCount = confirmedPlayers.length;
+  const confirmedCount = confirmedPlayers.length + 1;
 
   let pendingConfirmation = true;
   let title = `${profile?.username} ha confermato i risultati`;
   let body = `I risultati per la partita "${match.name}" sono stati confermati. Non appena la maggioranza dei giocatori avrà confermato, i punteggi saranno aggiornati.`;
-  if (confirmedCount / playersCount >= 0.5) {
-    // if more than 50% of players have confirmed, set pending_confirmation = false and update winner_id
+  console.log(
+    'confirmedCount / playersCount',
+    confirmedCount / playersCount,
+    playersCount,
+    confirmedCount,
+  );
+  if (confirmedCount / playersCount > 0.5) {
+    console.log('ciao');
     setWinner({ match });
     pendingConfirmation = false;
     title = `Risultati confermati per la partita "${match.name}"`;
@@ -507,7 +525,6 @@ export async function setWinner({ match }: { match: Match }) {
   updateGameElo(match.players, match.game);
   updatePlaceElo(match.players, match.place);
   updateGamePlaceElo(match.players, match.game, match.place);
-  revalidatePath(`/matches/${match.id}`);
   return { success: true, message: 'Vincitore aggiornato con successo' };
 }
 
@@ -854,7 +871,14 @@ export async function getMatches({
   mine = false,
   limit,
   withPlaceDistance = false,
-}: { mine?: boolean; limit?: number; withPlaceDistance?: boolean } = {}) {
+  placeIds = [],
+}: {
+  mine?: boolean;
+  limit?: number;
+  withPlaceDistance?: boolean;
+  placeIds?: string[];
+} = {}) {
+  console.log(limit);
   const supabase = await createClient();
   const { profile } = await getAuthenticatedUserWithProfile();
   let matchesList: Match[] = [];
@@ -881,6 +905,15 @@ export async function getMatches({
     `,
       )
       .in('id', matchIds)
+      .order('startAt', { ascending: true });
+    matchesList = data as Match[];
+  } else if (placeIds.length > 0) {
+    const { data } = await supabase
+      .from('matches')
+      .select(
+        '*, game:games(*), place:places(*), winner:profiles(*), players:profiles_matches(*, profile:profiles(*))',
+      )
+      .in('place_id', placeIds)
       .order('startAt', { ascending: true });
     matchesList = data as Match[];
   } else {

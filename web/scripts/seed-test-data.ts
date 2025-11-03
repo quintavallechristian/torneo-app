@@ -141,6 +141,7 @@ async function main() {
     .from("games")
     .select("id, name, bgg_rank")
     .lt("bgg_rank", 100)
+    .gt("bgg_rank", 0)
     .not("bgg_rank", "is", null)
     .order("bgg_rank");
 

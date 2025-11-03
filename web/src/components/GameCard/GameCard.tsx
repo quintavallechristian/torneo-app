@@ -40,7 +40,8 @@ export default async function GameCard({
   const canManageGames = await canUser(UserAction.ManageGames, {
     gameId: game.id,
   });
-  const updatedGame = await updateGame(game);
+  //const updatedGame = await updateGame(game);
+  const updatedGame = game;
   const avatarUrl = updatedGame?.image || '/placeholder.png';
   return (
     <SpotlightCard className="px-0 pt-0 pb-0 md:pb-2">
@@ -51,7 +52,11 @@ export default async function GameCard({
               className="mt-1"
               size="xs"
               stat={
-                (updatedGame.bgg_rank || 0) > 0 ? updatedGame.bgg_rank : 'N/A'
+                (updatedGame.bgg_rank || 0) > 0
+                  ? (updatedGame.bgg_rank || 0) > 500
+                    ? '500+'
+                    : updatedGame.bgg_rank
+                  : 'N/A'
               }
               label="RANK"
               variant={BadgeVariant.amber}

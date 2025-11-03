@@ -22,27 +22,27 @@ const badgeVariants = cva('relative flex items-center justify-center', {
   variants: {
     variant: {
       [BadgeVariant.default]:
-        'bg-primary text-primary-foreground [a&]:hover:bg-primary/90',
+        'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground [a&]:hover:from-primary/90 [a&]:hover:to-primary/70',
       [BadgeVariant.secondary]:
-        'bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
+        'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground [a&]:hover:from-secondary/90 [a&]:hover:to-secondary/70',
       [BadgeVariant.destructive]:
-        'bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        'bg-gradient-to-br from-destructive to-destructive/80 text-white [a&]:hover:from-destructive/90 [a&]:hover:to-destructive/70 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:from-destructive/60 dark:to-destructive/40',
       [BadgeVariant.outline]:
         'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
       [BadgeVariant.blue]:
-        'bg-blue-500 text-white [a&]:hover:bg-blue-600 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 dark:bg-blue-900',
+        'bg-gradient-to-br from-blue-500 to-blue-600 text-white [a&]:hover:from-blue-600 [a&]:hover:to-blue-700 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 dark:from-blue-900 dark:to-blue-950',
       [BadgeVariant.red]:
-        'bg-red-500 text-white [a&]:hover:bg-red-600 focus-visible:ring-red-500/20 dark:focus-visible:ring-red-500/40 dark:bg-red-900',
+        'bg-gradient-to-br from-red-500 to-red-600 text-white [a&]:hover:from-red-600 [a&]:hover:to-red-700 focus-visible:ring-red-500/20 dark:focus-visible:ring-red-500/40 dark:from-red-900 dark:to-red-950',
       [BadgeVariant.amber]:
-        'bg-amber-500 text-white [a&]:hover:bg-amber-600 focus-visible:ring-amber-500/20 dark:focus-visible:ring-amber-500/40 dark:bg-amber-500',
+        'bg-gradient-to-br from-amber-500 to-amber-600 text-white [a&]:hover:from-amber-600 [a&]:hover:to-amber-700 focus-visible:ring-amber-500/20 dark:focus-visible:ring-amber-500/40 dark:from-amber-500 dark:to-amber-600',
       [BadgeVariant.gold]:
-        'bg-yellow-400 text-white [a&]:hover:bg-yellow-500 focus-visible:ring-yellow-400/20 dark:focus-visible:ring-yellow-400/40 dark:bg-yellow-600 ring-offset-4 ring-yellow-300',
+        'bg-gradient-to-br from-yellow-400 to-yellow-500 text-white [a&]:hover:from-yellow-500 [a&]:hover:to-yellow-600 focus-visible:ring-yellow-400/20 dark:focus-visible:ring-yellow-400/40 dark:from-yellow-600 dark:to-yellow-700 ring-offset-4 ring-yellow-300',
       [BadgeVariant.silver]:
-        'bg-slate-400 text-white [a&]:hover:bg-slate-500 focus-visible:ring-slate-400/20 dark:focus-visible:ring-slate-400/40 dark:bg-slate-600',
+        'bg-gradient-to-br from-slate-400 to-slate-500 text-white [a&]:hover:from-slate-500 [a&]:hover:to-slate-600 focus-visible:ring-slate-400/20 dark:focus-visible:ring-slate-400/40 dark:from-slate-600 dark:to-slate-700',
       [BadgeVariant.bronze]:
-        'bg-amber-600 text-white [a&]:hover:bg-amber-700 focus-visible:ring-amber-600/20 dark:focus-visible:ring-amber-600/40 dark:bg-amber-700',
+        'bg-gradient-to-br from-amber-600 to-amber-700 text-white [a&]:hover:from-amber-700 [a&]:hover:to-amber-800 focus-visible:ring-amber-600/20 dark:focus-visible:ring-amber-600/40 dark:from-amber-700 dark:to-amber-800',
       [BadgeVariant.opaque]:
-        'bg-indigo-50/5 text-indigo-100 [a&]:hover:bg-indigo-50/10 focus-visible:ring-indigo-500/20 dark:focus-visible:ring-indigo-500/40',
+        'bg-gradient-to-br from-indigo-50/5 to-indigo-50/10 text-indigo-100 [a&]:hover:from-indigo-50/10 [a&]:hover:to-indigo-50/15 focus-visible:ring-indigo-500/20 dark:focus-visible:ring-indigo-500/40',
     },
     size: {
       xs: 'size-4 text-xs',
@@ -67,17 +67,20 @@ const badgeVariants = cva('relative flex items-center justify-center', {
 const borderVariants = cva('', {
   variants: {
     variant: {
-      [BadgeVariant.default]: 'bg-primary/50',
-      [BadgeVariant.secondary]: 'bg-secondary/50',
-      [BadgeVariant.destructive]: 'bg-destructive/50',
-      [BadgeVariant.outline]: 'bg-border',
-      [BadgeVariant.blue]: 'bg-blue-300',
-      [BadgeVariant.red]: 'bg-red-300',
-      [BadgeVariant.amber]: 'bg-amber-300',
-      [BadgeVariant.gold]: 'bg-yellow-300',
-      [BadgeVariant.silver]: 'bg-slate-300',
-      [BadgeVariant.bronze]: 'bg-amber-400',
-      [BadgeVariant.opaque]: 'bg-indigo-300/30',
+      [BadgeVariant.default]: 'bg-gradient-to-br from-primary/60 to-primary/40',
+      [BadgeVariant.secondary]:
+        'bg-gradient-to-br from-secondary/60 to-secondary/40',
+      [BadgeVariant.destructive]:
+        'bg-gradient-to-br from-destructive/60 to-destructive/40',
+      [BadgeVariant.outline]: 'bg-gradient-to-br from-border to-border/80',
+      [BadgeVariant.blue]: 'bg-gradient-to-br from-blue-300 to-blue-400',
+      [BadgeVariant.red]: 'bg-gradient-to-br from-red-300 to-red-400',
+      [BadgeVariant.amber]: 'bg-gradient-to-br from-amber-300 to-amber-400',
+      [BadgeVariant.gold]: 'bg-gradient-to-br from-yellow-300 to-yellow-400',
+      [BadgeVariant.silver]: 'bg-gradient-to-br from-slate-300 to-slate-400',
+      [BadgeVariant.bronze]: 'bg-gradient-to-br from-amber-400 to-amber-500',
+      [BadgeVariant.opaque]:
+        'bg-gradient-to-br from-indigo-300/30 to-indigo-300/20',
     },
   },
   defaultVariants: {

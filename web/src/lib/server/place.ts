@@ -14,6 +14,8 @@ export async function getPlaces(
   withMatches: boolean = false,
   withProfileStats: boolean = false,
   withCollection: boolean = false,
+  mine: boolean = false,
+  favouriteOnly: boolean = false,
   limit: number = 100,
 ): Promise<{ data: Place[] | null; error: PostgrestError | null }> {
   const supabase = await createClient();
@@ -45,13 +47,34 @@ export async function getPlaces(
       : []),
 
     ...(withProfileStats
-      ? ['placeStats:profiles_places(profile_id, favourite)']
+      ? ['placeStats:profiles_places!inner(profile_id, favourite)']
       : []),
     ...(withCollection ? ['places_games(id)'] : []),
   ].join(', ');
 
-  // Creazione query
-  const query = supabase.from('places').select(selectFields).limit(limit);
+  let query;
+  if (mine) {
+    const { profile } = await getAuthenticatedUserWithProfile();
+    if (!profile) {
+      return { data: null, error: null };
+    }
+    if (favouriteOnly) {
+      query = supabase
+        .from('places')
+        .select(selectFields)
+        .eq('placeStats.profile_id', profile.id)
+        .eq('placeStats.favourite', true)
+        .limit(limit);
+    } else {
+      query = supabase
+        .from('places')
+        .select(selectFields)
+        .eq('placeStats.profile_id', profile.id)
+        .limit(limit);
+    }
+  } else {
+    query = supabase.from('places').select(selectFields).limit(limit);
+  }
 
   // Esecuzione query
   const { data, error } = await query;

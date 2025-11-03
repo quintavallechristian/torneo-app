@@ -4,11 +4,17 @@ import { getMatches } from '@/lib/server/match';
 import { getMatchStatus } from '@/lib/client/match';
 import { MATCHSTATUS } from '@/types';
 import MatchListClient from '@/components/MatchList/MatchListClient';
+import { getPlaces } from '@/lib/server/place';
 
 export default async function matchesPage() {
   const { profile } = await getAuthenticatedUserWithProfile();
   const data = await getMatches({ mine: true });
-  const otherMatches = await getMatches();
+
+  const playerPlaces = await getPlaces(false, true, false, true, true);
+  const placeIds =
+    playerPlaces?.data?.map((place) => place.id!).filter(Boolean) || [];
+
+  const otherMatches = await getMatches({ placeIds: placeIds });
 
   const matchesWithStatus = data?.map((match) => {
     const status = getMatchStatus(match);

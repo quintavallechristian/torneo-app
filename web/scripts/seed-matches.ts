@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Database } from "../../database.types";
 import { config } from "dotenv";
 import { resolve } from "path";
+import { addDays, subDays } from "date-fns";
 
 // Carica le variabili d'ambiente dal file .env.local
 config({ path: resolve(__dirname, "../.env.local") });
@@ -43,25 +44,19 @@ const matchNames = [
   "Challenge Cup",
 ];
 
-// Funzione per generare una data casuale nell'ultimo mese
+// Funzione per generare una data casuale 15 giorni nel futuro o 15 giorni nel passato
 function getRandomDate(): string {
   const now = new Date();
-  const pastDate = new Date(
-    now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000
-  );
+  const pastDate = subDays(addDays(now, 15), Math.floor(Math.random() * 30));
   return pastDate.toISOString();
 }
 
 // Funzione per generare date start/end casuali
 function getRandomMatchDates(): { startAt: string; endAt: string } {
   const startAt = getRandomDate();
-  const startDate = new Date(startAt);
-  const endDate = new Date(
-    startDate.getTime() + Math.random() * 4 * 60 * 60 * 1000
-  ); // 0-4 ore dopo
   return {
     startAt: startAt,
-    endAt: endDate.toISOString(),
+    endAt: startAt,
   };
 }
 

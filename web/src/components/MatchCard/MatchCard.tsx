@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import SpotlightCard from '@/components/SpotlightCard/SpotlightCard';
 import React from 'react';
-import { Match, Profile } from '@/types';
+import { Match, MATCHSTATUS, Profile } from '@/types';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {
@@ -75,10 +75,20 @@ export default function MatchCard({
       });
   }
 
+  const allPlayersConfirmed = match.players?.every((p) => p.confirmed);
   const alreadyConfirmedResults =
     match.winner_id ||
     match.players?.find((p) => p.profile_id === profile?.id)?.confirmed_result;
 
+  const canConfirmResult =
+    (canManagePlaces || canUpdateMatchStats) &&
+    !alreadyConfirmedResults &&
+    allPlayersConfirmed &&
+    [
+      MATCHSTATUS.Ongoing,
+      MATCHSTATUS.WaitingForResults,
+      MATCHSTATUS.PendingConfirmation,
+    ].includes(matchStatus);
   return (
     <SpotlightCard className="px-0 py-0">
       <div className="flex justify-between items-center p-4 gap-2">
@@ -146,16 +156,13 @@ export default function MatchCard({
             : 'text-base flex-col md:flex-row gap-4 items-center'
         }`}
       >
-        {/* Immagine del gioco se disponibile */}
-        {match.game?.image && (
-          <FlipCard
-            imageSrc={match.game.image}
-            imageAlt={match.game.name}
-            qrValue={`${PUBLIC_URL}/matches/${match.id}`}
-            size={small ? 100 : 220}
-            enableFlip={!small}
-          />
-        )}
+        <FlipCard
+          imageSrc={match.game?.image || '/placeholder.png'}
+          imageAlt={match.game?.name || 'Game Image'}
+          qrValue={`${PUBLIC_URL}/matches/${match.id}`}
+          size={small ? 100 : 220}
+          enableFlip={!small}
+        />
         <div>
           <CardHeader className="">
             <CardTitle
@@ -249,31 +256,29 @@ export default function MatchCard({
         </div>
       </div>
 
-      {!small &&
-        (canManagePlaces || canUpdateMatchStats) &&
-        !alreadyConfirmedResults && (
-          <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
-            {canUpdateMatchStats && !match.winner && (
-              <Button
-                className="cursor-pointer"
-                variant="default"
-                onClick={() => setConfirmationAction()}
-              >
-                <TrophyIcon className="inline mr-2 h-4 w-4" />
-                Conferma risultati
+      {!small && canConfirmResult && (
+        <CardFooter className="pb-4 flex flex-wrap gap-2 mt-4 justify-between">
+          {canUpdateMatchStats && !match.winner && (
+            <Button
+              className="cursor-pointer"
+              variant="default"
+              onClick={() => setConfirmationAction()}
+            >
+              <TrophyIcon className="inline mr-2 h-4 w-4" />
+              Conferma risultati
+            </Button>
+          )}
+          {canManagePlaces && (
+            <div className="ml-auto flex gap-2">
+              <Button className="cursor-pointer" variant="secondary">
+                <PencilIcon className="inline mr-2 h-4 w-4" />
+                <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
               </Button>
-            )}
-            {canManagePlaces && (
-              <div className="ml-auto flex gap-2">
-                <Button className="cursor-pointer" variant="secondary">
-                  <PencilIcon className="inline mr-2 h-4 w-4" />
-                  <Link href={`/matches/${match.id}/edit`}>Modifica</Link>
-                </Button>
-                {match.id && <DeleteMatchButton id={match.id} />}
-              </div>
-            )}
-          </CardFooter>
-        )}
+              {match.id && <DeleteMatchButton id={match.id} />}
+            </div>
+          )}
+        </CardFooter>
+      )}
     </SpotlightCard>
   );
 }

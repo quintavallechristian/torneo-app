@@ -4,21 +4,12 @@ import {
   Check,
   LockIcon,
   LockOpen,
-  TrophyIcon,
   UserMinus,
   UserPlus,
   UserRoundCheck,
   UserRoundX,
 } from 'lucide-react';
-import {
-  GameStats,
-  PlaceStats,
-  Match,
-  Player,
-  Profile,
-  MATCHSTATUS,
-  GamePlaceStats,
-} from '@/types';
+import { Match, Player, Profile, MATCHSTATUS, GamePlaceStats } from '@/types';
 import { PointsPopover } from '@/components/PointsPopover/PointsPopover';
 import {
   confirmPlayer,
@@ -27,8 +18,6 @@ import {
   unsubscribeMatch,
 } from '@/lib/server/match';
 import ProfileListItem from '@/components/ProfileListItem/ProfileListItem';
-import { setWinner } from '@/lib/server/match';
-import { BadgeVariant } from '@/components/ui/exagonalBadge';
 import { AddPlayerModal } from '@/components/AddPlayerModal/AddPlayerModal';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -96,6 +85,7 @@ export default function MatchPlayersList({
   const canMatchBeUpdated = [
     MATCHSTATUS.Ongoing,
     MATCHSTATUS.WaitingForResults,
+    MATCHSTATUS.PendingConfirmation,
   ].includes(matchStatus);
 
   return (

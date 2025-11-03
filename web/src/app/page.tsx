@@ -20,7 +20,6 @@ import {
   DicesIcon,
   ArrowRightIcon,
 } from 'lucide-react';
-import StatsShowcase from '@/components/StatsShowcase/StatsShowcase';
 import MyAvatar from '@/components/MyAvatar/MyAvatar';
 import { getMatches } from '@/lib/server/match';
 import { getMatchStatus } from '@/lib/client/match';

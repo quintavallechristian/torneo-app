@@ -1,10 +1,8 @@
-import MatchCard from '@/components/MatchCard/MatchCard';
 import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import EmptyArea from '@/components/EmptyArea/EmptyArea';
 import { getMatches } from '@/lib/server/match';
 import { getMatchStatus } from '@/lib/client/match';
 import { MATCHSTATUS } from '@/types';
-import MatchList from '@/components/MatchList/MatchList';
 import MatchListClient from '@/components/MatchList/MatchListClient';
 
 export default async function matchesPage() {

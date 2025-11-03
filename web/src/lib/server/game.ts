@@ -33,7 +33,8 @@ export async function getGames(
     const { data } = await supabase
       .from('games')
       .select('*')
-      .or('bgg_rank.neq.-1,bgg_rank.is.null')
+      .gt('bgg_rank', 0)
+      .eq('is_expansion', false)
       .order('bgg_rank')
       .limit(100);
     return data ?? [];
@@ -43,7 +44,8 @@ export async function getGames(
       .select(
         '*, gameStats:profiles_games!inner(profile_id, favourite, in_collection, in_wishlist, rating)',
       )
-      .or('bgg_rank.neq.-1,bgg_rank.is.null')
+      .gt('bgg_rank', 0)
+      .eq('is_expansion', false)
       .eq('gameStats.profile_id', profile.id)
       .eq(`gameStats.${filterBy}`, true)
       .ilike('name', `%${query}%`)
@@ -57,7 +59,8 @@ export async function getGames(
         '*, gameStats:profiles_games(profile_id, favourite, in_collection, in_wishlist, rating)',
       )
       .eq('gameStats.profile_id', profile.id)
-      .or('bgg_rank.neq.-1,bgg_rank.is.null')
+      .gt('bgg_rank', 0)
+      .eq('is_expansion', false)
       .ilike('name', `%${query}%`)
       .order('bgg_rank', { ascending: true, nullsFirst: false })
       .order('bgg_rating', { ascending: false })
@@ -196,6 +199,11 @@ export async function updateGame(game: Game): Promise<Game> {
     try {
       const response = await fetch(
         `https://boardgamegeek.com/xmlapi2/thing?id=${game.id}&stats=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.BGG_API_TOKEN}`,
+          },
+        },
       );
       const xmlData = await response.text();
 
