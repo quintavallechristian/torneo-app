@@ -47,7 +47,11 @@ export async function getPlaces(
       : []),
 
     ...(withProfileStats
-      ? ['placeStats:profiles_places!inner(profile_id, favourite)']
+      ? [
+          mine
+            ? 'placeStats:profiles_places!inner(profile_id, favourite)'
+            : 'placeStats:profiles_places(profile_id, favourite)',
+        ]
       : []),
     ...(withCollection ? ['places_games(id)'] : []),
   ].join(', ');

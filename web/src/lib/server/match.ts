@@ -17,6 +17,7 @@ import { getAuthenticatedUserWithProfile } from '@/utils/auth-helpers';
 import { redirect } from 'next/navigation';
 
 import * as z from 'zod';
+import { point } from 'leaflet';
 
 const K = 32;
 
@@ -27,8 +28,19 @@ const K = 32;
  * @returns array con i nuovi rating
  */
 export async function updateElo(
-  players: Pick<Player, 'profile_id' | 'points'>[],
+  match: Match,
+  type: 'global' | 'game' | 'place' | 'game_place',
 ) {
+  if (!match.players) {
+    console.error('No players found in match');
+    return;
+  }
+
+  if (!match.game || !match.place) {
+    console.error('No game or place found in match');
+    return;
+  }
+
   const supabase = await createClient();
   const playersWithAllNeeded: {
     [id: string]: {
@@ -41,24 +53,75 @@ export async function updateElo(
     };
   } = {};
 
-  const { data } = await supabase
-    .from('profiles_stats')
-    .select<'profile_id, points, win, loss', PlayerStats>(
-      'profile_id, points, win, loss',
-    )
-    .in(
-      'profile_id',
-      players.map((p) => p.profile_id),
-    );
+  let retrievedData: PlayerStats[];
+  if (type === 'global') {
+    const { data } = await supabase
+      .from('profiles_stats')
+      .select<'profile_id, points, win, loss', PlayerStats>(
+        'profile_id, points, win, loss',
+      )
+      .in(
+        'profile_id',
+        match.players.map((p) => p.profile_id),
+      );
+    if (data) {
+      retrievedData = data;
+    }
+  } else if (type === 'game') {
+    const { data } = await supabase
+      .from('profiles_games')
+      .select<'profile_id, points, win, loss', PlayerStats>(
+        'profile_id, points, win, loss',
+      )
+      .eq('game_id', match.game.id)
+      .in(
+        'profile_id',
+        match.players.map((p) => p.profile_id),
+      );
+    if (data) {
+      retrievedData = data;
+    }
+  } else if (type === 'place') {
+    const { data } = await supabase
+      .from('profiles_places')
+      .select<'profile_id, points, win, loss', PlayerStats>(
+        'profile_id, points, win, loss',
+      )
+      .eq('place_id', match.place.id)
+      .in(
+        'profile_id',
+        match.players.map((p) => p.profile_id),
+      );
+    if (data) {
+      retrievedData = data;
+    }
+  } else if (type === 'game_place') {
+    const { data } = await supabase
+      .from('profiles_games_places')
+      .select<'profile_id, points, win, loss', PlayerStats>(
+        'profile_id, points, win, loss',
+      )
+      .eq('place_id', match.place.id)
+      .eq('game_id', match.game.id)
+      .in(
+        'profile_id',
+        match.players.map((p) => p.profile_id),
+      );
+    if (data) {
+      retrievedData = data;
+    }
+  }
 
-  players.forEach(
+  match.players.forEach(
     (p, index) =>
       (playersWithAllNeeded[p.profile_id] = {
         currentElo:
-          data?.find((d) => d.profile_id === p.profile_id)?.points || 0,
-        currentWins: data?.find((d) => d.profile_id === p.profile_id)?.win || 0,
+          retrievedData?.find((d) => d.profile_id === p.profile_id)?.points ||
+          0,
+        currentWins:
+          retrievedData?.find((d) => d.profile_id === p.profile_id)?.win || 0,
         currentLosses:
-          data?.find((d) => d.profile_id === p.profile_id)?.loss || 0,
+          retrievedData?.find((d) => d.profile_id === p.profile_id)?.loss || 0,
         points: p.points || 0,
         position: index + 1,
         result: 0,
@@ -109,7 +172,14 @@ export async function updateElo(
         ? Math.max(0, playersWithAllNeeded[playerId].currentElo + eloChange)
         : Math.max(100, playersWithAllNeeded[playerId].currentElo + eloChange);
 
-    return {
+    const objectToReturn: {
+      profile_id: string;
+      points: number;
+      win: number;
+      loss: number;
+      game_id?: string;
+      place_id?: string;
+    } = {
       profile_id: playerId,
       points: newElo,
       win:
@@ -119,297 +189,35 @@ export async function updateElo(
         playersWithAllNeeded[playerId].currentLosses +
         (playersWithAllNeeded[playerId].position !== 1 ? 1 : 0),
     };
-  });
-
-  const { error } = await supabase.from('profiles_stats').upsert(rows, {
-    onConflict: 'profile_id',
-  });
-
-  if (error) {
-    console.error('Error updating ELOs', error);
-  }
-}
-export async function updateGameElo(
-  players: Pick<Player, 'profile_id' | 'points'>[],
-  game: Game,
-) {
-  const supabase = await createClient();
-  const playersWithAllNeeded: {
-    [id: string]: {
-      currentElo: number;
-      points: number;
-      position: number;
-      result: number;
-    };
-  } = {};
-
-  const { data } = await supabase
-    .from('profiles_games')
-    .select<'profile_id, points', GameStats>('profile_id, points')
-    .eq('game_id', game.id)
-    .in(
-      'profile_id',
-      players.map((p) => p.profile_id),
-    );
-
-  players.forEach(
-    (p, index) =>
-      (playersWithAllNeeded[p.profile_id] = {
-        currentElo:
-          data?.find((d) => d.profile_id === p.profile_id)?.points || 0,
-        points: p.points || 0,
-        position: index + 1,
-        result: 0,
-      }),
-  );
-
-  // confronta ogni coppia di giocatori
-  const playerIds = Object.keys(playersWithAllNeeded);
-  const results: { [id: string]: number } = {};
-  playerIds.forEach((id) => (results[id] = 0));
-
-  for (let i = 0; i < playerIds.length; i++) {
-    for (let j = i + 1; j < playerIds.length; j++) {
-      const A = playersWithAllNeeded[playerIds[i]];
-      const B = playersWithAllNeeded[playerIds[j]];
-
-      // aspettative (probabilità che A vinca contro B)
-      const expectedA =
-        1 / (1 + Math.pow(10, (B.currentElo - A.currentElo) / 400));
-      const expectedB = 1 - expectedA;
-
-      // punteggi reali in base al position
-      let scoreA = 0.5;
-      let scoreB = 0.5;
-
-      if (A.position < B.position) {
-        scoreA = 1;
-        scoreB = 0;
-      } else if (A.position > B.position) {
-        scoreA = 0;
-        scoreB = 1;
-      }
-
-      // se position uguali → resta scoreA = 0.5 e scoreB = 0.5 (pareggio)
-
-      // aggiorna i risultati accumulati
-      results[playerIds[i]] += K * (scoreA - expectedA);
-      results[playerIds[j]] += K * (scoreB - expectedB);
+    if (type === 'game') {
+      objectToReturn.game_id = match.game!.id;
+    } else if (type === 'place') {
+      objectToReturn.place_id = match.place!.id;
+    } else if (type === 'game_place') {
+      objectToReturn.game_id = match.game!.id;
+      objectToReturn.place_id = match.place!.id;
     }
+    return objectToReturn;
+  });
+
+  let tableToUpdate = '';
+  let onConflict = '';
+  if (type === 'global') {
+    tableToUpdate = 'profiles_stats';
+    onConflict = 'profile_id';
+  } else if (type === 'game') {
+    tableToUpdate = 'profiles_games';
+    onConflict = 'game_id,profile_id';
+  } else if (type === 'place') {
+    tableToUpdate = 'profiles_places';
+    onConflict = 'place_id,profile_id';
+  } else if (type === 'game_place') {
+    tableToUpdate = 'profiles_games_places';
+    onConflict = 'game_id,place_id,profile_id';
   }
-
-  const rows = playerIds.map((playerId) => {
-    const eloChange =
-      playersWithAllNeeded[playerId].currentElo <= 100
-        ? Math.max(Math.round(results[playerId]), 0)
-        : Math.round(results[playerId]);
-    const newElo =
-      playersWithAllNeeded[playerId].currentElo <= 100
-        ? Math.max(0, playersWithAllNeeded[playerId].currentElo + eloChange)
-        : Math.max(100, playersWithAllNeeded[playerId].currentElo + eloChange);
-
-    return {
-      profile_id: playerId,
-      game_id: game.id,
-      points: newElo,
-    };
+  const { error } = await supabase.from(tableToUpdate).upsert(rows, {
+    onConflict,
   });
-
-  const { error } = await supabase.from('profiles_games').upsert(rows, {
-    onConflict: 'game_id,profile_id',
-  });
-
-  if (error) {
-    console.error('Error updating ELOs', error);
-  }
-}
-export async function updatePlaceElo(
-  players: Pick<Player, 'profile_id' | 'points'>[],
-  place: Place,
-) {
-  const supabase = await createClient();
-  const playersWithAllNeeded: {
-    [id: string]: {
-      currentElo: number;
-      points: number;
-      position: number;
-      result: number;
-    };
-  } = {};
-
-  const { data } = await supabase
-    .from('profiles_places')
-    .select<'profile_id, points', PlaceStats>('profile_id, points')
-    .eq('place_id', place.id)
-    .in(
-      'profile_id',
-      players.map((p) => p.profile_id),
-    );
-
-  players.forEach(
-    (p, index) =>
-      (playersWithAllNeeded[p.profile_id] = {
-        currentElo:
-          data?.find((d) => d.profile_id === p.profile_id)?.points || 0,
-        points: p.points || 0,
-        position: index + 1,
-        result: 0,
-      }),
-  );
-
-  // confronta ogni coppia di giocatori
-  const playerIds = Object.keys(playersWithAllNeeded);
-  const results: { [id: string]: number } = {};
-  playerIds.forEach((id) => (results[id] = 0));
-
-  for (let i = 0; i < playerIds.length; i++) {
-    for (let j = i + 1; j < playerIds.length; j++) {
-      const A = playersWithAllNeeded[playerIds[i]];
-      const B = playersWithAllNeeded[playerIds[j]];
-
-      // aspettative (probabilità che A vinca contro B)
-      const expectedA =
-        1 / (1 + Math.pow(10, (B.currentElo - A.currentElo) / 400));
-      const expectedB = 1 - expectedA;
-
-      // punteggi reali in base al position
-      let scoreA = 0.5;
-      let scoreB = 0.5;
-
-      if (A.position < B.position) {
-        scoreA = 1;
-        scoreB = 0;
-      } else if (A.position > B.position) {
-        scoreA = 0;
-        scoreB = 1;
-      }
-
-      // se position uguali → resta scoreA = 0.5 e scoreB = 0.5 (pareggio)
-
-      // aggiorna i risultati accumulati
-      results[playerIds[i]] += K * (scoreA - expectedA);
-      results[playerIds[j]] += K * (scoreB - expectedB);
-    }
-  }
-
-  const rows = playerIds.map((playerId) => {
-    const eloChange =
-      playersWithAllNeeded[playerId].currentElo <= 100
-        ? Math.max(Math.round(results[playerId]), 0)
-        : Math.round(results[playerId]);
-    const newElo =
-      playersWithAllNeeded[playerId].currentElo <= 100
-        ? Math.max(0, playersWithAllNeeded[playerId].currentElo + eloChange)
-        : Math.max(100, playersWithAllNeeded[playerId].currentElo + eloChange);
-
-    return {
-      profile_id: playerId,
-      place_id: place.id,
-      points: newElo,
-    };
-  });
-
-  const { error } = await supabase.from('profiles_places').upsert(rows, {
-    onConflict: 'place_id,profile_id',
-  });
-
-  if (error) {
-    console.error('Error updating ELOs', error);
-  }
-}
-export async function updateGamePlaceElo(
-  players: Pick<Player, 'profile_id' | 'points'>[],
-  game: Game,
-  place: Place,
-) {
-  const supabase = await createClient();
-  const playersWithAllNeeded: {
-    [id: string]: {
-      currentElo: number;
-      points: number;
-      position: number;
-      result: number;
-    };
-  } = {};
-
-  const { data } = await supabase
-    .from('profiles_games_places')
-    .select<'profile_id, points', PlaceStats>('profile_id, points')
-    .eq('place_id', place.id)
-    .eq('game_id', game.id)
-    .in(
-      'profile_id',
-      players.map((p) => p.profile_id),
-    );
-
-  players.forEach(
-    (p, index) =>
-      (playersWithAllNeeded[p.profile_id] = {
-        currentElo:
-          data?.find((d) => d.profile_id === p.profile_id)?.points || 0,
-        points: p.points || 0,
-        position: index + 1,
-        result: 0,
-      }),
-  );
-
-  // confronta ogni coppia di giocatori
-  const playerIds = Object.keys(playersWithAllNeeded);
-  const results: { [id: string]: number } = {};
-  playerIds.forEach((id) => (results[id] = 0));
-
-  for (let i = 0; i < playerIds.length; i++) {
-    for (let j = i + 1; j < playerIds.length; j++) {
-      const A = playersWithAllNeeded[playerIds[i]];
-      const B = playersWithAllNeeded[playerIds[j]];
-
-      // aspettative (probabilità che A vinca contro B)
-      const expectedA =
-        1 / (1 + Math.pow(10, (B.currentElo - A.currentElo) / 400));
-      const expectedB = 1 - expectedA;
-
-      // punteggi reali in base al position
-      let scoreA = 0.5;
-      let scoreB = 0.5;
-
-      if (A.position < B.position) {
-        scoreA = 1;
-        scoreB = 0;
-      } else if (A.position > B.position) {
-        scoreA = 0;
-        scoreB = 1;
-      }
-
-      // se position uguali → resta scoreA = 0.5 e scoreB = 0.5 (pareggio)
-
-      // aggiorna i risultati accumulati
-      results[playerIds[i]] += K * (scoreA - expectedA);
-      results[playerIds[j]] += K * (scoreB - expectedB);
-    }
-  }
-
-  const rows = playerIds.map((playerId) => {
-    const eloChange =
-      playersWithAllNeeded[playerId].currentElo <= 100
-        ? Math.max(Math.round(results[playerId]), 0)
-        : Math.round(results[playerId]);
-    const newElo =
-      playersWithAllNeeded[playerId].currentElo <= 100
-        ? Math.max(0, playersWithAllNeeded[playerId].currentElo + eloChange)
-        : Math.max(100, playersWithAllNeeded[playerId].currentElo + eloChange);
-
-    return {
-      profile_id: playerId,
-      place_id: place.id,
-      game_id: game.id,
-      points: newElo,
-    };
-  });
-
-  const { error } = await supabase.from('profiles_games_places').upsert(rows, {
-    onConflict: 'place_id,game_id,profile_id',
-  });
-
   if (error) {
     console.error('Error updating ELOs', error);
   }
@@ -521,10 +329,10 @@ export async function setWinner({ match }: { match: Match }) {
       message: 'Non hai i permessi per aggiornare le statistiche',
     };
   }
-  updateElo(match.players);
-  updateGameElo(match.players, match.game);
-  updatePlaceElo(match.players, match.place);
-  updateGamePlaceElo(match.players, match.game, match.place);
+  updateElo(match, 'global');
+  updateElo(match, 'game');
+  updateElo(match, 'place');
+  updateElo(match, 'game_place');
   return { success: true, message: 'Vincitore aggiornato con successo' };
 }
 

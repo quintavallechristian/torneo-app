@@ -36,7 +36,7 @@ export default async function ProfileCard({
             : 'text-base flex-col items-center md:flex-row gap-4'
         }`}
       >
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Image
             src={avatarUrl}
             alt={profile?.username || 'Avatar'}

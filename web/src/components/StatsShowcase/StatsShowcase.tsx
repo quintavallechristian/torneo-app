@@ -17,6 +17,16 @@ export default async function StatsShowcase({
   }
   const supabase = await createClient();
   // Fetch user statistics
+
+  const { data: profileStats } = await supabase
+    .from('profiles_stats')
+    .select('*')
+    .eq('profile_id', profile.id)
+    .maybeSingle();
+
+  const globalElo = profileStats?.points || 0;
+  const globalWins = profileStats?.wins || 0;
+
   const { data: allProfileGames } = await supabase
     .from('profiles_games')
     .select('*')
@@ -30,26 +40,20 @@ export default async function StatsShowcase({
   const gamesInCollection =
     allProfileGames?.filter((game) => game.in_collection)?.length || 0;
   const totalPlaces = allProfilePlaces?.length || 0;
-  const highestGameElo =
-    allProfileGames?.find(
-      (game) =>
-        game.points === Math.max(...allProfileGames.map((g) => g?.points || 0)),
-    )?.points || 0;
-  const totalWins =
-    allProfileGames?.reduce((sum, game) => sum + (game.win || 0), 0) || 0;
+
   return (
     <div className="grid grid-cols-3 md:grid-cols-5 gap-4 justify-items-center">
       <StatsExagon
         hideLabel={hideLabels}
         size={size}
-        stat={highestGameElo}
-        label="MAX ELO"
+        stat={globalElo}
+        label="ELO"
         withShadow
       />
       <StatsExagon
         hideLabel={hideLabels}
         size={size}
-        stat={totalWins}
+        stat={globalWins}
         label="Partite vinte"
         variant={BadgeVariant.amber}
         withShadow
